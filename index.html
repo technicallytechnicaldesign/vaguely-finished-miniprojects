@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Dictionary — say it right, every time</title>
+<style>
+  /* SIGNAL tokens (SHARED/DESIGN_IDENTITIES/SIGNAL/tokens.css) */
+  :root {
+    --page:     #f4faf6;
+    --surface:  #fdfffd;
+    --ink:      #0c1a12;
+    --ink-2:    #47584d;
+    --muted:    #7d8f83;
+    --grid:     #d9e6dc;
+    --ring:     rgba(12,26,18,0.12);
+    --accent:   #0e8a5f;
+    --accent-2: #c2571f;
+    --good:     #0e8a5f;
+    --warn:     #a06a00;
+    --crit:     #c62f2f;
+    --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-head: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, Consolas, monospace;
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0c120e; --surface: #131c16;
+      --ink: #eef7f1; --ink-2: #b5c7ba; --muted: #7d8f83;
+      --grid: #253328; --ring: rgba(238,247,241,0.12);
+      --accent: #2fbf8a; --accent-2: #e8814a;
+      --good: #2fbf8a; --warn: #e0a828; --crit: #ef6a5a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0c120e; --surface: #131c16;
+    --ink: #eef7f1; --ink-2: #b5c7ba; --muted: #7d8f83;
+    --grid: #253328; --ring: rgba(238,247,241,0.12);
+    --accent: #2fbf8a; --accent-2: #e8814a;
+    --good: #2fbf8a; --warn: #e0a828; --crit: #ef6a5a;
+  }
+  :root[data-theme="light"] {
+    --page: #f4faf6; --surface: #fdfffd;
+    --ink: #0c1a12; --ink-2: #47584d; --muted: #7d8f83;
+    --grid: #d9e6dc; --ring: rgba(12,26,18,0.12);
+    --accent: #0e8a5f; --accent-2: #c2571f;
+    --good: #0e8a5f; --warn: #a06a00; --crit: #c62f2f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--page); color: var(--ink);
+    font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+    padding: 28px 20px 80px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  header { margin-bottom: 20px; }
+  .kicker {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  h1 { font-family: var(--font-head); font-weight: 700; font-size: 28px; letter-spacing: -0.02em; margin: 4px 0 6px; }
+  .sub { color: var(--ink-2); max-width: 62ch; }
+  .sub .hint { color: var(--muted); font-size: 13px; display: block; margin-top: 6px; }
+
+  .toolbar { position: sticky; top: 0; z-index: 5; background: var(--page); padding: 12px 0 10px; margin-bottom: 14px; border-bottom: 1px solid var(--grid); }
+  .searchrow { display: flex; gap: 10px; align-items: center; }
+  #search {
+    flex: 1; padding: 10px 14px; font: inherit; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--grid); border-radius: var(--radius);
+    outline: none;
+  }
+  #search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+  #count { font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    font: 600 12px var(--font-body); color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--grid); border-radius: 999px;
+    padding: 4px 12px; cursor: pointer; user-select: none;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: var(--page); }
+
+  section.cat { margin-top: 26px; }
+  section.cat > h2 {
+    font-family: var(--font-head); font-weight: 650; font-size: 15px; letter-spacing: -0.01em;
+    color: var(--ink-2); margin-bottom: 10px;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  section.cat > h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-weight: 400; }
+
+  .entry {
+    background: var(--surface); border: 1px solid var(--grid); border-radius: var(--radius);
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .entry .row1 { display: flex; align-items: flex-start; gap: 10px; }
+  .prompt {
+    flex: 1; font-family: var(--font-mono); font-size: 13.5px; font-weight: 600;
+    color: var(--ink); word-break: break-word;
+  }
+  .prompt .ph { color: var(--accent-2); font-weight: 600; }
+  .copy {
+    flex: none; font: 600 12px var(--font-body); cursor: pointer;
+    color: var(--accent); background: none;
+    border: 1px solid var(--grid); border-radius: 999px; padding: 4px 12px;
+  }
+  .copy:hover { border-color: var(--accent); }
+  .copy.done { background: var(--accent); color: var(--page); border-color: var(--accent); }
+  .does { color: var(--ink-2); font-size: 13.5px; margin-top: 7px; }
+  .meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .tag {
+    font: 500 11px var(--font-mono); color: var(--muted);
+    border: 1px solid var(--grid); border-radius: 999px; padding: 2px 9px;
+  }
+  .tag.agent { color: var(--accent); border-color: var(--accent); }
+  .vars { color: var(--muted); font-size: 12.5px; margin-top: 6px; }
+  .vars b { color: var(--ink-2); font-weight: 600; }
+
+  .empty { text-align: center; color: var(--muted); padding: 48px 0; display: none; }
+  .grow {
+    margin-top: 34px; border: 1px dashed var(--grid); border-radius: var(--radius);
+    padding: 16px 18px; color: var(--ink-2); font-size: 13.5px;
+  }
+  .grow b { color: var(--ink); }
+  footer { margin-top: 28px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  mark { background: none; color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Workspace Ops · living reference</div>
+    <h1>Prompt Dictionary</h1>
+    <p class="sub">The canonical phrasings every agent understands, one copy button away. Placeholders look like <span style="font-family:var(--font-mono);color:var(--accent-2);font-weight:600">&lt;this&gt;</span> — swap them before sending.
+    <span class="hint">Grows over time: when a new reliable phrasing emerges in a session, it gets added here. Say "add to the prompt dictionary: …" to file one yourself.</span></p>
+  </header>
+
+  <div class="toolbar">
+    <div class="searchrow">
+      <input id="search" type="search" placeholder="Search prompts, effects, keywords… ( / to focus )" autocomplete="off">
+      <span id="count"></span>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div id="list"></div>
+  <div class="empty" id="empty">Nothing matches — try fewer words.</div>
+
+  <div class="grow">
+    <b>Building this together.</b> Missing a move you make often? Got a phrasing that misfired? Tell any agent — it lands here with the exact wording that works. This file is the single source; agents keep it current.
+  </div>
+
+  <footer>prompt-dictionary.html · WORKSPACE_OPS / 04_DOCS · seeded 2026-07-13 · <!-- identity: SIGNAL --> identity: SIGNAL</footer>
+</div>
+
+<script>
+const DATA = [
+  // ——— Capture & intake ———
+  { cat: "Capture & intake", p: "Process the inbox for <PROJECT>",
+    does: "Empties that project's 00_INBOX/: files each item into 01_RESEARCH or 02_WORK, extracts implied tasks into TODO.md, logs findings in PROJECT.md, refreshes.",
+    agent: "intake", vars: "Also: “Sweep the inboxes” — same, but every project at once." },
+  { cat: "Capture & intake", p: "This belongs to <PROJECT>: <links / notes / half-thoughts>",
+    does: "Pure dump-and-file. The material lands in that project's 00_INBOX; no decisions needed from you at capture time.",
+    agent: "intake", vars: "You can paste anything — URLs, PDFs paths, a sentence. Filing is the system's job." },
+  { cat: "Capture & intake", p: "Adopt this folder: PROJECTS/<Name>",
+    does: "Treats a bare folder as a new-project gesture: scaffolds the skeleton over it (stage: idea), moves its files into 00_INBOX, refreshes.",
+    agent: "intake", vars: "Agents also do this on sight — the prompt just makes it immediate." },
+  { cat: "Capture & intake", p: "File this into <PROJECT>'s research: <material>",
+    does: "Skips the inbox — puts material straight into 01_RESEARCH with a note, still extracts any implied tasks.",
+    agent: "intake" },
+
+  // ——— IDs & items ———
+  { cat: "IDs & items", p: "Open <UID>",
+    does: "Resolves the ID in _SYSTEM/data/id-index.json and shows you the item — file, task, or decision — with its current state.",
+    vars: "UIDs look like RAD-0042, OPS-0011. Works for retired IDs too." },
+  { cat: "IDs & items", p: "What happened to <UID>?",
+    does: "Traces the item's full lifecycle from the project's _ids.json ledger: added, modified, renamed/moved, retired — with dates.",
+    vars: "The dashboard's Lifecycle timeline shows the same, filterable." },
+  { cat: "IDs & items", p: "Process <UID>",
+    does: "Runs the standard pipeline on just that one item (file it, extract tasks, log) instead of a whole inbox." },
+  { cat: "IDs & items", p: "Check echoes on <UID> first, then <action>",
+    does: "Makes the agent read any ⇄ adjacency chips (related open tasks/decisions) before acting — the contract requires it anyway; this phrasing pins it.",
+    vars: "Dismiss a false pair with: “Dismiss the echo between <UID-A> and <UID-B>”." },
+  { cat: "IDs & items", p: "Review the echoes — suggest a resolution for each real pair, dismiss the rest",
+    does: "Full sweep of every open ⇄ adjacency pair workspace-wide: genuinely related pairs get a written suggestion (merge, sequence, or cross-link), unrelated ones are dismissed into adjacency.json so they stop resurfacing. Plan with Opus, run with Sonnet.",
+    vars: "Scope it with “…for <PROJECT> only”. Results land as a chat digest + dismissals applied." },
+
+  // ——— Tasks ———
+  { cat: "Tasks", p: "Add task to <PROJECT>: <verb-first text>",
+    does: "Appends an atomic task under ## Next in TODO.md; the next refresh stamps its permanent ID.",
+    vars: "Add a trailing <b>#sub:&lt;slug&gt;</b> to attach it to a sub-project, or <b>#tags</b> at the end of the line." },
+  { cat: "Tasks", p: "Tick <UID>",
+    does: "Marks that task done, moves it to ## Done, bumps the project's updated date, refreshes." },
+  { cat: "Tasks", p: "Move <UID> to Now",
+    does: "Reprioritises a task between ## Now / Next / Later — the task-priority axis. The ID travels with it.",
+    vars: "Also “…to Next” / “…to Later”." },
+  { cat: "Tasks", p: "Run my queue, in order, per the Agent Operating Contract",
+    does: "The “Copy run brief” output from the dashboard's Up-next tile starts exactly like this — paste it whole; each UID runs claim → work → close in order.",
+    vars: "Build the queue on DASHBOARD.html with the “+ queue” pills." },
+  { cat: "Tasks", p: "What needs attention in <PROJECT>?",
+    does: "Reads the project's Now tasks, open decisions, echoes, and inbox count — a spoken version of the dashboard glance." },
+
+  // ——— Decisions ———
+  { cat: "Decisions", p: "What's on the table?",
+    does: "Lists every open DECISIONS.md item across projects with its UID and #triage chip — same set as the dashboard's On-the-table drawer." },
+  { cat: "Decisions", p: "Settle <UID>: <your answer>",
+    does: "Resolves that decision the same turn: ticks it, moves it to ## Resolved with your actual answer, updates affected docs/system, logs it in PROJECT.md.",
+    vars: "Your answer may override the written _Rec:_ — say so plainly." },
+  { cat: "Decisions", p: "Put on the table for <PROJECT>: <question> — rec: <suggestion>, triage: <routine|eyes|complex>",
+    does: "Writes a properly-formatted open decision into DECISIONS.md; refresh stamps its UID and surfaces it in the drawer." },
+  { cat: "Decisions", p: "Run everything tagged #triage:routine",
+    does: "Executes the open decisions an agent can just do — no human call needed — resolving each as it goes." },
+
+  // ——— Files, moves & the bin ———
+  { cat: "Files & the bin", p: "Delete <path or UID>",
+    does: "Never a real delete: the item moves to ARCHIVE/_RECYCLING via recycle.ps1 with a reason logged in the manifest, and you're told where it went.",
+    vars: "A PreToolUse hook machine-blocks real rm/del on workspace paths. Only you empty the bin, by hand." },
+  { cat: "Files & the bin", p: "What's in the recycling bin?",
+    does: "Runs recycle.ps1 -List: numbered table of every binned item — path, agent, reason, when, restored-or-not." },
+  { cat: "Files & the bin", p: "Restore <name or index> from the bin",
+    does: "recycle.ps1 -Restore — moves the item back to its original location and marks it restored in the manifest." },
+  { cat: "Files & the bin", p: "Move <file/UID> to <PROJECT or folder>",
+    does: "Relocates via the OneDrive-safe path; the next refresh records it as a `moved` event and the ID survives.",
+    vars: "Refresh soon after — a move plus an edit between refreshes breaks ID matching." },
+
+  // ——— Projects & stages ———
+  { cat: "Projects & stages", p: "New project: <Name> — <one-line description>",
+    does: "Runs new-project.ps1: full skeleton, auto project code, stage idea. Safe on existing folders, never overwrites." },
+  { cat: "Projects & stages", p: "Set <PROJECT> to <stage>",
+    does: "Changes stage in project.json (field edit, never a file move) and refreshes. Stages: idea → research → development → in-work → complete.",
+    vars: "Stage changes doc identity defaults too (FIELD_NOTES → BLUEPRINT → SIGNAL → GALLERY)." },
+  { cat: "Projects & stages", p: "Put <PROJECT> on hold: <why>",
+    does: "Sets stage on-hold and writes the why into PROJECT.md — parked work always carries its reason." },
+  { cat: "Projects & stages", p: "Archive <PROJECT>",
+    does: "Moves the whole folder to ARCHIVE/; next refresh drops it from the dashboards. IDs stay resolvable forever." },
+  { cat: "Projects & stages", p: "Set <PROJECT> priority to <low|medium|high>",
+    does: "Edits project.json priority — affects kanban sort order and the high-priority dot badge." },
+
+  // ——— Docs & dashboards ———
+  { cat: "Docs & dashboards", p: "Refresh",
+    does: "Runs _SYSTEM/scripts/refresh.ps1: regenerates all dashboard data, stamps new IDs, records lifecycle events, sweeps expired agent claims.",
+    vars: "Agents run it automatically after real work — say it when you've edited things by hand." },
+  { cat: "Docs & dashboards", p: "Build an HTML doc in <PROJECT>: <topic>",
+    does: "Self-contained single file into 04_DOCS, wearing the project's resolved design identity, auto-listed on its dashboard after refresh." },
+  { cat: "Docs & dashboards", p: "Re-skin <doc> with <IDENTITY>",
+    does: "Swaps the doc's inline token values for another identity's (WORKSPACE, FIELD_NOTES, BLUEPRINT, SIGNAL, GALLERY) — structure untouched." },
+  { cat: "Docs & dashboards", p: "Give me the state of everything",
+    does: "A spoken master-dashboard glance: what's in-work, fresh drops, open decisions count, anything stale or stuck." },
+
+  // ——— Agents & routing ———
+  { cat: "Agents & routing", p: "Brand audit",
+    does: "Routes to the Branding agent: checks brand consistency across projects that declare the FROSTSFABRIK brand.",
+    agent: "branding", vars: "Also: “apply the brand to <doc>”, “brand kit”." },
+  { cat: "Agents & routing", p: "Add <PROJECT> to the portfolio",
+    does: "Routes to the Portfolio agent: authors the showcase, manages CORE/PORTFOLIO, gets the project presentation-ready.",
+    agent: "portfolio" },
+  { cat: "Agents & routing", p: "Which agent handles <task>?",
+    does: "Consults _SYSTEM/AGENT_ROUTING.md (visual portal: agents.html in WORKSPACE_OPS/04_DOCS) and points you at the right one." },
+  { cat: "Agents & routing", p: "Add to the prompt dictionary: <prompt> — <what it should do>",
+    does: "Files a new canonical phrasing into this very doc — how we grow the dictionary together." }
+];
+
+const listEl = document.getElementById("list");
+const chipsEl = document.getElementById("chips");
+const searchEl = document.getElementById("search");
+const countEl = document.getElementById("count");
+const emptyEl = document.getElementById("empty");
+let activeCat = null;
+
+const cats = [...new Set(DATA.map(d => d.cat))];
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmtPrompt(p){
+  return esc(p).replace(/&lt;([^&]+?)&gt;/g, '<span class="ph">&lt;$1&gt;</span>');
+}
+
+function render(){
+  const q = searchEl.value.trim().toLowerCase();
+  const terms = q ? q.split(/\s+/) : [];
+  listEl.innerHTML = "";
+  let shown = 0;
+
+  cats.forEach(cat => {
+    if (activeCat && cat !== activeCat) return;
+    const items = DATA.filter(d => d.cat === cat).filter(d => {
+      if (!terms.length) return true;
+      const hay = (d.p + " " + d.does + " " + (d.vars||"") + " " + (d.agent||"") + " " + d.cat).toLowerCase();
+      return terms.every(t => hay.includes(t));
+    });
+    if (!items.length) return;
+
+    const sec = document.createElement("section");
+    sec.className = "cat";
+    sec.innerHTML = `<h2>${esc(cat)} <span class="n">${items.length}</span></h2>`;
+    items.forEach(d => {
+      shown++;
+      const el = document.createElement("div");
+      el.className = "entry";
+      el.innerHTML =
+        `<div class="row1">
+           <div class="prompt">${fmtPrompt(d.p)}</div>
+           <button class="copy" data-p="${esc(d.p)}">copy</button>
+         </div>
+         <div class="does">${d.does}</div>` +
+        (d.vars ? `<div class="vars">${d.vars}</div>` : "") +
+        (d.agent ? `<div class="meta"><span class="tag agent">agent: ${d.agent}</span></div>` : "");
+      sec.appendChild(el);
+    });
+    listEl.appendChild(sec);
+  });
+
+  countEl.textContent = shown + " / " + DATA.length;
+  emptyEl.style.display = shown ? "none" : "block";
+}
+
+function renderChips(){
+  chipsEl.innerHTML = "";
+  cats.forEach(cat => {
+    const c = document.createElement("span");
+    c.className = "chip" + (activeCat === cat ? " on" : "");
+    c.textContent = cat;
+    c.onclick = () => { activeCat = (activeCat === cat) ? null : cat; renderChips(); render(); };
+    chipsEl.appendChild(c);
+  });
+}
+
+listEl.addEventListener("click", e => {
+  const btn = e.target.closest(".copy");
+  if (!btn) return;
+  const text = btn.dataset.p;
+  const done = () => { btn.textContent = "copied ✓"; btn.classList.add("done");
+    setTimeout(() => { btn.textContent = "copy"; btn.classList.remove("done"); }, 1400); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+});
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); done(); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+searchEl.addEventListener("input", render);
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && document.activeElement !== searchEl) { e.preventDefault(); searchEl.focus(); }
+  if (e.key === "Escape" && document.activeElement === searchEl) { searchEl.value = ""; render(); }
+});
+
+renderChips();
+render();
+</script>
+</body>
+</html>
