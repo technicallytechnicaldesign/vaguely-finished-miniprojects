@@ -253,6 +253,22 @@ const DATA = [
   { cat: "Docs & dashboards", p: "Give me the state of everything",
     does: "A spoken master-dashboard glance: what's in-work, fresh drops, open decisions count, anything stale or stuck." },
 
+  // ——— Tablet (AiPaper) ———
+  { cat: "Tablet (AiPaper)", p: "Push <file/folder/glob> to the tablet",
+    does: "Runs CORE/VIWOODS/02_WORK/push-to-tablet.ps1: copies into the Google Drive shelf at G:\\My Drive\\AiPaper-Inbox\\, guards on quota, flags formats the AiPaper cannot open, logs the push. Then open Google Drive on the device and tap the file to import it.",
+    vars: "Add <b>-Shelf books</b> to drop it in a named subfolder. Nothing auto-propagates down: the last step is always a tap on the tablet." },
+  { cat: "Tablet (AiPaper)", p: "Print <doc>.html to the tablet",
+    does: "-Print mode: renders a workspace HTML doc to PDF with headless Chrome, then pushes it. The PDF lands in that doc's own project 03_OUTPUT/print/ so it can be re-pushed later.",
+    vars: "<b>-Paper aipaper</b> sizes it to the device screen (4.92x6.56in) instead of A4. <b>-NoPush</b> renders without shelving it. A doc that declares its own @page size keeps it." },
+  { cat: "Tablet (AiPaper)", p: "Push <PROJECT>'s print folder to the tablet",
+    does: "-Project mode: pushes everything in that project's 03_OUTPUT/print/ as a set, to a shelf named after the project. Any project gets a tablet pipe just by making that folder.",
+    vars: "The print folder is the convention — put a PDF there and it is tablet-ready." },
+  { cat: "Tablet (AiPaper)", p: "What's on the tablet shelf?",
+    does: "-List: everything waiting in the Drive shelf with sizes, dates and remaining Drive space. Drive runs near full on a 15 GB tier, so the shelf is a small rotating set, not a library." },
+  { cat: "Tablet (AiPaper)", p: "Back up the tablet notes",
+    does: "Runs CORE/VIWOODS/02_WORK/backup-notes.ps1: incremental copy-only archive of both Viwoods Drive trees (.note originals and rendered PDFs) to D:, where there is room. Repeat runs copy nothing.",
+    vars: "Worth doing periodically — Drive is currently the only copy of the vector ink outside the tablet." },
+
   // ——— Agents & routing ———
   { cat: "Agents & routing", p: "Brand audit",
     does: "Routes to the Branding agent: checks brand consistency across projects that declare the FROSTSFABRIK brand.",
