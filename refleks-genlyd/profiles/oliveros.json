@@ -25,9 +25,9 @@
     "kind": "tilt",
     "voice": {
       "family": "bowl",
-      "attack": 1.6,
-      "release": 4.5,
-      "glide": 1.2,
+      "attack": 2.2,
+      "release": 5.5,
+      "glide": 2.6,
       "minRatio": 1.5
     }
   },

@@ -43,25 +43,41 @@
     attach: function (audio, ui) {
       var got = false;
 
+      // A held phone is never still: an unfiltered reading turns ordinary hand
+      // tremor into a constantly re-targeted pitch glide, which is a warble on
+      // top of the tone rather than a played gesture. Smoothing here, at the
+      // source, is the fix - smoothing only the audio side would just re-chase
+      // a new noisy target every call. 0.12 settles a deliberate tilt over
+      // roughly half a second and damps tremor well below audible.
+      var SMOOTH = 0.12;
+      var smoothGamma = null, smoothBeta = null;
+
       function onOrient(e) {
         if (e.gamma === null && e.beta === null) return;
         got = true;
+        var rawGamma = e.gamma || 0, rawBeta = e.beta || 0;
+        smoothGamma = smoothGamma === null ? rawGamma : smoothGamma + (rawGamma - smoothGamma) * SMOOTH;
+        smoothBeta = smoothBeta === null ? rawBeta : smoothBeta + (rawBeta - smoothBeta) * SMOOTH;
         // gamma runs -90..90 across a roll. Centre is silence-ish, so the axis
         // is the absolute roll: tilting either way moves up the set.
-        var pitchAxis = Math.min(1, Math.abs(e.gamma || 0) / 60);
+        var pitchAxis = Math.min(1, Math.abs(smoothGamma) / 60);
         // beta 0 is flat on a table, 90 is upright. Held at a comfortable
         // reading angle is around 45, which sits mid-range.
-        var mag = Math.min(1, Math.max(0, ((e.beta || 0) - 10) / 70));
+        var mag = Math.min(1, Math.max(0, (smoothBeta - 10) / 70));
         audio.gesture(pitchAxis, mag);
       }
 
       // Desktop has no orientation sensor. Rather than silently doing nothing
       // during a build check, fall back to the pointer and SAY SO on screen.
       // This is a development affordance, not a second interaction kind.
+      var smoothPX = null, smoothPY = null;
       function onPointer(e) {
         if (got) return;
         var w = root.innerWidth || 1, h = root.innerHeight || 1;
-        audio.gesture(Math.abs((e.clientX / w) * 2 - 1), 1 - (e.clientY / h));
+        var rawX = Math.abs((e.clientX / w) * 2 - 1), rawY = 1 - (e.clientY / h);
+        smoothPX = smoothPX === null ? rawX : smoothPX + (rawX - smoothPX) * SMOOTH;
+        smoothPY = smoothPY === null ? rawY : smoothPY + (rawY - smoothPY) * SMOOTH;
+        audio.gesture(smoothPX, smoothPY);
       }
 
       root.addEventListener('deviceorientation', onOrient, true);

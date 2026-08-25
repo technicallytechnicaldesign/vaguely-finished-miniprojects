@@ -16,6 +16,9 @@
   var LOOKAHEAD = 4.0;   // seconds of wash scheduled in advance
   var TICK_MS = 900;     // scheduler wake-up; safe below the ~1s throttle floor
   var STEP = 0.2;        // resolution of the scheduled ramp
+  var REVERB_SECONDS = 3.2; // decay tail length: a room, not a canyon
+  var REVERB_DECAY = 2.4;   // exponential falloff shape of the generated impulse
+  var REVERB_WET = 0.3;     // send level; the dry signal (and its ceiling) is untouched
 
   function RGAudio(profile) {
     this.profile = profile;
@@ -154,8 +157,10 @@
     this.voiceGain.gain.setTargetAtTime(g, now, attack / 3);
 
     // Timbre follows the same gesture: this is the "how you play shapes the
-    // sound" half of GEN-0060, brightness rather than more notes.
-    var cut = 420 + Core.clamp01(magnitude) * 1400;
+    // sound" half of GEN-0060, brightness rather than more notes. Ceiling
+    // lowered from 1820Hz: the old top end let the (now-fixed) upper partials
+    // ring bright enough to read as shrill on top of the beating.
+    var cut = 380 + Core.clamp01(magnitude) * 900;
     this.voiceFilter.frequency.setTargetAtTime(cut, now, 0.3);
   };
 
@@ -165,6 +170,42 @@
       var rel = (this.profile.interaction.voice || {}).release || 4;
       this.voiceGain.gain.setTargetAtTime(0, this.ctx.currentTime, rel / 3);
     }
+  };
+
+  /* ---- reverb -----------------------------------------------------------
+   * A generated impulse response, not a loaded file: the app ships as five
+   * static files and stays that way. This is a SEND, tapped from the same
+   * post-fader gain nodes the dry signal already goes through, so it adds
+   * space without touching either level ceiling guarantee2b asserts on.
+   */
+  RGAudio.prototype._buildReverb = function () {
+    var ctx = this.ctx;
+    var convolver = ctx.createConvolver();
+    convolver.buffer = this._impulseResponse(REVERB_SECONDS, REVERB_DECAY);
+    var wet = ctx.createGain();
+    wet.gain.value = REVERB_WET;
+    convolver.connect(wet);
+    wet.connect(ctx.destination);
+
+    var send = ctx.createGain();
+    send.gain.value = 1;
+    send.connect(convolver);
+    this.reverbSend = send;
+    return send;
+  };
+
+  RGAudio.prototype._impulseResponse = function (duration, decay) {
+    var ctx = this.ctx;
+    var rate = ctx.sampleRate;
+    var length = Math.max(1, Math.floor(rate * duration));
+    var impulse = ctx.createBuffer(2, length, rate);
+    for (var c = 0; c < impulse.numberOfChannels; c++) {
+      var data = impulse.getChannelData(c);
+      for (var i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return impulse;
   };
 
   /* ---- the wash scheduler ---------------------------------------------- */
@@ -196,8 +237,11 @@
       self.session = session;
       if (!self.droneGain) self._buildDrone();
       if (!self.voiceGain) self._buildVoice();
+      if (!self.reverbSend) self._buildReverb();
       self.droneGain.connect(self.ctx.destination);
       self.voiceGain.connect(self.ctx.destination);
+      self.droneGain.connect(self.reverbSend);
+      self.voiceGain.connect(self.reverbSend);
 
       self.startTime = self.ctx.currentTime + 0.15;
       self.scheduledTo = self.startTime;
