@@ -1,0 +1,118 @@
+{
+  "slug": "oliveros",
+  "author": "Pauline Oliveros",
+  "dates": "1932 to 2016",
+  "blurb": "Composer, founder of Deep Listening.",
+  "adaptationNote": "Her meditations were written for group work over a long period with regular meetings. The solo form here is our adaptation, and the sessions are written for this project in her tradition, not reproduced from her scores.",
+  "reader": {
+    "slug": "oliveros",
+    "title": "The Bottoms of Your Feet"
+  },
+  "defaults": {
+    "duration": 600
+  },
+  "drone": {
+    "root": 110,
+    "ratios": [1, 1.5, 2, 3, 4],
+    "swellPeriod": 28,
+    "swellDepth": 0.55,
+    "timbre": {
+      "cutoff": 620,
+      "detune": 4
+    }
+  },
+  "interaction": {
+    "kind": "tilt",
+    "voice": {
+      "family": "bowl",
+      "attack": 1.6,
+      "release": 4.5,
+      "glide": 1.2,
+      "minRatio": 1.5
+    }
+  },
+  "skin": {
+    "bg": "#0b0d0f",
+    "ink": "#e8e4dc",
+    "dim": "#6f7680",
+    "accent": "#9ba98a",
+    "type": "Georgia, 'Iowan Old Style', serif"
+  },
+  "credit": "Sessions written for this project in the tradition of Pauline Oliveros. Her own words are quoted briefly and credited. Sonic Meditations (Smith Publications, 1974; meditations dated 1971).",
+  "sessions": [
+    {
+      "id": "oliveros.01",
+      "title": "Narrow and wide",
+      "instruction": "Find one sound and stay with it until you know its edges.\nThen let it go and take in everything at once, the whole room, without choosing.\nMove between the two. Notice which one you fall back into when you stop trying.",
+      "duration": 480,
+      "tilt": false,
+      "after": "Which of the two do you land in by default, and what has that cost you?",
+      "credit": "After Pauline Oliveros, \"Quantum Listening: From Practice to Theory\" (1999)."
+    },
+    {
+      "id": "oliveros.02",
+      "title": "Your own weather",
+      "instruction": "Cup your hands over your ears and listen to your breathing until it stops sounding like breathing.\nIt becomes weather, or an engine, or the sea.\nStay with it after it stops being interesting.",
+      "duration": 360,
+      "tilt": false,
+      "after": "What did your breath sound like once it stopped being yours?",
+      "credit": "After Pauline Oliveros, Breathe In/Breathe Out."
+    },
+    {
+      "id": "oliveros.03",
+      "title": "Hear it first",
+      "instruction": "Do not make a sound yet.\nWait until you can hear a tone inside your head clearly enough to recognise it if someone else played it.\nOnly then let it out, and only for as long as you can still hear it inside.",
+      "duration": 600,
+      "tilt": true,
+      "after": "How long was the gap, and what did you do in it?",
+      "credit": "After Pauline Oliveros, Tuning Meditation and Imaginary Meditation."
+    },
+    {
+      "id": "oliveros.04",
+      "title": "A tone you did not choose",
+      "instruction": "A tone is already sounding. You did not pick it.\nMatch it with your voice, as exactly as you can, and keep matching it as it moves.\nWhen you lose it, do not start again somewhere easier. Find it.",
+      "duration": 720,
+      "tilt": true,
+      "after": "What did you do with the moment you lost it?",
+      "credit": "After Pauline Oliveros, Tuning Meditation. In her form the other voice is another person; here it is a machine."
+    },
+    {
+      "id": "oliveros.05",
+      "title": "The smallest change",
+      "instruction": "Something here is changing more slowly than you can notice.\nYour job is to catch it at the earliest moment you honestly can, not the moment you are sure.\nDo not decide in advance what will change.",
+      "duration": 900,
+      "tilt": false,
+      "after": "The difference between noticing and being sure, in your own work.",
+      "credit": "After Pauline Oliveros, \"Quantum Listening\" (1999)."
+    },
+    {
+      "id": "oliveros.06",
+      "title": "Where it stops and memory starts",
+      "instruction": "This one fades out and does not come back.\nFollow it down. Find the exact place where you stop hearing it and start remembering it.\nStay there after the sound has gone.",
+      "duration": 540,
+      "tilt": false,
+      "fadeOut": 0.35,
+      "after": "Where was the border, and could you find it twice?",
+      "credit": "After Pauline Oliveros, \"Quantum Listening\" (1999)."
+    },
+    {
+      "id": "oliveros.07",
+      "title": "Remind yourself",
+      "instruction": "Listen to everything. When you notice you have stopped, that noticing is the practice, not the failure.\nThis session is short because it is not meant to end when it ends.",
+      "duration": 300,
+      "tilt": false,
+      "after": "How many times today, and what were you doing each time?",
+      "credit": "After Pauline Oliveros, \"Quantum Listening\" (1999), on the practice she set herself in 1953."
+    },
+    {
+      "id": "oliveros.08",
+      "title": "Walk so the ground can hear you",
+      "instruction": "Put this away and go outside, at night if you can, somewhere you already know.\nWalk slowly enough that your own footsteps stop covering the sound of the place.\nLet the ground report to you through your feet.",
+      "duration": 1200,
+      "silent": true,
+      "tilt": false,
+      "after": "What did the place sound like when you were not adding to it?",
+      "credit": "After Pauline Oliveros, Sonic Meditations V, \"Native\" (Smith Publications, 1974; meditations dated 1971)."
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>REFLEKS x GENLYD</title>
+<!-- skin: supplied by the loaded profile, per PROFILE-CONTRACT.md. The app does
+     not carry a workspace design identity of its own: a profile's skin is
+     matched to the reader it pairs with, which is the whole point of GEN-0059. -->
+<style>
+  :root{
+    --bg:#0b0d0f; --ink:#e8e4dc; --dim:#6f7680; --accent:#9ba98a;
+    --type: Georgia, 'Iowan Old Style', serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--type);
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+    padding:max(1.5rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; min-height:100%;
+  }
+  section[hidden]{display:none}
+  section{flex:1; display:flex; flex-direction:column; max-width:34rem; margin:0 auto; width:100%}
+  h1{font-size:1.5rem; font-weight:400; margin:0 0 .2rem; letter-spacing:.01em}
+  h2{font-size:1.25rem; font-weight:400; margin:0 0 .6rem}
+  .sub,.meta,.len,.ord,.credit,.note{color:var(--dim); font-size:.82rem}
+  .lede{color:var(--dim); font-size:.9rem; margin:.4rem 0 1.6rem}
+  button{
+    font-family:inherit; color:inherit; background:none; border:0;
+    text-align:left; cursor:pointer; padding:0;
+  }
+  .author,.session{
+    display:grid; width:100%; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .session{grid-template-columns:2rem 1fr auto; align-items:baseline; gap:.5rem}
+  .author{gap:.15rem}
+  .name{font-size:1.15rem}
+  .stitle{font-size:1.05rem}
+  .ord{color:var(--dim)}
+  .len{text-align:right; white-space:nowrap}
+  .instruction{
+    font-size:1.15rem; white-space:pre-line; margin:1.2rem 0 1.6rem; max-width:26rem;
+  }
+  .act{
+    border:1px solid var(--accent); color:var(--accent); border-radius:2rem;
+    padding:.7rem 1.4rem; display:inline-block; text-align:center; font-size:.95rem;
+  }
+  .act.wide{display:block; width:100%}
+  .ghost{color:var(--dim); border-color:rgba(255,255,255,.14)}
+  .ghost.on{color:var(--accent); border-color:var(--accent)}
+  .spacer{flex:1}
+  .barwrap{height:2px; background:rgba(255,255,255,.1); margin:2rem 0 1rem; overflow:hidden}
+  #r-bar{height:100%; background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform .5s linear}
+  .run-instruction{font-size:1.2rem; white-space:pre-line; opacity:.9}
+  .warn{color:#d88; font-size:.9rem}
+  .back{color:var(--dim); font-size:.85rem; margin-bottom:1.2rem}
+  .adaptation{
+    color:var(--dim); font-size:.78rem; border-left:2px solid rgba(255,255,255,.12);
+    padding-left:.8rem; margin:1.4rem 0 0;
+  }
+  @media (prefers-color-scheme: light){
+    /* The listening screens stay dark whatever the phone prefers: this is used
+       in a quiet room, often at night, and a white field is a floodlight. */
+  }
+</style>
+</head>
+<body>
+
+<section id="s-pick">
+  <h1>REFLEKS x GENLYD</h1>
+  <p class="lede">A listening companion to a printed reader. Choose whose practice you are working in.</p>
+  <div id="authors"></div>
+</section>
+
+<section id="s-list" hidden>
+  <button class="back" id="list-back">&larr; authors</button>
+  <h1 id="list-title"></h1>
+  <p class="sub" id="list-sub"></p>
+  <div id="sessions" style="margin-top:1.4rem"></div>
+  <p class="adaptation" id="adaptation"></p>
+</section>
+
+<section id="s-brief" hidden>
+  <button class="back" id="b-back">&larr; sessions</button>
+  <p class="ord" id="b-ord"></p>
+  <h2 id="b-title"></h2>
+  <p class="instruction" id="b-instruction"></p>
+  <p class="sub" id="b-len"></p>
+  <div class="spacer"></div>
+  <p><button class="act ghost" id="b-play" hidden>let me play too</button></p>
+  <p><button class="act wide" id="b-start">begin</button></p>
+  <p class="credit" id="b-credit"></p>
+</section>
+
+<section id="s-run" hidden>
+  <h2 id="r-title" style="color:var(--dim);font-size:.85rem"></h2>
+  <p class="run-instruction" id="r-instruction"></p>
+  <p class="note" id="r-note"></p>
+  <div class="spacer"></div>
+  <div class="barwrap"><div id="r-bar"></div></div>
+  <p><button class="back" id="r-stop">end early</button></p>
+</section>
+
+<section id="s-done" hidden>
+  <h2 id="d-title"></h2>
+  <p class="sub">Now go to the reader.</p>
+  <p class="instruction" id="d-after"></p>
+  <p class="sub" id="d-page"></p>
+  <div class="spacer"></div>
+  <p><button class="act wide" id="d-back">back to the sessions</button></p>
+  <p class="credit" id="d-credit"></p>
+</section>
+
+<script src="core.js"></script>
+<script src="interactions.js"></script>
+<script src="audio.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
