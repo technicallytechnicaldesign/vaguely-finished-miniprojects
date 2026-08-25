@@ -1,0 +1,598 @@
+<!-- identity: FREE_STREET -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workspace Radio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* WORKSPACE RADIO: a shortwave numbers-station tuner for the whole workspace's live pulse.
+   Deliberate single visual world, a physical instrument under its own panel lighting, not
+   a document; FREE_STREET tokens, opt-in per IDENTITIES.md. No light-mode variant on
+   purpose: real radio hardware doesn't get a daylight skin, but every color is still an
+   explicit token, painted on an explicit background. */
+:root{
+  --chassis:   #05070c;
+  --face:      #0b0f1a;
+  --face-2:    #0e1424;
+  --seam:      #1c2440;
+  --ink:       #cbd6f0;
+  --ink-dim:   #5c6a8c;
+  --live:      #54f0ff;   /* tuned / interactive */
+  --attn:      #ff5fd2;   /* high priority */
+  --amber:     #ffb454;   /* LCD glow */
+  --good:      #57f2a4;
+  --warn:      #ffd23e;
+  --crit:      #ff5d5d;
+  --font-lcd:  "VT323", ui-monospace, Consolas, monospace;
+  --font-body: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+*{box-sizing:border-box;}
+html,body{max-width:100%;overflow-x:hidden;}
+body{
+  margin:0; min-height:100vh; background:var(--chassis); color:var(--ink);
+  font-family:var(--font-body); font-size:13px;
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:36px 16px 60px;
+}
+@media (prefers-reduced-motion: reduce){ *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+
+.unit{
+  width:100%; max-width:820px; background:
+    linear-gradient(180deg, #0a0d17, #05070c 60%);
+  border:1px solid var(--seam); border-radius:6px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 30px 70px -30px rgba(0,0,0,0.8);
+  padding:20px 22px 24px;
+}
+
+/* ---- brand rail ---- */
+.rail{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+.rail .name{
+  font-weight:600; letter-spacing:0.14em; font-size:12px; color:var(--ink);
+  text-transform:uppercase;
+}
+.rail .sub{color:var(--ink-dim); font-size:11px; letter-spacing:0.04em;}
+.rail .leds{margin-left:auto; display:flex; gap:14px; align-items:center;}
+.led{display:flex; align-items:center; gap:6px; font-size:10px; color:var(--ink-dim); letter-spacing:0.08em; text-transform:uppercase;}
+.led i{
+  width:7px; height:7px; border-radius:50%; background:#22283f; display:block;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4) inset;
+}
+.led.on i{background:var(--live); box-shadow:0 0 8px 1px var(--live);}
+.led.on.scan i{background:var(--amber); box-shadow:0 0 8px 1px var(--amber);}
+.led.on.core i{background:var(--good); box-shadow:0 0 8px 1px var(--good);}
+
+/* ---- LCD ---- */
+.lcd{
+  background: linear-gradient(180deg, var(--face-2), var(--face));
+  border:1px solid var(--seam); border-radius:4px; padding:16px 18px 14px;
+  position:relative; overflow:hidden;
+}
+.lcd::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+}
+.freq-row{display:flex; align-items:baseline; gap:12px;}
+.freq{
+  font-family:var(--font-lcd); font-size:64px; line-height:1; color:var(--amber);
+  text-shadow:0 0 10px rgba(255,180,84,0.55), 0 0 2px rgba(255,180,84,0.8);
+  letter-spacing:0.01em; font-variant-numeric:tabular-nums;
+}
+.mhz{font-family:var(--font-lcd); font-size:20px; color:var(--ink-dim); letter-spacing:0.08em;}
+.callsign{
+  margin-left:auto; text-align:right;
+}
+.callsign .name{font-family:var(--font-lcd); font-size:26px; color:var(--live); text-shadow:0 0 8px rgba(84,240,255,0.5); line-height:1;}
+.callsign .path{font-size:10px; color:var(--ink-dim); letter-spacing:0.06em;}
+.meta-row{
+  display:flex; gap:16px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--seam);
+  flex-wrap:wrap; font-size:11px; color:var(--ink-dim); letter-spacing:0.03em;
+}
+.meta-row b{color:var(--ink); font-weight:600;}
+.pill{
+  display:inline-flex; align-items:center; gap:5px; padding:2px 8px; border-radius:99px;
+  border:1px solid var(--seam); text-transform:uppercase; font-size:10px; letter-spacing:0.06em;
+}
+.pill.stage{color:var(--live); border-color:rgba(84,240,255,0.35);}
+.pill.pri-high{color:var(--attn); border-color:rgba(255,95,210,0.4);}
+.pill.pri-medium{color:var(--ink);}
+.pill.pri-low{color:var(--ink-dim);}
+.actmeter{display:flex; align-items:center; gap:6px;}
+.actmeter .bar{width:60px; height:5px; background:var(--face); border:1px solid var(--seam); border-radius:2px; overflow:hidden;}
+.actmeter .bar i{display:block; height:100%; background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+/* ---- tuning strip ---- */
+.tuner{margin-top:16px;}
+.band-labels{display:flex; justify-content:space-between; font-family:var(--font-lcd); font-size:15px; color:var(--ink-dim); padding:0 2px;}
+.strip{
+  position:relative; height:56px; margin-top:4px; background:var(--face);
+  border:1px solid var(--seam); border-radius:4px; cursor:pointer;
+  padding:0 10px;
+}
+.tick{
+  position:absolute; bottom:8px; width:2px; transform:translateX(-1px);
+  border-radius:1px; cursor:pointer;
+}
+.tick[data-stage="development"]{background:var(--ink-dim);}
+.tick[data-stage="research"]{background:var(--live);}
+.tick[data-stage="cooking"]{background:var(--attn);}
+.tick[data-stage="in-work"]{background:var(--good);}
+.tick[data-stage="on-hold"]{background:var(--crit); opacity:0.6;}
+.tick[data-stage="idea"]{background:var(--warn);}
+.tick[data-stage="complete"]{background:var(--good);}
+.tick.tuned{box-shadow:0 0 6px 1px currentColor;}
+.needle{
+  position:absolute; top:4px; width:0; height:0; transform:translateX(-7px);
+  border-left:7px solid transparent; border-right:7px solid transparent; border-top:10px solid var(--amber);
+  filter:drop-shadow(0 0 4px rgba(255,180,84,0.7));
+  transition:left 220ms cubic-bezier(.2,.9,.2,1);
+}
+
+/* ---- lower panels ---- */
+.panels{display:grid; grid-template-columns:1.1fr 1fr; gap:14px; margin-top:16px;}
+@media (max-width:600px){ .panels{grid-template-columns:1fr;} }
+.panel{background:var(--face); border:1px solid var(--seam); border-radius:4px; padding:12px 14px;}
+.panel h2{
+  margin:0 0 10px; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600;
+}
+.logline{display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dotted var(--seam); font-size:11.5px;}
+.logline:last-child{border-bottom:0;}
+.logline span:first-child{color:var(--ink-dim);}
+.logline span:last-child{color:var(--ink); font-variant-numeric:tabular-nums;}
+canvas#scope{width:100%; height:78px; display:block; background:var(--chassis); border:1px solid var(--seam); border-radius:3px;}
+.blipline{display:flex; align-items:center; gap:8px; margin-top:8px;}
+.blipline .lamp{width:9px; height:9px; border-radius:50%; background:#22283f; box-shadow:0 0 0 1px rgba(0,0,0,0.4) inset;}
+.blipline .lamp.hit{background:var(--attn); box-shadow:0 0 10px 2px var(--attn);}
+.blipline span{font-size:10px; color:var(--ink-dim); letter-spacing:0.05em; text-transform:uppercase;}
+
+/* ---- controls ---- */
+.controls{display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap;}
+button.ctrl{
+  font-family:var(--font-body); font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+  background:var(--face); color:var(--ink); border:1px solid var(--seam); border-radius:4px;
+  padding:9px 14px; cursor:pointer; font-weight:600;
+}
+button.ctrl:hover{border-color:var(--ink-dim);}
+button.ctrl:focus-visible, .strip:focus-visible, input[type=range]:focus-visible{outline:2px solid var(--live); outline-offset:2px;}
+button.ctrl.power{color:var(--good); border-color:rgba(87,242,164,0.35);}
+button.ctrl.power.off{color:var(--crit); border-color:rgba(255,93,93,0.35);}
+button.ctrl.active{color:var(--chassis); background:var(--amber); border-color:var(--amber);}
+button.ctrl.nudge{padding:9px 12px;}
+.vol{display:flex; align-items:center; gap:8px; margin-left:auto; color:var(--ink-dim); font-size:10px; letter-spacing:0.06em; text-transform:uppercase;}
+input[type=range]{-webkit-appearance:none; width:110px; height:3px; background:var(--seam); border-radius:2px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--amber); box-shadow:0 0 6px var(--amber); cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; background:var(--amber); border:0; box-shadow:0 0 6px var(--amber); cursor:pointer;}
+
+.foot{margin-top:16px; font-size:10.5px; color:var(--ink-dim); letter-spacing:0.03em; text-align:center;}
+.foot code{color:var(--ink);}
+.foot a{color:var(--live);}
+</style>
+</head>
+<body>
+
+<div class="unit" role="group" aria-label="Workspace Radio tuner">
+  <div id="noData" style="display:none; background:var(--face); border:1px solid var(--crit); border-radius:4px; padding:14px 16px; margin-bottom:16px; font-size:12px; color:var(--ink);">
+    Station list didn't load: <code style="color:var(--amber);">radio.data.js</code> is missing or empty. Run
+    <code style="color:var(--amber);">_SYSTEM\scripts\refresh.ps1</code> (it calls <code style="color:var(--amber);">build-radio-data.ps1</code> automatically), then reload this page.
+  </div>
+  <div class="rail">
+    <span class="name">Workspace Radio</span>
+    <span class="sub">shortwave tuner · live pulse of the workspace</span>
+    <div class="leds">
+      <span class="led" id="ledPower"><i></i>power</span>
+      <span class="led scan" id="ledScan"><i></i>scan</span>
+      <span class="led core" id="ledCore"><i></i>infra</span>
+    </div>
+  </div>
+
+  <div class="lcd">
+    <div class="freq-row">
+      <span class="freq" id="freqNum">076.0</span>
+      <span class="mhz">MHz</span>
+      <div class="callsign">
+        <div class="name" id="stName">— OFF AIR —</div>
+        <div class="path" id="stPath">power on to tune in</div>
+      </div>
+    </div>
+    <div class="meta-row">
+      <span>stage <b id="mStage">—</b></span>
+      <span>priority <b id="mPriority">—</b></span>
+      <span class="actmeter">7-day pulse <span class="bar"><i id="mActBar" style="width:0%"></i></span> <b id="mActNum">0</b></span>
+      <span id="mCoreFlag" style="display:none; color:var(--good);">⏚ infrastructure line</span>
+    </div>
+  </div>
+
+  <div class="tuner">
+    <div class="band-labels"><span>076</span><span>108</span></div>
+    <div class="strip" id="strip" tabindex="0" aria-label="Tune by clicking or dragging, or use arrow keys">
+      <div class="needle" id="needle" style="left:0px;"></div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <h2>Station log</h2>
+      <div class="logline"><span>events (all recorded)</span><span id="lTotal">—</span></div>
+      <div class="logline"><span>events, last 7 days</span><span id="l7d">—</span></div>
+      <div class="logline"><span>events, last 24h</span><span id="l1d">—</span></div>
+      <div class="logline"><span>resting</span><span id="lResting">—</span></div>
+      <div class="logline"><span>data generated</span><span id="lSnap">—</span></div>
+    </div>
+    <div class="panel">
+      <h2>Scope</h2>
+      <canvas id="scope" width="360" height="78"></canvas>
+      <div class="blipline"><span class="lamp" id="blipLamp"></span><span>activity blip = one dashboard event, sonified</span></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl nudge" id="btnPrev" aria-label="Previous station">◀</button>
+    <button class="ctrl power off" id="btnPower">Power</button>
+    <button class="ctrl" id="btnScan">Scan</button>
+    <button class="ctrl" id="btnMute">Mute</button>
+    <button class="ctrl nudge" id="btnNext" aria-label="Next station">▶</button>
+    <div class="vol">vol
+      <input type="range" id="volSlider" min="0" max="100" value="55">
+    </div>
+  </div>
+
+  <div class="foot">reads <code>radio.data.js</code> live, generated <span id="footStamp">—</span> by <code>build-radio-data.ps1</code> from <code>_SYSTEM/data/projects-data.js</code> · stage + priority + 7-day event count, each mapped to a synthesized station · only as fresh as the last <code>refresh.ps1</code> run · <a href="../../../CORE/WORKSPACE_OPS/04_DOCS/prompt-dictionary.html">Prompt Dictionary →</a></div>
+</div>
+
+<script src="radio.data.js"></script>
+<script>
+(function(){
+"use strict";
+
+if (!window.RADIO_DATA || !window.RADIO_DATA.stations || !window.RADIO_DATA.stations.length) {
+  document.getElementById("noData").style.display = "block";
+  return;
+}
+document.getElementById("footStamp").textContent = window.RADIO_DATA.generated;
+var RAW = window.RADIO_DATA.stations;
+
+var STAGE_RANK = {idea:0, research:1, development:2, cooking:3, "in-work":4, complete:5, "on-hold":6};
+var BAND_LO = 76.0, BAND_HI = 108.0;
+
+var stations = RAW.slice().sort(function(a,b){
+  var ra = STAGE_RANK[a.stage] != null ? STAGE_RANK[a.stage] : 9;
+  var rb = STAGE_RANK[b.stage] != null ? STAGE_RANK[b.stage] : 9;
+  if (ra !== rb) return ra - rb;
+  return a.name < b.name ? -1 : 1;
+});
+stations.forEach(function(s, i){
+  s.freq = stations.length > 1 ? BAND_LO + (BAND_HI - BAND_LO) * (i / (stations.length - 1)) : (BAND_LO+BAND_HI)/2;
+  // a consonant root per station, picked from a small pentatonic set by name hash
+  var roots = [98.00, 110.00, 130.81, 146.83, 164.81, 196.00, 220.00];
+  var h = 0; for (var c=0;c<s.name.length;c++) h = (h*31 + s.name.charCodeAt(c)) >>> 0;
+  s.root = roots[h % roots.length];
+});
+
+var CHORDS = {
+  "idea":       {ratios:[1], gated:true},
+  "research":   {ratios:[1, 1.122], beat:true},
+  "development":{ratios:[1, 1.25, 1.5]},
+  "cooking":    {ratios:[1, 1.189, 1.5], tremolo:true},
+  "in-work":    {ratios:[1, 1.5], pulse:true},
+  "complete":   {ratios:[1, 1.25, 1.5, 2]},
+  "on-hold":    {ratios:[0.5], quiet:true}
+};
+var PRIORITY_CUTOFF = {low:500, medium:1200, high:2600};
+var PRIORITY_GAIN   = {low:0.07, medium:0.13, high:0.19};
+
+// ---------- audio engine ----------
+var ctx = null, master = null, analyser = null, noiseBuf = null;
+var current = null; // {gainNode, oscs[], blipTimer}
+var idx = 0, muted = false, scanTimer = null, scanning = false;
+var volTarget = 0.55;
+
+function ensureCtx(){
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+  master = ctx.createGain(); master.gain.value = volTarget;
+  analyser = ctx.createAnalyser(); analyser.fftSize = 1024;
+  master.connect(analyser); analyser.connect(ctx.destination);
+  var len = ctx.sampleRate * 1.0;
+  noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+  var d = noiseBuf.getChannelData(0);
+  for (var i=0;i<len;i++) d[i] = Math.random()*2-1;
+}
+
+function staticBurst(dur){
+  if (!ctx) return;
+  var src = ctx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+  var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 3000; bp.Q.value = 0.6;
+  var g = ctx.createGain(); g.gain.value = 0;
+  src.connect(bp); bp.connect(g); g.connect(master);
+  var t = ctx.currentTime;
+  g.gain.linearRampToValueAtTime(0.10, t + 0.02);
+  g.gain.linearRampToValueAtTime(0, t + (dur||0.16));
+  src.start(t); src.stop(t + (dur||0.16) + 0.05);
+}
+
+function blip(gainMul, onFire){
+  if (!ctx) return;
+  var src = ctx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+  var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
+  bp.frequency.value = 1800 + Math.random()*1800; bp.Q.value = 4;
+  var g = ctx.createGain(); g.gain.value = 0;
+  src.connect(bp); bp.connect(g); g.connect(master);
+  var t = ctx.currentTime;
+  g.gain.linearRampToValueAtTime(0.09 * gainMul, t + 0.004);
+  g.gain.linearRampToValueAtTime(0, t + 0.09);
+  src.start(t); src.stop(t + 0.12);
+  if (onFire) onFire();
+}
+
+function stopStation(st){
+  if (!st) return;
+  var t = ctx.currentTime;
+  st.gainNode.gain.cancelScheduledValues(t);
+  st.gainNode.gain.setTargetAtTime(0, t, 0.09);
+  clearTimeout(st.blipHandle);
+  var oscs = st.oscs;
+  setTimeout(function(){
+    oscs.forEach(function(o){ try{ o.stop(); }catch(e){} });
+    try{ st.gainNode.disconnect(); }catch(e){}
+  }, 400);
+}
+
+function scheduleBlips(st, s){
+  var rate = Math.max(1, Math.min(150, s.recent7d));
+  var interval = 6000 / (1 + Math.log2(rate + 1));
+  interval = Math.max(280, Math.min(4200, interval));
+  (function tick(){
+    st.blipHandle = setTimeout(function(){
+      blip(0.6 + Math.random()*0.5, function(){
+        var lamp = document.getElementById("blipLamp");
+        lamp.classList.add("hit");
+        setTimeout(function(){ lamp.classList.remove("hit"); }, 120);
+      });
+      tick();
+    }, interval * (0.6 + Math.random()*0.8));
+  })();
+}
+
+function startStation(s){
+  var chord = CHORDS[s.stage] || CHORDS.development;
+  var pc = PRIORITY_CUTOFF[s.priority] || 1200;
+  var pg = PRIORITY_GAIN[s.priority] || 0.13;
+
+  var gainNode = ctx.createGain(); gainNode.gain.value = 0;
+  var filt = ctx.createBiquadFilter(); filt.type = "lowpass"; filt.frequency.value = pc;
+  filt.connect(gainNode); gainNode.connect(master);
+
+  var oscs = [];
+  chord.ratios.forEach(function(r, i){
+    var o = ctx.createOscillator(); o.type = (i===0) ? "sine" : "triangle";
+    o.frequency.value = s.root * r;
+    var og = ctx.createGain(); og.gain.value = 1 / chord.ratios.length;
+    o.connect(og); og.connect(filt);
+    o.start();
+    oscs.push(o);
+  });
+
+  if (chord.tremolo || chord.pulse) {
+    var lfo = ctx.createOscillator(); lfo.type = "sine";
+    lfo.frequency.value = chord.tremolo ? 6 : 1.8;
+    var lfoGain = ctx.createGain();
+    lfoGain.gain.value = chord.tremolo ? 0.35 : 0.45;
+    var lfoOffset = ctx.createConstantSource(); lfoOffset.offset.value = chord.tremolo ? 0.65 : 0.55;
+    lfo.connect(lfoGain);
+    var trem = ctx.createGain(); trem.gain.value = 1;
+    lfoGain.connect(trem.gain); lfoOffset.connect(trem.gain);
+    filt.disconnect(); filt.connect(trem); trem.connect(gainNode);
+    lfo.start(); lfoOffset.start();
+    oscs.push(lfo); oscs.push(lfoOffset);
+  }
+
+  if (s.core) {
+    var sub = ctx.createOscillator(); sub.type = "sine"; sub.frequency.value = 55;
+    var subG = ctx.createGain(); subG.gain.value = 0.05;
+    sub.connect(subG); subG.connect(gainNode);
+    sub.start(); oscs.push(sub);
+  }
+
+  var targetGain = pg * (chord.quiet ? 0.35 : 1) * (chord.gated ? 0.5 : 1);
+  var t = ctx.currentTime;
+  gainNode.gain.setTargetAtTime(targetGain, t, 0.25);
+
+  if (chord.gated) {
+    var gate = ctx.createOscillator(); gate.type="sine"; gate.frequency.value = 0.15;
+    var gateGain = ctx.createGain(); gateGain.gain.value = 0.5;
+    var gateOff = ctx.createConstantSource(); gateOff.offset.value = 0.5;
+    gate.connect(gateGain);
+    var gt = ctx.createGain(); gt.gain.value = targetGain;
+    gainNode.gain.setTargetAtTime(0, t, 0.01);
+    gateGain.connect(gt.gain); gateOff.connect(gt.gain);
+    gainNode.disconnect(); filt.disconnect(); filt.connect(gt); gt.connect(master);
+    gate.start(); gateOff.start();
+    oscs.push(gate); oscs.push(gateOff);
+  }
+
+  var station = {gainNode:gainNode, oscs:oscs, blipHandle:null};
+  scheduleBlips(station, s);
+  return station;
+}
+
+// ---------- UI wiring ----------
+var els = {
+  freq: document.getElementById("freqNum"),
+  name: document.getElementById("stName"),
+  path: document.getElementById("stPath"),
+  stage: document.getElementById("mStage"),
+  priority: document.getElementById("mPriority"),
+  actBar: document.getElementById("mActBar"),
+  actNum: document.getElementById("mActNum"),
+  coreFlag: document.getElementById("mCoreFlag"),
+  strip: document.getElementById("strip"),
+  needle: document.getElementById("needle"),
+  ledPower: document.getElementById("ledPower"),
+  ledScan: document.getElementById("ledScan"),
+  ledCore: document.getElementById("ledCore"),
+  btnPower: document.getElementById("btnPower"),
+  btnScan: document.getElementById("btnScan"),
+  btnMute: document.getElementById("btnMute"),
+  btnPrev: document.getElementById("btnPrev"),
+  btnNext: document.getElementById("btnNext"),
+  vol: document.getElementById("volSlider"),
+  lTotal: document.getElementById("lTotal"),
+  l7d: document.getElementById("l7d"),
+  l1d: document.getElementById("l1d"),
+  lResting: document.getElementById("lResting"),
+  lSnap: document.getElementById("lSnap"),
+  scope: document.getElementById("scope")
+};
+
+var maxAct = Math.max.apply(null, stations.map(function(s){return s.recent7d;}));
+
+function buildTicksAndNeedle(){
+  stations.forEach(function(s){
+    var t = document.createElement("div");
+    t.className = "tick"; t.dataset.stage = s.stage;
+    var pct = (s.freq - BAND_LO) / (BAND_HI - BAND_LO);
+    t.style.left = (pct*100) + "%";
+    t.style.height = (14 + 22 * (s.recent7d / maxAct)) + "px";
+    t.title = s.name + " · " + s.freq.toFixed(1) + " MHz";
+    t.addEventListener("click", function(e){ e.stopPropagation(); tuneTo(stations.indexOf(s), true); });
+    els.strip.appendChild(t);
+  });
+}
+
+function renderUI(s, on){
+  var pct = (s.freq - BAND_LO) / (BAND_HI - BAND_LO);
+  els.needle.style.left = (pct*100) + "%";
+  els.freq.textContent = s.freq.toFixed(1).padStart(5, "0");
+  els.name.textContent = on ? s.name : "— OFF AIR —";
+  els.path.textContent = on ? "PROJECTS/" + s.name : "power on to tune in";
+  els.stage.textContent = s.stage;
+  els.priority.textContent = s.priority;
+  els.actBar.style.width = (100 * s.recent7d / maxAct) + "%";
+  els.actNum.textContent = s.recent7d;
+  els.coreFlag.style.display = s.core ? "inline" : "none";
+  els.lTotal.textContent = s.totalHist;
+  els.l7d.textContent = s.recent7d;
+  els.l1d.textContent = s.recent1d;
+  els.lResting.textContent = s.restingDays == null ? "active" : s.restingDays + "d";
+  els.lSnap.textContent = window.RADIO_DATA.generated;
+  els.ledCore.classList.toggle("on", !!s.core);
+  document.querySelectorAll(".tick").forEach(function(t, i){ t.classList.toggle("tuned", stations[i]===s); });
+}
+
+var powerOn = false;
+
+function tuneTo(i, userInitiated){
+  idx = ((i % stations.length) + stations.length) % stations.length;
+  var s = stations[idx];
+  if (!powerOn){ renderUI(s, false); return; }
+  ensureCtx();
+  if (ctx.state === "suspended") ctx.resume();
+  staticBurst(userInitiated ? 0.22 : 0.32);
+  if (current) stopStation(current);
+  current = startStation(s);
+  renderUI(s, true);
+}
+
+function setPower(on){
+  powerOn = on;
+  els.ledPower.classList.toggle("on", on);
+  els.btnPower.textContent = "Power";
+  els.btnPower.classList.toggle("off", !on);
+  els.btnPower.classList.toggle("power", true);
+  if (on) {
+    ensureCtx();
+    if (ctx.state === "suspended") ctx.resume();
+    tuneTo(idx, false);
+  } else {
+    if (current) stopStation(current);
+    current = null;
+    stopScan();
+    renderUI(stations[idx], false);
+  }
+}
+
+function startScan(){
+  if (!powerOn) return;
+  scanning = true;
+  els.ledScan.classList.add("on");
+  els.btnScan.classList.add("active");
+  scanTimer = setInterval(function(){ tuneTo(idx+1, false); }, 4500);
+}
+function stopScan(){
+  scanning = false;
+  els.ledScan.classList.remove("on");
+  els.btnScan.classList.remove("active");
+  clearInterval(scanTimer);
+}
+
+els.btnPower.addEventListener("click", function(){ setPower(!powerOn); });
+els.btnScan.addEventListener("click", function(){ scanning ? stopScan() : startScan(); });
+els.btnMute.addEventListener("click", function(){
+  muted = !muted;
+  els.btnMute.classList.toggle("active", muted);
+  if (master) master.gain.setTargetAtTime(muted ? 0 : volTarget, ctx.currentTime, 0.05);
+});
+els.btnPrev.addEventListener("click", function(){ stopScan(); tuneTo(idx-1, true); });
+els.btnNext.addEventListener("click", function(){ stopScan(); tuneTo(idx+1, true); });
+els.vol.addEventListener("input", function(){
+  volTarget = els.vol.value/100;
+  if (master && !muted) master.gain.setTargetAtTime(volTarget, ctx.currentTime, 0.05);
+});
+
+els.strip.addEventListener("click", function(e){
+  var rect = els.strip.getBoundingClientRect();
+  var pct = (e.clientX - rect.left) / rect.width;
+  var target = BAND_LO + pct*(BAND_HI-BAND_LO);
+  var nearest = 0, best = Infinity;
+  stations.forEach(function(s,i){ var d = Math.abs(s.freq-target); if (d<best){best=d; nearest=i;} });
+  stopScan(); tuneTo(nearest, true);
+});
+els.strip.addEventListener("keydown", function(e){
+  if (e.key === "ArrowRight"){ stopScan(); tuneTo(idx+1, true); }
+  if (e.key === "ArrowLeft"){ stopScan(); tuneTo(idx-1, true); }
+});
+
+buildTicksAndNeedle();
+renderUI(stations[idx], false);
+
+// ---------- scope ----------
+var sctx = els.scope.getContext("2d");
+function sizeCanvas(){
+  var r = els.scope.getBoundingClientRect();
+  els.scope.width = r.width * (window.devicePixelRatio||1);
+  els.scope.height = r.height * (window.devicePixelRatio||1);
+}
+window.addEventListener("resize", sizeCanvas);
+sizeCanvas();
+
+var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var scopeData = new Uint8Array(1024);
+function drawScope(){
+  requestAnimationFrame(drawScope);
+  var w = els.scope.width, h = els.scope.height;
+  sctx.clearRect(0,0,w,h);
+  sctx.strokeStyle = "rgba(92,106,140,0.25)";
+  sctx.lineWidth = 1;
+  sctx.beginPath(); sctx.moveTo(0,h/2); sctx.lineTo(w,h/2); sctx.stroke();
+  if (!analyser || !powerOn) return;
+  analyser.getByteTimeDomainData(scopeData);
+  sctx.beginPath();
+  sctx.strokeStyle = "#54f0ff";
+  sctx.shadowColor = "rgba(84,240,255,0.6)";
+  sctx.shadowBlur = reduceMotion ? 0 : 6;
+  sctx.lineWidth = 1.5;
+  var step = w / scopeData.length;
+  for (var i=0;i<scopeData.length;i++){
+    var v = scopeData[i]/128.0;
+    var y = v*h/2;
+    if (i===0) sctx.moveTo(0,y); else sctx.lineTo(i*step, y);
+  }
+  sctx.stroke();
+}
+drawScope();
+
+})();
+</script>
+</body>
+</html>
