@@ -62,6 +62,11 @@ body{
 .led.on i{background:var(--live); box-shadow:0 0 8px 1px var(--live);}
 .led.on.scan i{background:var(--amber); box-shadow:0 0 8px 1px var(--amber);}
 .led.on.core i{background:var(--good); box-shadow:0 0 8px 1px var(--good);}
+@media (max-width:600px){
+  .rail{align-items:flex-start; flex-wrap:wrap;}
+  .rail .sub{flex:1; min-width:140px;}
+  .rail .leds{width:100%; justify-content:flex-end;}
+}
 
 /* ---- mode switch: two synthesis engines, meditative (default/base) and free
    street (upbeat, beat-synced). Colour-coded to match what they mean: cyan/live
@@ -80,26 +85,31 @@ body{
 .modebtn.active{background:var(--live); color:var(--chassis);}
 #modeFreestreet.active{background:var(--attn);}
 .modebar-hint{font-size:10.5px; color:var(--ink-dim);}
-.orbitbar{
-  display:grid; grid-template-columns:auto minmax(140px,1fr) auto; align-items:center; gap:12px;
-  margin:-4px 0 14px; padding:10px 12px; background:var(--face); border:1px solid var(--seam); border-radius:4px;
+.orbitbench{margin-top:10px; padding-top:10px; border-top:1px dotted var(--seam);}
+.orbit-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+.orbit-head strong{font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink);}
+.orbit-hint{font-size:9px; color:var(--ink-dim); line-height:1.35; margin:5px 0 8px; min-height:2.7em;}
+.orbit-toggle,.choicebtn{
+  font-family:var(--font-body); font-size:9px; letter-spacing:0.06em; text-transform:uppercase;
+  background:var(--chassis); color:var(--ink-dim); border:1px solid var(--seam); border-radius:3px; cursor:pointer;
 }
-.orbit-copy{display:flex; flex-direction:column; gap:2px; min-width:0;}
-.orbit-copy strong{font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink);}
-.orbit-copy span{font-size:10px; color:var(--ink-dim); line-height:1.35;}
+.orbit-toggle{padding:5px 8px;}
+.orbit-toggle.active{background:var(--amber); border-color:var(--amber); color:var(--chassis);}
+.orbit-toggle:focus-visible,.choicebtn:focus-visible{outline:2px solid var(--live); outline-offset:2px;}
 .orbit-track{height:20px; position:relative; border-left:1px solid var(--ink-dim); border-right:1px solid var(--ink-dim);}
 .orbit-track::before{content:""; position:absolute; left:0; right:0; top:9px; border-top:1px dotted var(--seam);}
 .orbit-track::after{content:"centre"; position:absolute; left:50%; top:-1px; transform:translateX(-50%); font-size:8px; color:var(--ink-dim); letter-spacing:0.08em; text-transform:uppercase;}
 .orbit-dot{position:absolute; top:6px; left:50%; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:var(--live); box-shadow:0 0 9px var(--live);}
-.orbit-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
-.orbit-controls label{display:flex; align-items:center; gap:7px; font-size:9px; color:var(--ink-dim); letter-spacing:0.06em; text-transform:uppercase;}
-.orbit-controls input[type=range]{width:76px;}
-@media (max-width:600px){
-  .orbitbar{grid-template-columns:1fr; gap:10px;}
-  .orbit-copy,.orbit-controls,.orbit-track{grid-column:1;}
-  .orbit-copy span{max-width:none;}
-  .orbit-controls{justify-content:space-between;}
-}
+.orbit-params{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;}
+.orbit-params label{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:6px; font-size:8px; color:var(--ink-dim); letter-spacing:0.06em; text-transform:uppercase;}
+.orbit-params input[type=range]{width:100%; min-width:0;}
+.orbit-params .readout{color:var(--amber); min-width:2.8em; text-align:right; font-variant-numeric:tabular-nums;}
+.orbit-reply{display:flex; align-items:center; justify-content:space-between; gap:7px; margin-top:8px;}
+.orbit-reply>span{font-size:8px; color:var(--ink-dim); letter-spacing:0.08em; text-transform:uppercase;}
+.orbit-choices{display:flex; border:1px solid var(--seam); border-radius:3px; overflow:hidden;}
+.choicebtn{border:0; border-left:1px solid var(--seam); border-radius:0; padding:4px 6px;}
+.choicebtn:first-child{border-left:0;}
+.choicebtn.active{background:var(--live); color:var(--chassis);}
 
 /* ---- LCD ---- */
 .lcd{
@@ -235,18 +245,6 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
     <span class="modebar-hint" id="modeHint">sustained drones, one chord per stage</span>
   </div>
 
-  <div class="orbitbar" aria-label="Headphone spatial orbit case study">
-    <div class="orbit-copy">
-      <strong>headphone orbit</strong>
-      <span id="orbitHint">centred; switch on to let the station drift while activity answers from the other side</span>
-    </div>
-    <div class="orbit-track" aria-hidden="true"><i class="orbit-dot" id="orbitDot"></i></div>
-    <div class="orbit-controls">
-      <button class="ctrl" id="btnOrbit" aria-pressed="false">Orbit off</button>
-      <label>cycle <input type="range" id="orbitCycle" min="12" max="60" step="4" value="28"><span class="readout" id="orbitCycleVal">28s</span></label>
-    </div>
-  </div>
-
   <div class="lcd">
     <div class="freq-row">
       <span class="freq" id="freqNum">076.0</span>
@@ -285,6 +283,20 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
       <h2>Scope</h2>
       <canvas id="scope" width="360" height="78"></canvas>
       <div class="blipline"><span class="lamp" id="blipLamp"></span><span>activity blip = one dashboard event, sonified</span></div>
+      <div class="orbitbench" aria-label="Headphone spatial orbit experiment bench">
+        <div class="orbit-head"><strong>headphone orbit</strong><button class="orbit-toggle" id="btnOrbit" aria-pressed="false">Orbit off</button></div>
+        <div class="orbit-hint" id="orbitHint">centred; switch on to let the station drift while activity answers from the other side</div>
+        <div class="orbit-track" aria-hidden="true"><i class="orbit-dot" id="orbitDot"></i></div>
+        <div class="orbit-params">
+          <label>width <input type="range" id="orbitWidth" min="0" max="100" step="1" value="72"><span class="readout" id="orbitWidthVal">72%</span></label>
+          <label>cycle <input type="range" id="orbitCycle" min="12" max="60" step="4" value="28"><span class="readout" id="orbitCycleVal">28s</span></label>
+        </div>
+        <div class="orbit-reply"><span>activity replies</span><div class="orbit-choices" role="group" aria-label="Activity reply position">
+          <button class="choicebtn active" data-reply="opposite" aria-pressed="true">opposite</button>
+          <button class="choicebtn" data-reply="center" aria-pressed="false">centre</button>
+          <button class="choicebtn" data-reply="follow" aria-pressed="false">follow</button>
+        </div></div>
+      </div>
     </div>
   </div>
 
@@ -378,11 +390,15 @@ var current = null; // {gainNode, oscs[], blipHandle, schedulerHandle}
 var idx = 0, muted = false, scanTimer = null, scanning = false, shuffleOn = false;
 var volTarget = 0.55;
 var dwellMs = 4500; // re-read live each scan tick, so the slider takes effect mid-scan
-var orbitOn = false, orbitCycleSeconds = 28, orbitEpoch = performance.now();
+var orbitOn = false, orbitCycleSeconds = 28, orbitWidth = 0.72, orbitReply = "opposite", orbitEpoch = performance.now();
 try {
   orbitOn = localStorage.getItem("workspaceRadioOrbit") === "on";
   var savedCycle = parseFloat(localStorage.getItem("workspaceRadioOrbitCycle"));
   if (savedCycle >= 12 && savedCycle <= 60) orbitCycleSeconds = savedCycle;
+  var savedWidth = parseFloat(localStorage.getItem("workspaceRadioOrbitWidth"));
+  if (savedWidth >= 0 && savedWidth <= 1) orbitWidth = savedWidth;
+  var savedReply = localStorage.getItem("workspaceRadioOrbitReply");
+  if (["opposite","center","follow"].indexOf(savedReply) >= 0) orbitReply = savedReply;
 } catch (e) {}
 var radioMode = (function(){
   try {
@@ -660,6 +676,8 @@ var els = {
   modeFS: document.getElementById("modeFreestreet"),
   modeHint: document.getElementById("modeHint"),
   btnOrbit: document.getElementById("btnOrbit"),
+  orbitWidth: document.getElementById("orbitWidth"),
+  orbitWidthVal: document.getElementById("orbitWidthVal"),
   orbitCycle: document.getElementById("orbitCycle"),
   orbitCycleVal: document.getElementById("orbitCycleVal"),
   orbitDot: document.getElementById("orbitDot"),
@@ -679,11 +697,23 @@ function updateOrbitUI(){
   els.btnOrbit.textContent = orbitOn ? "Orbit on" : "Orbit off";
   els.btnOrbit.classList.toggle("active", orbitOn);
   els.btnOrbit.setAttribute("aria-pressed", String(orbitOn));
+  els.orbitWidth.value = Math.round(orbitWidth * 100);
+  els.orbitWidthVal.textContent = Math.round(orbitWidth * 100) + "%";
   els.orbitCycle.value = orbitCycleSeconds;
   els.orbitCycleVal.textContent = orbitCycleSeconds.toFixed(0) + "s";
+  document.querySelectorAll("[data-reply]").forEach(function(button){
+    var active = button.dataset.reply === orbitReply;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
   els.orbitHint.textContent = orbitOn
-    ? "station drifts; activity answers from the other side; tuning static stays centred"
+    ? "station width " + Math.round(orbitWidth * 100) + "%; activity replies " + (orbitReply === "center" ? "from centre" : orbitReply) + "; tuning static stays centred"
     : "centred; switch on to let the station drift while activity answers from the other side";
+}
+
+function activityOrbitDepth(){
+  if (orbitReply === "center") return 0;
+  return orbitWidth * (orbitReply === "follow" ? 0.67 : -0.67);
 }
 
 function updateOrbitAudio(immediate){
@@ -695,11 +725,11 @@ function updateOrbitAudio(immediate){
   orbitDepth.gain.cancelScheduledValues(t);
   activityDepth.gain.cancelScheduledValues(t);
   if (immediate) {
-    orbitDepth.gain.setValueAtTime(orbitOn ? 0.72 : 0, t);
-    activityDepth.gain.setValueAtTime(orbitOn ? -0.48 : 0, t);
+    orbitDepth.gain.setValueAtTime(orbitOn ? orbitWidth : 0, t);
+    activityDepth.gain.setValueAtTime(orbitOn ? activityOrbitDepth() : 0, t);
   } else {
-    orbitDepth.gain.setTargetAtTime(orbitOn ? 0.72 : 0, t, 0.18);
-    activityDepth.gain.setTargetAtTime(orbitOn ? -0.48 : 0, t, 0.18);
+    orbitDepth.gain.setTargetAtTime(orbitOn ? orbitWidth : 0, t, 0.18);
+    activityDepth.gain.setTargetAtTime(orbitOn ? activityOrbitDepth() : 0, t, 0.18);
   }
   orbitEpoch = performance.now();
 }
@@ -707,6 +737,12 @@ function updateOrbitAudio(immediate){
 function setOrbit(on){
   orbitOn = !!on;
   try { localStorage.setItem("workspaceRadioOrbit", orbitOn ? "on" : "off"); } catch (e) {}
+  updateOrbitUI();
+  updateOrbitAudio(false);
+}
+function setOrbitReply(reply){
+  orbitReply = reply;
+  try { localStorage.setItem("workspaceRadioOrbitReply", reply); } catch (e) {}
   updateOrbitUI();
   updateOrbitAudio(false);
 }
@@ -846,6 +882,9 @@ els.btnRandom.addEventListener("click", function(){ stopScan(); tuneTo(randomInd
 els.modeMed.addEventListener("click", function(){ setMode("meditative"); });
 els.modeFS.addEventListener("click", function(){ setMode("freestreet"); });
 els.btnOrbit.addEventListener("click", function(){ setOrbit(!orbitOn); });
+document.querySelectorAll("[data-reply]").forEach(function(button){
+  button.addEventListener("click", function(){ setOrbitReply(button.dataset.reply); });
+});
 els.btnPrev.addEventListener("click", function(){ stopScan(); tuneTo(idx-1, true); });
 els.btnNext.addEventListener("click", function(){ stopScan(); tuneTo(idx+1, true); });
 els.vol.addEventListener("input", function(){
@@ -861,6 +900,12 @@ els.orbitCycle.addEventListener("input", function(){
   orbitCycleSeconds = parseFloat(els.orbitCycle.value);
   els.orbitCycleVal.textContent = orbitCycleSeconds.toFixed(0) + "s";
   try { localStorage.setItem("workspaceRadioOrbitCycle", String(orbitCycleSeconds)); } catch (e) {}
+  updateOrbitAudio(false);
+});
+els.orbitWidth.addEventListener("input", function(){
+  orbitWidth = parseFloat(els.orbitWidth.value) / 100;
+  try { localStorage.setItem("workspaceRadioOrbitWidth", String(orbitWidth)); } catch (e) {}
+  updateOrbitUI();
   updateOrbitAudio(false);
 });
 
@@ -895,7 +940,7 @@ var scopeData = new Uint8Array(1024);
 function drawScope(){
   requestAnimationFrame(drawScope);
   var orbitPhase = ((performance.now() - orbitEpoch) / 1000) * (Math.PI * 2 / orbitCycleSeconds);
-  var orbitPct = orbitOn && !reduceMotion ? 50 + Math.sin(orbitPhase) * 36 : 50;
+  var orbitPct = orbitOn && !reduceMotion ? 50 + Math.sin(orbitPhase) * orbitWidth * 50 : 50;
   els.orbitDot.style.left = orbitPct.toFixed(2) + "%";
   els.orbitDot.style.opacity = orbitOn ? "1" : "0.35";
   var w = els.scope.width, h = els.scope.height;
