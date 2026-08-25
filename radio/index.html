@@ -159,7 +159,9 @@ button.ctrl.power{color:var(--good); border-color:rgba(87,242,164,0.35);}
 button.ctrl.power.off{color:var(--crit); border-color:rgba(255,93,93,0.35);}
 button.ctrl.active{color:var(--chassis); background:var(--amber); border-color:var(--amber);}
 button.ctrl.nudge{padding:9px 12px;}
-.vol{display:flex; align-items:center; gap:8px; margin-left:auto; color:var(--ink-dim); font-size:10px; letter-spacing:0.06em; text-transform:uppercase;}
+.sliders{display:flex; align-items:center; gap:16px; margin-left:auto; flex-wrap:wrap;}
+.vol{display:flex; align-items:center; gap:8px; color:var(--ink-dim); font-size:10px; letter-spacing:0.06em; text-transform:uppercase;}
+.vol .readout{color:var(--amber); font-variant-numeric:tabular-nums; min-width:3.4em;}
 input[type=range]{-webkit-appearance:none; width:110px; height:3px; background:var(--seam); border-radius:2px;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--amber); box-shadow:0 0 6px var(--amber); cursor:pointer;}
 input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; background:var(--amber); border:0; box-shadow:0 0 6px var(--amber); cursor:pointer;}
@@ -230,10 +232,18 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
     <button class="ctrl nudge" id="btnPrev" aria-label="Previous station">◀</button>
     <button class="ctrl power off" id="btnPower">Power</button>
     <button class="ctrl" id="btnScan">Scan</button>
+    <button class="ctrl" id="btnShuffle" aria-pressed="false">Shuffle</button>
     <button class="ctrl" id="btnMute">Mute</button>
+    <button class="ctrl nudge" id="btnRandom" aria-label="Jump to a random station">🎲</button>
     <button class="ctrl nudge" id="btnNext" aria-label="Next station">▶</button>
-    <div class="vol">vol
-      <input type="range" id="volSlider" min="0" max="100" value="55">
+    <div class="sliders">
+      <div class="vol">scan
+        <input type="range" id="dwellSlider" min="1.5" max="15" step="0.5" value="4.5">
+        <span class="readout" id="dwellVal">4.5s</span>
+      </div>
+      <div class="vol">vol
+        <input type="range" id="volSlider" min="0" max="100" value="55">
+      </div>
     </div>
   </div>
 
@@ -284,8 +294,9 @@ var PRIORITY_GAIN   = {low:0.07, medium:0.13, high:0.19};
 // ---------- audio engine ----------
 var ctx = null, master = null, analyser = null, noiseBuf = null;
 var current = null; // {gainNode, oscs[], blipTimer}
-var idx = 0, muted = false, scanTimer = null, scanning = false;
+var idx = 0, muted = false, scanTimer = null, scanning = false, shuffleOn = false;
 var volTarget = 0.55;
+var dwellMs = 4500; // re-read live each scan tick, so the slider takes effect mid-scan
 
 function ensureCtx(){
   if (ctx) return;
@@ -433,10 +444,14 @@ var els = {
   ledCore: document.getElementById("ledCore"),
   btnPower: document.getElementById("btnPower"),
   btnScan: document.getElementById("btnScan"),
+  btnShuffle: document.getElementById("btnShuffle"),
   btnMute: document.getElementById("btnMute"),
+  btnRandom: document.getElementById("btnRandom"),
   btnPrev: document.getElementById("btnPrev"),
   btnNext: document.getElementById("btnNext"),
   vol: document.getElementById("volSlider"),
+  dwell: document.getElementById("dwellSlider"),
+  dwellVal: document.getElementById("dwellVal"),
   lTotal: document.getElementById("lTotal"),
   l7d: document.getElementById("l7d"),
   l1d: document.getElementById("l1d"),
@@ -512,32 +527,59 @@ function setPower(on){
   }
 }
 
+function randomIndex(){
+  // a different station than the one currently tuned, whenever there's a choice
+  if (stations.length <= 1) return idx;
+  var n;
+  do { n = Math.floor(Math.random() * stations.length); } while (n === idx);
+  return n;
+}
+function nextScanIndex(){ return shuffleOn ? randomIndex() : idx + 1; }
+
 function startScan(){
   if (!powerOn) return;
   scanning = true;
   els.ledScan.classList.add("on");
   els.btnScan.classList.add("active");
-  scanTimer = setInterval(function(){ tuneTo(idx+1, false); }, 4500);
+  (function loop(){
+    // dwellMs is read fresh on every schedule, so dragging the slider mid-scan
+    // changes the *next* hop's timing without needing to tear the scan down
+    scanTimer = setTimeout(function(){
+      tuneTo(nextScanIndex(), false);
+      if (scanning) loop();
+    }, dwellMs);
+  })();
 }
 function stopScan(){
   scanning = false;
   els.ledScan.classList.remove("on");
   els.btnScan.classList.remove("active");
-  clearInterval(scanTimer);
+  clearTimeout(scanTimer);
 }
 
 els.btnPower.addEventListener("click", function(){ setPower(!powerOn); });
 els.btnScan.addEventListener("click", function(){ scanning ? stopScan() : startScan(); });
+els.btnShuffle.addEventListener("click", function(){
+  shuffleOn = !shuffleOn;
+  els.btnShuffle.classList.toggle("active", shuffleOn);
+  els.btnShuffle.setAttribute("aria-pressed", String(shuffleOn));
+});
 els.btnMute.addEventListener("click", function(){
   muted = !muted;
   els.btnMute.classList.toggle("active", muted);
   if (master) master.gain.setTargetAtTime(muted ? 0 : volTarget, ctx.currentTime, 0.05);
 });
+els.btnRandom.addEventListener("click", function(){ stopScan(); tuneTo(randomIndex(), true); });
 els.btnPrev.addEventListener("click", function(){ stopScan(); tuneTo(idx-1, true); });
 els.btnNext.addEventListener("click", function(){ stopScan(); tuneTo(idx+1, true); });
 els.vol.addEventListener("input", function(){
   volTarget = els.vol.value/100;
   if (master && !muted) master.gain.setTargetAtTime(volTarget, ctx.currentTime, 0.05);
+});
+els.dwell.addEventListener("input", function(){
+  var secs = parseFloat(els.dwell.value);
+  dwellMs = Math.round(secs * 1000);
+  els.dwellVal.textContent = secs.toFixed(1) + "s";
 });
 
 els.strip.addEventListener("click", function(e){
