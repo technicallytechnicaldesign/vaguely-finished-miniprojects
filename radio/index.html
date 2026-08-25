@@ -80,6 +80,26 @@ body{
 .modebtn.active{background:var(--live); color:var(--chassis);}
 #modeFreestreet.active{background:var(--attn);}
 .modebar-hint{font-size:10.5px; color:var(--ink-dim);}
+.orbitbar{
+  display:grid; grid-template-columns:auto minmax(140px,1fr) auto; align-items:center; gap:12px;
+  margin:-4px 0 14px; padding:10px 12px; background:var(--face); border:1px solid var(--seam); border-radius:4px;
+}
+.orbit-copy{display:flex; flex-direction:column; gap:2px; min-width:0;}
+.orbit-copy strong{font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink);}
+.orbit-copy span{font-size:10px; color:var(--ink-dim); line-height:1.35;}
+.orbit-track{height:20px; position:relative; border-left:1px solid var(--ink-dim); border-right:1px solid var(--ink-dim);}
+.orbit-track::before{content:""; position:absolute; left:0; right:0; top:9px; border-top:1px dotted var(--seam);}
+.orbit-track::after{content:"centre"; position:absolute; left:50%; top:-1px; transform:translateX(-50%); font-size:8px; color:var(--ink-dim); letter-spacing:0.08em; text-transform:uppercase;}
+.orbit-dot{position:absolute; top:6px; left:50%; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:var(--live); box-shadow:0 0 9px var(--live);}
+.orbit-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+.orbit-controls label{display:flex; align-items:center; gap:7px; font-size:9px; color:var(--ink-dim); letter-spacing:0.06em; text-transform:uppercase;}
+.orbit-controls input[type=range]{width:76px;}
+@media (max-width:600px){
+  .orbitbar{grid-template-columns:1fr; gap:10px;}
+  .orbit-copy,.orbit-controls,.orbit-track{grid-column:1;}
+  .orbit-copy span{max-width:none;}
+  .orbit-controls{justify-content:space-between;}
+}
 
 /* ---- LCD ---- */
 .lcd{
@@ -215,6 +235,18 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
     <span class="modebar-hint" id="modeHint">sustained drones, one chord per stage</span>
   </div>
 
+  <div class="orbitbar" aria-label="Headphone spatial orbit case study">
+    <div class="orbit-copy">
+      <strong>headphone orbit</strong>
+      <span id="orbitHint">centred; switch on to let the station drift while activity answers from the other side</span>
+    </div>
+    <div class="orbit-track" aria-hidden="true"><i class="orbit-dot" id="orbitDot"></i></div>
+    <div class="orbit-controls">
+      <button class="ctrl" id="btnOrbit" aria-pressed="false">Orbit off</button>
+      <label>cycle <input type="range" id="orbitCycle" min="12" max="60" step="4" value="28"><span class="readout" id="orbitCycleVal">28s</span></label>
+    </div>
+  </div>
+
   <div class="lcd">
     <div class="freq-row">
       <span class="freq" id="freqNum">076.0</span>
@@ -275,7 +307,7 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
     </div>
   </div>
 
-  <div class="foot">reads <code>radio.data.js</code> live, generated <span id="footStamp">—</span> by <code>build-radio-data.ps1</code> from <code>_SYSTEM/data/projects-data.js</code> · stage + priority + 7-day event count, each mapped to a synthesized station · only as fresh as the last <code>refresh.ps1</code> run · <a href="../../../CORE/WORKSPACE_OPS/04_DOCS/prompt-dictionary.html">Prompt Dictionary →</a></div>
+  <div class="foot">reads <code>radio.data.js</code> live, generated <span id="footStamp">—</span> by <code>build-radio-data.ps1</code> from <code>_SYSTEM/data/projects-data.js</code> · stage + priority + 7-day event count, each mapped to a synthesized station · only as fresh as the last <code>refresh.ps1</code> run · <a href="../01_RESEARCH/workspace-radio-spatial-orbit-case-study.md">spatial case study →</a> · <a href="../../../CORE/WORKSPACE_OPS/04_DOCS/prompt-dictionary.html">Prompt Dictionary →</a></div>
 </div>
 
 <script src="radio.data.js"></script>
@@ -341,10 +373,17 @@ var BPM = {idea:92, research:104, development:124, cooking:142, "in-work":132, c
 
 // ---------- audio engine ----------
 var ctx = null, master = null, analyser = null, noiseBuf = null;
+var orbitPanner = null, activityPanner = null, orbitLfo = null, orbitDepth = null, activityDepth = null;
 var current = null; // {gainNode, oscs[], blipHandle, schedulerHandle}
 var idx = 0, muted = false, scanTimer = null, scanning = false, shuffleOn = false;
 var volTarget = 0.55;
 var dwellMs = 4500; // re-read live each scan tick, so the slider takes effect mid-scan
+var orbitOn = false, orbitCycleSeconds = 28, orbitEpoch = performance.now();
+try {
+  orbitOn = localStorage.getItem("workspaceRadioOrbit") === "on";
+  var savedCycle = parseFloat(localStorage.getItem("workspaceRadioOrbitCycle"));
+  if (savedCycle >= 12 && savedCycle <= 60) orbitCycleSeconds = savedCycle;
+} catch (e) {}
 var radioMode = (function(){
   try {
     var m = localStorage.getItem("workspaceRadioMode");
@@ -359,6 +398,24 @@ function ensureCtx(){
   master = ctx.createGain(); master.gain.value = volTarget;
   analyser = ctx.createAnalyser(); analyser.fftSize = 1024;
   master.connect(analyser); analyser.connect(ctx.destination);
+  if (ctx.createStereoPanner) {
+    orbitPanner = ctx.createStereoPanner();
+    activityPanner = ctx.createStereoPanner();
+    orbitPanner.connect(master);
+    activityPanner.connect(master);
+    orbitLfo = ctx.createOscillator(); orbitLfo.type = "sine";
+    orbitDepth = ctx.createGain();
+    activityDepth = ctx.createGain();
+    orbitLfo.connect(orbitDepth); orbitDepth.connect(orbitPanner.pan);
+    orbitLfo.connect(activityDepth); activityDepth.connect(activityPanner.pan);
+    orbitLfo.start();
+    updateOrbitAudio(true);
+  } else {
+    orbitPanner = master;
+    activityPanner = master;
+    orbitOn = false;
+    updateOrbitUI();
+  }
   var len = ctx.sampleRate * 1.0;
   noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
   var d = noiseBuf.getChannelData(0);
@@ -383,7 +440,7 @@ function blip(gainMul, onFire){
   var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
   bp.frequency.value = 1800 + Math.random()*1800; bp.Q.value = 4;
   var g = ctx.createGain(); g.gain.value = 0;
-  src.connect(bp); bp.connect(g); g.connect(master);
+  src.connect(bp); bp.connect(g); g.connect(activityPanner || master);
   var t = ctx.currentTime;
   g.gain.linearRampToValueAtTime(0.09 * gainMul, t + 0.004);
   g.gain.linearRampToValueAtTime(0, t + 0.09);
@@ -432,7 +489,7 @@ function startStationMeditative(s){
 
   var gainNode = ctx.createGain(); gainNode.gain.value = 0;
   var filt = ctx.createBiquadFilter(); filt.type = "lowpass"; filt.frequency.value = pc;
-  filt.connect(gainNode); gainNode.connect(master);
+  filt.connect(gainNode); gainNode.connect(orbitPanner || master);
 
   var oscs = [];
   chord.ratios.forEach(function(r, i){
@@ -479,7 +536,7 @@ function startStationMeditative(s){
     var gt = ctx.createGain(); gt.gain.value = targetGain;
     gainNode.gain.setTargetAtTime(0, t, 0.01);
     gateGain.connect(gt.gain); gateOff.connect(gt.gain);
-    gainNode.disconnect(); filt.disconnect(); filt.connect(gt); gt.connect(master);
+    gainNode.disconnect(); filt.disconnect(); filt.connect(gt); gt.connect(orbitPanner || master);
     gate.start(); gateOff.start();
     oscs.push(gate); oscs.push(gateOff);
   }
@@ -525,7 +582,7 @@ function startStationFreestreet(s){
 
   var gainNode = ctx.createGain(); gainNode.gain.value = 0;
   var filt = ctx.createBiquadFilter(); filt.type = "lowpass"; filt.frequency.value = pc;
-  filt.connect(gainNode); gainNode.connect(master);
+  filt.connect(gainNode); gainNode.connect(orbitPanner || master);
   var t0 = ctx.currentTime;
   gainNode.gain.setTargetAtTime(pg * 1.15, t0, 0.25); // a touch louder/brighter than meditative
 
@@ -602,6 +659,11 @@ var els = {
   modeMed: document.getElementById("modeMeditative"),
   modeFS: document.getElementById("modeFreestreet"),
   modeHint: document.getElementById("modeHint"),
+  btnOrbit: document.getElementById("btnOrbit"),
+  orbitCycle: document.getElementById("orbitCycle"),
+  orbitCycleVal: document.getElementById("orbitCycleVal"),
+  orbitDot: document.getElementById("orbitDot"),
+  orbitHint: document.getElementById("orbitHint"),
   lTotal: document.getElementById("lTotal"),
   l7d: document.getElementById("l7d"),
   l1d: document.getElementById("l1d"),
@@ -612,6 +674,43 @@ var els = {
 };
 
 var maxAct = Math.max.apply(null, stations.map(function(s){return s.recent7d;}));
+
+function updateOrbitUI(){
+  els.btnOrbit.textContent = orbitOn ? "Orbit on" : "Orbit off";
+  els.btnOrbit.classList.toggle("active", orbitOn);
+  els.btnOrbit.setAttribute("aria-pressed", String(orbitOn));
+  els.orbitCycle.value = orbitCycleSeconds;
+  els.orbitCycleVal.textContent = orbitCycleSeconds.toFixed(0) + "s";
+  els.orbitHint.textContent = orbitOn
+    ? "station drifts; activity answers from the other side; tuning static stays centred"
+    : "centred; switch on to let the station drift while activity answers from the other side";
+}
+
+function updateOrbitAudio(immediate){
+  if (!ctx || !orbitLfo || !orbitDepth || !activityDepth) return;
+  var t = ctx.currentTime;
+  var frequency = 1 / orbitCycleSeconds;
+  orbitLfo.frequency.cancelScheduledValues(t);
+  orbitLfo.frequency.setTargetAtTime(frequency, t, immediate ? 0.01 : 0.12);
+  orbitDepth.gain.cancelScheduledValues(t);
+  activityDepth.gain.cancelScheduledValues(t);
+  if (immediate) {
+    orbitDepth.gain.setValueAtTime(orbitOn ? 0.72 : 0, t);
+    activityDepth.gain.setValueAtTime(orbitOn ? -0.48 : 0, t);
+  } else {
+    orbitDepth.gain.setTargetAtTime(orbitOn ? 0.72 : 0, t, 0.18);
+    activityDepth.gain.setTargetAtTime(orbitOn ? -0.48 : 0, t, 0.18);
+  }
+  orbitEpoch = performance.now();
+}
+
+function setOrbit(on){
+  orbitOn = !!on;
+  try { localStorage.setItem("workspaceRadioOrbit", orbitOn ? "on" : "off"); } catch (e) {}
+  updateOrbitUI();
+  updateOrbitAudio(false);
+}
+updateOrbitUI();
 
 function buildTicksAndNeedle(){
   stations.forEach(function(s){
@@ -746,6 +845,7 @@ els.btnMute.addEventListener("click", function(){
 els.btnRandom.addEventListener("click", function(){ stopScan(); tuneTo(randomIndex(), true); });
 els.modeMed.addEventListener("click", function(){ setMode("meditative"); });
 els.modeFS.addEventListener("click", function(){ setMode("freestreet"); });
+els.btnOrbit.addEventListener("click", function(){ setOrbit(!orbitOn); });
 els.btnPrev.addEventListener("click", function(){ stopScan(); tuneTo(idx-1, true); });
 els.btnNext.addEventListener("click", function(){ stopScan(); tuneTo(idx+1, true); });
 els.vol.addEventListener("input", function(){
@@ -756,6 +856,12 @@ els.dwell.addEventListener("input", function(){
   var secs = parseFloat(els.dwell.value);
   dwellMs = Math.round(secs * 1000);
   els.dwellVal.textContent = secs.toFixed(1) + "s";
+});
+els.orbitCycle.addEventListener("input", function(){
+  orbitCycleSeconds = parseFloat(els.orbitCycle.value);
+  els.orbitCycleVal.textContent = orbitCycleSeconds.toFixed(0) + "s";
+  try { localStorage.setItem("workspaceRadioOrbitCycle", String(orbitCycleSeconds)); } catch (e) {}
+  updateOrbitAudio(false);
 });
 
 els.strip.addEventListener("click", function(e){
@@ -788,6 +894,10 @@ var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-moti
 var scopeData = new Uint8Array(1024);
 function drawScope(){
   requestAnimationFrame(drawScope);
+  var orbitPhase = ((performance.now() - orbitEpoch) / 1000) * (Math.PI * 2 / orbitCycleSeconds);
+  var orbitPct = orbitOn && !reduceMotion ? 50 + Math.sin(orbitPhase) * 36 : 50;
+  els.orbitDot.style.left = orbitPct.toFixed(2) + "%";
+  els.orbitDot.style.opacity = orbitOn ? "1" : "0.35";
   var w = els.scope.width, h = els.scope.height;
   sctx.clearRect(0,0,w,h);
   sctx.strokeStyle = "rgba(92,106,140,0.25)";
