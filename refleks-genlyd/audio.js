@@ -90,8 +90,16 @@
    * A bowl: a few slightly inharmonic sine partials, slow in, long out. Its
    * pitch always comes from Core.pitchForGesture, so it is drawn from the
    * drone's own set and cannot be a wrong note.
+   *
+   * The detune on each partial has to stay small. A partial beats against its
+   * true harmonic at (fundamental * multiplier * fractional-detune) Hz, and
+   * anywhere in roughly 15-40Hz that beat stops reading as a slow shimmer and
+   * starts reading as buzz. The original set's 4th partial (4.07, i.e. 1.75%
+   * sharp) beat at ~31Hz against the highest playable fundamental (440Hz) -
+   * an actual insect-wing rate, which is what "IS THAT A BEE" was hearing.
+   * This set keeps every partial's worst-case beat under ~4Hz.
    */
-  var BOWL_PARTIALS = [1, 2.01, 2.98, 4.07];
+  var BOWL_PARTIALS = [1, 2.004, 3.002, 3.997];
 
   RGAudio.prototype._buildVoice = function () {
     var ctx = this.ctx;
