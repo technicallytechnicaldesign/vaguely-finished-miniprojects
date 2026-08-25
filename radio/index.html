@@ -63,6 +63,24 @@ body{
 .led.on.scan i{background:var(--amber); box-shadow:0 0 8px 1px var(--amber);}
 .led.on.core i{background:var(--good); box-shadow:0 0 8px 1px var(--good);}
 
+/* ---- mode switch: two synthesis engines, meditative (default/base) and free
+   street (upbeat, beat-synced). Colour-coded to match what they mean: cyan/live
+   for the calm default, magenta/attn for the energetic one - the same two
+   accents FREE_STREET's own visual identity uses for "current" vs "attention". */
+.modebar{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.modebar-label{font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim);}
+.modeswitch{display:inline-flex; border:1px solid var(--seam); border-radius:999px; overflow:hidden;}
+.modebtn{
+  font-family:var(--font-body); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; font-weight:600;
+  background:var(--face); color:var(--ink-dim); border:0; border-left:1px solid var(--seam);
+  padding:6px 14px; cursor:pointer;
+}
+.modebtn:first-child{border-left:0;}
+.modebtn:focus-visible{outline:2px solid var(--live); outline-offset:-2px;}
+.modebtn.active{background:var(--live); color:var(--chassis);}
+#modeFreestreet.active{background:var(--attn);}
+.modebar-hint{font-size:10.5px; color:var(--ink-dim);}
+
 /* ---- LCD ---- */
 .lcd{
   background: linear-gradient(180deg, var(--face-2), var(--face));
@@ -188,6 +206,15 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
     </div>
   </div>
 
+  <div class="modebar">
+    <span class="modebar-label">vibe</span>
+    <div class="modeswitch" role="group" aria-label="Sound mode">
+      <button type="button" class="modebtn active" id="modeMeditative" aria-pressed="true">Meditative</button>
+      <button type="button" class="modebtn" id="modeFreestreet" aria-pressed="false">Free Street</button>
+    </div>
+    <span class="modebar-hint" id="modeHint">sustained drones, one chord per stage</span>
+  </div>
+
   <div class="lcd">
     <div class="freq-row">
       <span class="freq" id="freqNum">076.0</span>
@@ -219,6 +246,7 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
       <div class="logline"><span>events, last 7 days</span><span id="l7d">—</span></div>
       <div class="logline"><span>events, last 24h</span><span id="l1d">—</span></div>
       <div class="logline"><span>resting</span><span id="lResting">—</span></div>
+      <div class="logline"><span>discipline</span><span id="lDiscipline">—</span></div>
       <div class="logline"><span>data generated</span><span id="lSnap">—</span></div>
     </div>
     <div class="panel">
@@ -291,12 +319,39 @@ var CHORDS = {
 var PRIORITY_CUTOFF = {low:500, medium:1200, high:2600};
 var PRIORITY_GAIN   = {low:0.07, medium:0.13, high:0.19};
 
+// per-station timbre, from radio.data.js's "family" (derived server-side from each
+// project's real portfolio discipline - see build-radio-data.ps1). Used by both engines
+// so a station keeps its character whichever mode you're in: melodic/soft lean toward
+// sine+triangle and a gentle top end, mechanical/clicky/digital lean toward square/saw
+// and a harder edge. "bass" is Free Street's low end only.
+var TIMBRE = {
+  melodic:    {types:["sine","triangle","triangle"], detune:4, bass:"sawtooth"},
+  mechanical: {types:["sawtooth","square","triangle"], detune:9, bass:"square"},
+  clicky:     {types:["square","square","triangle"], detune:6, bass:"square"},
+  digital:    {types:["square","sine","sine"], detune:0, bass:"square"},
+  soft:       {types:["sine","sine","triangle"], detune:3, bass:"sawtooth"}
+};
+function timbreFor(s){ return TIMBRE[s.family] || TIMBRE.digital; }
+
+// Free Street's tempo per stage - the same "stage says something real" idea as the
+// meditative chords, just expressed as motion instead of harmony. Nudged up slightly by
+// real 7-day activity so a busy station also sounds busier, log-scaled and capped so one
+// very active project can't run away with the tempo.
+var BPM = {idea:92, research:104, development:124, cooking:142, "in-work":132, complete:120, "on-hold":76};
+
 // ---------- audio engine ----------
 var ctx = null, master = null, analyser = null, noiseBuf = null;
-var current = null; // {gainNode, oscs[], blipTimer}
+var current = null; // {gainNode, oscs[], blipHandle, schedulerHandle}
 var idx = 0, muted = false, scanTimer = null, scanning = false, shuffleOn = false;
 var volTarget = 0.55;
 var dwellMs = 4500; // re-read live each scan tick, so the slider takes effect mid-scan
+var radioMode = (function(){
+  try {
+    var m = localStorage.getItem("workspaceRadioMode");
+    if (m === "freestreet" || m === "meditative") return m;
+  } catch (e) {}
+  return "meditative";
+})();
 
 function ensureCtx(){
   if (ctx) return;
@@ -342,11 +397,18 @@ function stopStation(st){
   st.gainNode.gain.cancelScheduledValues(t);
   st.gainNode.gain.setTargetAtTime(0, t, 0.09);
   clearTimeout(st.blipHandle);
+  clearInterval(st.schedulerHandle);
   var oscs = st.oscs;
   setTimeout(function(){
     oscs.forEach(function(o){ try{ o.stop(); }catch(e){} });
     try{ st.gainNode.disconnect(); }catch(e){}
   }, 400);
+}
+
+function flashBlipLamp(){
+  var lamp = document.getElementById("blipLamp");
+  lamp.classList.add("hit");
+  setTimeout(function(){ lamp.classList.remove("hit"); }, 120);
 }
 
 function scheduleBlips(st, s){
@@ -355,18 +417,16 @@ function scheduleBlips(st, s){
   interval = Math.max(280, Math.min(4200, interval));
   (function tick(){
     st.blipHandle = setTimeout(function(){
-      blip(0.6 + Math.random()*0.5, function(){
-        var lamp = document.getElementById("blipLamp");
-        lamp.classList.add("hit");
-        setTimeout(function(){ lamp.classList.remove("hit"); }, 120);
-      });
+      blip(0.6 + Math.random()*0.5, flashBlipLamp);
       tick();
     }, interval * (0.6 + Math.random()*0.8));
   })();
 }
 
-function startStation(s){
+// ---------- engine 1: meditative (default/base) - sustained chords, one per stage ----------
+function startStationMeditative(s){
   var chord = CHORDS[s.stage] || CHORDS.development;
+  var fam = timbreFor(s);
   var pc = PRIORITY_CUTOFF[s.priority] || 1200;
   var pg = PRIORITY_GAIN[s.priority] || 0.13;
 
@@ -376,8 +436,10 @@ function startStation(s){
 
   var oscs = [];
   chord.ratios.forEach(function(r, i){
-    var o = ctx.createOscillator(); o.type = (i===0) ? "sine" : "triangle";
+    var o = ctx.createOscillator();
+    o.type = fam.types[i % fam.types.length];
     o.frequency.value = s.root * r;
+    if (fam.detune) o.detune.value = (i % 2 === 0 ? 1 : -1) * fam.detune * i;
     var og = ctx.createGain(); og.gain.value = 1 / chord.ratios.length;
     o.connect(og); og.connect(filt);
     o.start();
@@ -422,9 +484,94 @@ function startStation(s){
     oscs.push(gate); oscs.push(gateOff);
   }
 
-  var station = {gainNode:gainNode, oscs:oscs, blipHandle:null};
+  var station = {gainNode:gainNode, oscs:oscs, blipHandle:null, schedulerHandle:null};
   scheduleBlips(station, s);
   return station;
+}
+
+// ---------- engine 2: free street (upbeat, beat-synced) ----------
+// A proper lookahead scheduler (the standard WebAudio "look ahead, schedule precisely"
+// pattern) rather than setTimeout-triggered notes, so the bassline/arp/hats actually
+// lock to a 16th-note grid instead of drifting. Reuses the same CHORDS ratios and
+// PRIORITY tables as meditative, so a station's stage and priority still mean the same
+// thing in both modes - only the rhythmic language changes.
+function playBass(time, s, fam, filt){
+  var o = ctx.createOscillator();
+  o.type = fam.bass;
+  o.frequency.setValueAtTime(s.root / 2, time);
+  var og = ctx.createGain();
+  og.gain.setValueAtTime(0, time);
+  og.gain.linearRampToValueAtTime(0.9, time + 0.008);
+  og.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+  o.connect(og); og.connect(filt);
+  o.start(time); o.stop(time + 0.24);
+}
+function playArp(time, s, fam, filt, ratio){
+  var o = ctx.createOscillator();
+  o.type = fam.types[0];
+  o.frequency.setValueAtTime(s.root * ratio * 2, time);
+  var og = ctx.createGain();
+  og.gain.setValueAtTime(0, time);
+  og.gain.linearRampToValueAtTime(0.32, time + 0.006);
+  og.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+  o.connect(og); og.connect(filt);
+  o.start(time); o.stop(time + 0.14);
+}
+function startStationFreestreet(s){
+  var chord = CHORDS[s.stage] || CHORDS.development;
+  var fam = timbreFor(s);
+  var pc = PRIORITY_CUTOFF[s.priority] || 1200;
+  var pg = PRIORITY_GAIN[s.priority] || 0.13;
+
+  var gainNode = ctx.createGain(); gainNode.gain.value = 0;
+  var filt = ctx.createBiquadFilter(); filt.type = "lowpass"; filt.frequency.value = pc;
+  filt.connect(gainNode); gainNode.connect(master);
+  var t0 = ctx.currentTime;
+  gainNode.gain.setTargetAtTime(pg * 1.15, t0, 0.25); // a touch louder/brighter than meditative
+
+  var oscs = [];
+  if (s.core) {
+    var sub = ctx.createOscillator(); sub.type = "sine"; sub.frequency.value = 55;
+    var subG = ctx.createGain(); subG.gain.value = 0.045;
+    sub.connect(subG); subG.connect(gainNode);
+    sub.start(); oscs.push(sub);
+  }
+
+  var sparse = (s.stage === "on-hold"); // stays dormant even in the upbeat mode
+  var bpm = (BPM[s.stage] != null ? BPM[s.stage] : 120) + Math.min(10, Math.log2(1 + s.recent7d));
+  var stepDur = 60 / bpm / 4; // 16th notes
+  var density = Math.min(0.85, 0.12 + Math.log2(1 + s.recent7d) / 8); // real activity, sonified as groove density
+
+  var step = 0;
+  var nextStepTime = ctx.currentTime + 0.05;
+  var lookahead = 0.1;
+
+  function scheduleStep(stepIdx, time){
+    var inBar = stepIdx % 16;
+    if (inBar % (sparse ? 8 : 4) === 0) playBass(time, s, fam, filt);
+    if (!sparse && inBar % 2 === 0) {
+      var ratio = chord.ratios[((stepIdx / 2) | 0) % chord.ratios.length];
+      playArp(time, s, fam, filt, ratio);
+    }
+    if (inBar % 4 !== 0 && Math.random() < density * (sparse ? 0.3 : 1)) {
+      blip(0.55 + Math.random() * 0.4, flashBlipLamp);
+    }
+  }
+  function schedulerLoop(){
+    while (nextStepTime < ctx.currentTime + lookahead) {
+      scheduleStep(step, nextStepTime);
+      nextStepTime += stepDur;
+      step++;
+    }
+  }
+  var schedulerHandle = setInterval(schedulerLoop, 25);
+  schedulerLoop(); // prime immediately so the first bar isn't silent for 25ms
+
+  return {gainNode:gainNode, oscs:oscs, blipHandle:null, schedulerHandle:schedulerHandle};
+}
+
+function startStation(s){
+  return radioMode === "freestreet" ? startStationFreestreet(s) : startStationMeditative(s);
 }
 
 // ---------- UI wiring ----------
@@ -452,10 +599,14 @@ var els = {
   vol: document.getElementById("volSlider"),
   dwell: document.getElementById("dwellSlider"),
   dwellVal: document.getElementById("dwellVal"),
+  modeMed: document.getElementById("modeMeditative"),
+  modeFS: document.getElementById("modeFreestreet"),
+  modeHint: document.getElementById("modeHint"),
   lTotal: document.getElementById("lTotal"),
   l7d: document.getElementById("l7d"),
   l1d: document.getElementById("l1d"),
   lResting: document.getElementById("lResting"),
+  lDiscipline: document.getElementById("lDiscipline"),
   lSnap: document.getElementById("lSnap"),
   scope: document.getElementById("scope")
 };
@@ -490,6 +641,7 @@ function renderUI(s, on){
   els.l7d.textContent = s.recent7d;
   els.l1d.textContent = s.recent1d;
   els.lResting.textContent = s.restingDays == null ? "active" : s.restingDays + "d";
+  els.lDiscipline.textContent = s.disciplinePrimary || "—";
   els.lSnap.textContent = window.RADIO_DATA.generated;
   els.ledCore.classList.toggle("on", !!s.core);
   document.querySelectorAll(".tick").forEach(function(t, i){ t.classList.toggle("tuned", stations[i]===s); });
@@ -526,6 +678,28 @@ function setPower(on){
     renderUI(stations[idx], false);
   }
 }
+
+var MODE_HINT = {
+  meditative: "sustained drones, one chord per stage",
+  freestreet: "beat-synced bass + arp, tempo by stage and activity"
+};
+function setMode(mode){
+  var changed = mode !== radioMode;
+  radioMode = mode;
+  try { localStorage.setItem("workspaceRadioMode", mode); } catch (e) {}
+  els.modeMed.classList.toggle("active", mode === "meditative");
+  els.modeMed.setAttribute("aria-pressed", String(mode === "meditative"));
+  els.modeFS.classList.toggle("active", mode === "freestreet");
+  els.modeFS.setAttribute("aria-pressed", String(mode === "freestreet"));
+  els.modeHint.textContent = MODE_HINT[mode];
+  if (changed && powerOn) {
+    // rebuild the currently-tuned station fresh, in the new engine
+    if (current) stopStation(current);
+    staticBurst(0.18);
+    current = startStation(stations[idx]);
+  }
+}
+setMode(radioMode); // sync the button UI to whatever was restored from localStorage
 
 function randomIndex(){
   // a different station than the one currently tuned, whenever there's a choice
@@ -570,6 +744,8 @@ els.btnMute.addEventListener("click", function(){
   if (master) master.gain.setTargetAtTime(muted ? 0 : volTarget, ctx.currentTime, 0.05);
 });
 els.btnRandom.addEventListener("click", function(){ stopScan(); tuneTo(randomIndex(), true); });
+els.modeMed.addEventListener("click", function(){ setMode("meditative"); });
+els.modeFS.addEventListener("click", function(){ setMode("freestreet"); });
 els.btnPrev.addEventListener("click", function(){ stopScan(); tuneTo(idx-1, true); });
 els.btnNext.addEventListener("click", function(){ stopScan(); tuneTo(idx+1, true); });
 els.vol.addEventListener("input", function(){
