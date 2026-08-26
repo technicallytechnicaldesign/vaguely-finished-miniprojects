@@ -244,6 +244,14 @@ input[type=range]::-moz-range-thumb{width:13px; height:13px; border-radius:50%; 
     </div>
     <span class="modebar-hint" id="modeHint">sustained drones, one chord per stage</span>
   </div>
+  <div class="modebar">
+    <span class="modebar-label">path</span>
+    <div class="modeswitch" role="group" aria-label="Free Street arpeggio behaviour">
+      <button type="button" class="modebtn active" id="pathBrownian" aria-pressed="true">Brownian</button>
+      <button type="button" class="modebtn" id="pathTransitions" aria-pressed="false">Transitions</button>
+    </div>
+    <span class="modebar-hint" id="pathHint">Free Street arpeggio drifts one scale step at a time</span>
+  </div>
 
   <div class="lcd">
     <div class="freq-row">
@@ -407,6 +415,26 @@ var radioMode = (function(){
   } catch (e) {}
   return "meditative";
 })();
+var radioPath = (function(){
+  try { var p = localStorage.getItem("workspaceRadioPath"); if (p === "brownian" || p === "transitions") return p; } catch (e) {}
+  return "brownian";
+})();
+
+// A station's route is repeatable, not a generic random loop: its name seeds the
+// small decision-maker. Brownian only moves to a neighbour; transitions prefer a
+// few familiar next places, so it can form a tendency without becoming a pattern.
+function nameSeed(text){ var h = 2166136261; for (var i=0;i<text.length;i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619); return h >>> 0; }
+function seededRandom(seed){ return function(){ var t = seed += 0x6D2B79F5; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function makePath(station, kind){
+  var rand = seededRandom(nameSeed(station.name + "|" + kind)), degree = Math.floor(rand() * 4);
+  var matrix = [[.54,.31,.10,.04,.01],[.24,.43,.24,.07,.02],[.08,.25,.41,.20,.06],[.03,.09,.24,.43,.21],[.02,.05,.12,.31,.50]];
+  return {next:function(length){
+    if (kind === "brownian") { var move = rand(); if (move < .30) degree--; else if (move > .70) degree++; }
+    else { var row = matrix[Math.max(0, Math.min(4, degree))], roll = rand(), total = 0, pick = 0; for (var i=0;i<row.length;i++) total += row[i]; roll *= total; for (var j=0;j<row.length;j++){ roll -= row[j]; if (roll <= 0){ pick = j; break; } } degree = pick; }
+    degree = Math.max(0, Math.min(4, degree));
+    return Math.round(degree * Math.max(0, length - 1) / 4);
+  }};
+}
 
 function ensureCtx(){
   if (ctx) return;
@@ -616,6 +644,7 @@ function startStationFreestreet(s){
   var density = Math.min(0.85, 0.12 + Math.log2(1 + s.recent7d) / 8); // real activity, sonified as groove density
 
   var step = 0;
+  var path = makePath(s, radioPath);
   var nextStepTime = ctx.currentTime + 0.05;
   var lookahead = 0.1;
 
@@ -623,7 +652,7 @@ function startStationFreestreet(s){
     var inBar = stepIdx % 16;
     if (inBar % (sparse ? 8 : 4) === 0) playBass(time, s, fam, filt);
     if (!sparse && inBar % 2 === 0) {
-      var ratio = chord.ratios[((stepIdx / 2) | 0) % chord.ratios.length];
+      var ratio = chord.ratios[path.next(chord.ratios.length)];
       playArp(time, s, fam, filt, ratio);
     }
     if (inBar % 4 !== 0 && Math.random() < density * (sparse ? 0.3 : 1)) {
@@ -675,6 +704,9 @@ var els = {
   modeMed: document.getElementById("modeMeditative"),
   modeFS: document.getElementById("modeFreestreet"),
   modeHint: document.getElementById("modeHint"),
+  pathBrownian: document.getElementById("pathBrownian"),
+  pathTransitions: document.getElementById("pathTransitions"),
+  pathHint: document.getElementById("pathHint"),
   btnOrbit: document.getElementById("btnOrbit"),
   orbitWidth: document.getElementById("orbitWidth"),
   orbitWidthVal: document.getElementById("orbitWidthVal"),
@@ -818,6 +850,18 @@ var MODE_HINT = {
   meditative: "sustained drones, one chord per stage",
   freestreet: "beat-synced bass + arp, tempo by stage and activity"
 };
+var PATH_HINT = {brownian:"Free Street arpeggio drifts one scale step at a time", transitions:"Free Street arpeggio follows weighted, repeatable tendencies"};
+function setPath(path){
+  var changed = path !== radioPath;
+  radioPath = path;
+  try { localStorage.setItem("workspaceRadioPath", path); } catch (e) {}
+  els.pathBrownian.classList.toggle("active", path === "brownian");
+  els.pathBrownian.setAttribute("aria-pressed", String(path === "brownian"));
+  els.pathTransitions.classList.toggle("active", path === "transitions");
+  els.pathTransitions.setAttribute("aria-pressed", String(path === "transitions"));
+  els.pathHint.textContent = PATH_HINT[path];
+  if (changed && powerOn && radioMode === "freestreet") { if (current) stopStation(current); staticBurst(.12); current = startStation(stations[idx]); }
+}
 function setMode(mode){
   var changed = mode !== radioMode;
   radioMode = mode;
@@ -835,6 +879,7 @@ function setMode(mode){
   }
 }
 setMode(radioMode); // sync the button UI to whatever was restored from localStorage
+setPath(radioPath);
 
 function randomIndex(){
   // a different station than the one currently tuned, whenever there's a choice
@@ -881,6 +926,8 @@ els.btnMute.addEventListener("click", function(){
 els.btnRandom.addEventListener("click", function(){ stopScan(); tuneTo(randomIndex(), true); });
 els.modeMed.addEventListener("click", function(){ setMode("meditative"); });
 els.modeFS.addEventListener("click", function(){ setMode("freestreet"); });
+els.pathBrownian.addEventListener("click", function(){ setPath("brownian"); });
+els.pathTransitions.addEventListener("click", function(){ setPath("transitions"); });
 els.btnOrbit.addEventListener("click", function(){ setOrbit(!orbitOn); });
 document.querySelectorAll("[data-reply]").forEach(function(button){
   button.addEventListener("click", function(){ setOrbitReply(button.dataset.reply); });
