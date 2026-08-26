@@ -90,7 +90,7 @@ font-size:13px}.legend div{background:#16082a91;
 border-radius:12px;
 padding:8px 10px}.legend b{color:var(--yellow)}@media(max-width:600px){main{padding:10px}.machine{border-width:4px;
 border-radius:20px}.sky{height:380px}.deck{grid-template-columns:1fr 1fr}.legend{grid-template-columns:1fr}.speech{font-size:12px}}</style><main><header><h1>Stardust <i>Goblin</i><br>Orchestra</h1><p>Tap spells. Poke the sky. Wake a tiny orchestra of glittery creatures.</p></header><section class="machine"><div class="sky"><canvas id="sky"></canvas><div class="speech" id="speech">Tap a spell to wake us up!</div><div class="meter" id="meter">✨ 0 sparkles</div></div><div class="deck"><button class="spell" data-spell="fizz" style="--c:#ff92c7"><b>🫧</b> FIZZ</button><button class="spell" data-spell="boing" style="--c:#ffe95e"><b>🍄</b> BOING</button><button class="spell" data-spell="zap" style="--c:#73e8ff"><b>⚡</b> ZAP</button><button class="spell" data-spell="meteor" style="--c:#bf92ff"><b>☄️</b> METEOR</button></div><div class="toggles"><button class="toggle" id="auto">goblin autopilot: off</button><button class="toggle" id="clear">sweep the sky</button></div><div class="legend"><div><b>FIZZ</b> high shiny bubbles</div><div><b>BOING</b> bouncy mushroom bass</div><div><b>ZAP</b> electric bug beats</div><div><b>METEOR</b> enormous magic chords</div></div><p class="hint">Every poke makes a new little score. No wrong notes. Headphones make the goblins bigger.</p></section></main><script>(()=>{const c=document.querySelector('#sky'),x=c.getContext('2d'),speech=document.querySelector('#speech'),meter=document.querySelector('#meter'),buttons=[...document.querySelectorAll('.spell')],auto=document.querySelector('#auto');
-let W,H,dpr,stars=[],sparks=[],creatures=[],ctx,master,echo,autopilot=false,timer,scale=[0,3,5,7,10],root=220,last=0;
+let W,H,dpr,stars=[],sparks=[],creatures=[],wonders=[],ctx,master,echo,autopilot=false,timer,wonderTimer,wonderIndex=Math.floor(Math.random()*3),scale=[0,3,5,7,10],root=220,last=0;
 function resize(){const r=c.getBoundingClientRect();
 dpr=Math.min(devicePixelRatio||1,2);
 W=r.width;
@@ -188,12 +188,32 @@ spell(k,px,py)}c.addEventListener('pointerdown',poke);
 buttons.forEach(b=>b.addEventListener('click',()=>spell(b.dataset.spell,W*(.25+Math.random()*.5),H*(.25+Math.random()*.5))));
 document.querySelector('#clear').addEventListener('click',()=>{sparks=[];
 creatures=[];
+wonders=[];
 speech.textContent='Whoosh! Fresh sky!'});
 auto.addEventListener('click',()=>{autopilot=!autopilot;
 auto.classList.toggle('on',autopilot);
 auto.textContent=`goblin autopilot: ${autopilot?'on':'off'}`;
 clearTimeout(timer);
-if(autopilot)runAuto()});
+clearTimeout(wonderTimer);
+if(autopilot){runAuto();scheduleWonder(true)}});
+function wonderPad(intervals,base,when,len,wave='sine'){const bus=ctx.createGain(),filter=ctx.createBiquadFilter();
+filter.type='lowpass';filter.frequency.value=2800;
+bus.gain.setValueAtTime(.0001,when);bus.gain.linearRampToValueAtTime(.06,when+1.1);bus.gain.setValueAtTime(.06,when+len*.7);bus.gain.exponentialRampToValueAtTime(.0001,when+len);
+bus.connect(filter).connect(master);bus.connect(echo);
+intervals.forEach((v,i)=>{const o=ctx.createOscillator();o.type=wave;o.frequency.value=base*Math.pow(2,v/12);o.detune.value=(i-intervals.length/2)*4;o.connect(bus);o.start(when);o.stop(when+len+.1)})}
+function summonWonder(type){if(!autopilot)return;audio();ctx.resume();const now=ctx.currentTime;
+wonders.push({type,life:1,phase:Math.random()*7,x:W*(.3+Math.random()*.4),y:H*(.28+Math.random()*.28)});
+if(type==='meteor'){note(root*7,now,3.2,'sine',.055,.08);wonderPad([0,5,7,14],root/2,now,7,'triangle');speech.textContent='A WISHING METEOR!'}
+if(type==='hearts'){wonderPad([0,4,7,11],root,now,8,'sine');[0,4,7,12,16].forEach((v,i)=>note(root*Math.pow(2,v/12),now+.25+i*.32,1.8,'sine',.04));speech.textContent='HEART CONSTELLATION!'}
+if(type==='rainbow'){wonderPad([0,4,7,9,14],root/2,now,10,'sine');[0,2,4,7,9,11,14].forEach((v,i)=>note(root*Math.pow(2,v/12),now+i*.28,2.4,'triangle',.035));speech.textContent='SECRET RAINBOW!'}
+addSpark(W*.5,H*.38,type==='hearts'?'#ff83bc':type==='rainbow'?'#ffe85e':'#bdefff',50)}
+function scheduleWonder(first=false){clearTimeout(wonderTimer);if(!autopilot)return;wonderTimer=setTimeout(()=>{const types=['meteor','hearts','rainbow'];summonWonder(types[wonderIndex++%types.length]);scheduleWonder(false)},first?3500+Math.random()*2500:11000+Math.random()*12000)}
+function heartPath(px,py,s){x.moveTo(px,py+s*.28);x.bezierCurveTo(px-s,py-s*.28,px-s*.42,py-s,px,py-s*.42);x.bezierCurveTo(px+s*.42,py-s,px+s,py-s*.28,px,py+s*.28)}
+function drawWonder(w,t){w.life-=.0012;x.save();x.globalAlpha=Math.min(1,w.life*3);
+if(w.type==='meteor'){const p=1-w.life,px=-80+(W+160)*p,py=35+H*.42*p;x.strokeStyle='#d9f8ff';x.lineWidth=10;x.beginPath();x.moveTo(px-100,py-48);x.lineTo(px,py);x.stroke();x.strokeStyle='#ff9fd4';x.lineWidth=4;x.beginPath();x.moveTo(px-145,py-70);x.lineTo(px,py);x.stroke();x.fillStyle='#fff8bd';x.beginPath();x.arc(px,py,13+Math.sin(t*.01)*3,0,7);x.fill()}
+if(w.type==='hearts'){const spread=(1-w.life)*150;x.fillStyle='#ff89bd';for(let i=0;i<12;i++){const a=i/12*7+w.phase,d=24+spread*(.45+(i%3)*.18),px=w.x+Math.cos(a)*d,py=w.y+Math.sin(a)*d;x.beginPath();heartPath(px,py,8+(i%3)*3);x.fill()}}
+if(w.type==='rainbow'){const colors=['#ff78ad','#ffae68','#ffe85e','#85e77c','#65dcff','#ab8cff'];x.lineCap='round';colors.forEach((color,i)=>{x.strokeStyle=color;x.lineWidth=10;x.beginPath();x.arc(W*.5,H+24,150+i*13,Math.PI,Math.PI*2);x.stroke()});x.fillStyle='#fff8dc';x.beginPath();x.arc(W*.5-190,H-20,30,0,7);x.arc(W*.5+190,H-20,30,0,7);x.fill()}
+x.restore()}
 function drawCreature(q,t,conductor=false){const bob=Math.sin(t*.002+q.phase)*5,r=q.r;
 x.save();
 x.globalAlpha=Math.min(1,q.life*3);
@@ -273,13 +293,13 @@ x.fillStyle=s.color;
 x.beginPath();
 x.arc(s.x,s.y,Math.max(.1,s.r*s.life),0,7);
 x.fill();
-if(s.life<=0)sparks.splice(i,1)}for(let i=creatures.length-1;
+if(s.life<=0)sparks.splice(i,1)}for(let i=wonders.length-1;i>=0;i--){drawWonder(wonders[i],t);if(wonders[i].life<=0)wonders.splice(i,1)}for(let i=creatures.length-1;
 i>=0;
 i--){const q=creatures[i];
 q.life-=.00035;
 q.x+=q.drift;
 drawCreature(q,t);if(q.life<=0)creatures.splice(i,1)}x.globalAlpha=1;
 drawCreature({kind:'conductor',x:W*.5,y:H*.67,r:31,color:'#91df61',life:1,phase:0},t,true);
-meter.textContent=`✨ ${sparks.length} sparkles · ${creatures.length} goblins`};
+meter.textContent=`✨ ${sparks.length} sparkles · ${creatures.length} goblins${wonders.length?' · WONDER!':''}`};
 requestAnimationFrame(draw)})();
 </script></html>
