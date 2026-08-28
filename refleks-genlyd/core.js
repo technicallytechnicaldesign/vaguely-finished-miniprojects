@@ -55,11 +55,19 @@
   }
 
   // The played voice draws from the drone's own set, so no gesture can play a
-  // wrong note. Guarantee 2, first constraint.
+  // wrong note. Guarantee 2, first constraint. `maxRatio` is optional and
+  // symmetric with `minRatio`: a profile that finds its top note too bright
+  // for how the voice is voiced can drop it without touching the drone's own
+  // set, which the wash still uses in full.
   function voicePitches(profile) {
-    var min = (profile.interaction && profile.interaction.voice && profile.interaction.voice.minRatio) || 1;
+    var voice = (profile.interaction && profile.interaction.voice) || {};
+    var min = voice.minRatio || 1;
+    var max = voice.maxRatio || Infinity;
     var floor = profile.drone.root * min;
-    return dronePitches(profile.drone).filter(function (f) { return f >= floor - 1e-9; });
+    var ceiling = profile.drone.root * max;
+    return dronePitches(profile.drone).filter(function (f) {
+      return f >= floor - 1e-9 && f <= ceiling + 1e-9;
+    });
   }
 
   // Map a continuous 0..1 gesture axis onto the allowed set. Returns a frequency

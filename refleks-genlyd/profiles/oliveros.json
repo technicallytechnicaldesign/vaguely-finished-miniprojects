@@ -21,7 +21,7 @@
       "width": 0.55
     },
     "timbre": {
-      "cutoff": 620,
+      "cutoff": 480,
       "detune": 4
     }
   },
@@ -32,7 +32,8 @@
       "attack": 2.2,
       "release": 5.5,
       "glide": 2.6,
-      "minRatio": 1.5
+      "minRatio": 1.5,
+      "maxRatio": 3
     }
   },
   "skin": {

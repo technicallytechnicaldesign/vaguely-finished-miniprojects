@@ -61,9 +61,14 @@
         // gamma runs -90..90 across a roll. Centre is silence-ish, so the axis
         // is the absolute roll: tilting either way moves up the set.
         var pitchAxis = Math.min(1, Math.abs(smoothGamma) / 60);
-        // beta 0 is flat on a table, 90 is upright. Held at a comfortable
-        // reading angle is around 45, which sits mid-range.
-        var mag = Math.min(1, Math.max(0, (smoothBeta - 10) / 70));
+        // beta 0 is flat on a table, 90 is upright, pointed forward at your
+        // face is commonly 70-90. GEN-0102: the old 10..70 window put that
+        // whole forward-held range at or past its own ceiling, so tilting
+        // further "forward" from there read as dead - there was no headroom
+        // left to move into. Widened to the full 0..90 sweep so presence
+        // keeps changing across the range a phone actually rests in held
+        // upright, not just the range it passes through getting there.
+        var mag = Math.min(1, Math.max(0, smoothBeta / 90));
         audio.gesture(pitchAxis, mag);
       }
 

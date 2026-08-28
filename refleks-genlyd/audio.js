@@ -157,10 +157,13 @@
     this.voiceGain.gain.setTargetAtTime(g, now, attack / 3);
 
     // Timbre follows the same gesture: this is the "how you play shapes the
-    // sound" half of GEN-0060, brightness rather than more notes. Ceiling
-    // lowered from 1820Hz: the old top end let the (now-fixed) upper partials
-    // ring bright enough to read as shrill on top of the beating.
-    var cut = 380 + Core.clamp01(magnitude) * 900;
+    // sound" half of GEN-0060, brightness rather than more notes. GEN-0102:
+    // this used to run the other way, brighter as magnitude rose, which meant
+    // the more present the voice got the harsher it got too - the exact
+    // combination reported as "whiny" and doing nothing distinct on its own
+    // axis. Inverted: more present now reads warmer and rounder, so presence
+    // and brightness are no longer stacking toward shrill at the same moment.
+    var cut = 1050 - Core.clamp01(magnitude) * 620;
     this.voiceFilter.frequency.setTargetAtTime(cut, now, 0.3);
   };
 
