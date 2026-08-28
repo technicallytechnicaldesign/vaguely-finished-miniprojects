@@ -57,7 +57,18 @@
     var freqs = Core.dronePitches(d);
     var self = this;
     this.droneOscs = [];
+    // One emphasis gain per pitch, baseline 1 (transparent). GEN-0103: this is
+    // the hook `gesture()` leans on to pull one of the drone's own tones
+    // forward, so a tilt reaches into the chord instead of only ever adding a
+    // separate voice over it. Sits between each pitch's own oscillator pair
+    // and the shared filter, so it cannot touch the normalisation below it.
+    this.droneEmphGains = [];
     freqs.forEach(function (f, i) {
+      var emph = ctx.createGain();
+      emph.gain.value = 1;
+      emph.connect(filt);
+      self.droneEmphGains.push(emph);
+
       // Two oscillators a few cents apart per pitch, so the wash has movement
       // in it without anything modulating on a timer.
       [-detune, detune].forEach(function (cents) {
@@ -69,7 +80,7 @@
         // Higher partials quieter, and normalised across the stack so the sum
         // cannot run past the intended peak when they drift into phase.
         g.gain.value = 1 / (i + 1);
-        o.connect(g); g.connect(filt);
+        o.connect(g); g.connect(emph);
         o.start();
         self.droneOscs.push(o);
       });
@@ -165,6 +176,20 @@
     // and brightness are no longer stacking toward shrill at the same moment.
     var cut = 1050 - Core.clamp01(magnitude) * 620;
     this.voiceFilter.frequency.setTargetAtTime(cut, now, 0.3);
+
+    // GEN-0103: the gesture reaches into the drone's own mix too, pulling
+    // whichever of its tones pitchAxis is nearest to forward and letting the
+    // others recede - the same focus a listener hears the voice sitting on,
+    // so the two read as one thing moving rather than a voice laid over a
+    // chord that never answers. Slower time constant than the voice's own
+    // (0.6 vs ~0.3-0.7s attack): this is the whole wash's balance shifting,
+    // weather rather than a note being struck.
+    if (this.droneEmphGains) {
+      var weights = Core.droneEmphasisWeights(this.profile.drone, pitchAxis, magnitude);
+      this.droneEmphGains.forEach(function (g, i) {
+        g.gain.setTargetAtTime(weights[i], now, 0.6);
+      });
+    }
   };
 
   RGAudio.prototype.enableVoice = function (on) {

@@ -27,7 +27,9 @@
     SWELL_DEPTH_MAX: 0.85,    // never fully silent mid-session, that reads as a fault
     ORBIT_PERIOD_MIN: 20,     // seconds; a full pan sweep faster than this reads as a wobble, not a drift
     ORBIT_WIDTH_MAX: 0.85,    // never fully hard-panned - the wash stays present in a single earbud
-    ORBIT_VOICE_RATIO: -0.6   // the played voice answers from the opposite side, at this fraction of the drone's width
+    ORBIT_VOICE_RATIO: -0.6,  // the played voice answers from the opposite side, at this fraction of the drone's width
+    DRONE_EMPHASIS_STRENGTH: 1.8, // how hard a gesture can lean the drone's own mix toward one of its tones
+    DRONE_EMPHASIS_FLOOR: 0.25    // a de-emphasised tone recedes, it never actually vanishes - still one chord
   };
 
   // The voice ceiling is derived from the drone's QUIETEST moment, not its
@@ -121,6 +123,44 @@
   // apart in space instead of collapsing onto the same point.
   function voiceOrbitPanAt(drone, t) {
     return orbitPanAt(drone, t) * SHELL.ORBIT_VOICE_RATIO;
+  }
+
+  /* ---- drone emphasis (GEN-0103) -----------------------------------------
+   * Until now a gesture only ever added a separate voice over an unchanging
+   * chord - "a sound on top" rather than something that reaches into the
+   * drone itself. This is the reach-in: a per-pitch gain multiplier for each
+   * of the drone's own stacked tones, one array entry per member of
+   * dronePitches() in the same order, so the audio layer can wire it
+   * straight onto the oscillator gain it already built for that tone.
+   *
+   * `pitchAxis` places a continuous "focus" position across the drone's own
+   * pitch set (not the voice's narrower one - the drone answers over its
+   * full stack), and a triangular window around that position redistributes
+   * energy toward whichever tone the focus currently sits nearest, while its
+   * neighbours recede. `magnitude` is how far that redistribution is allowed
+   * to lean: at rest (0) every multiplier is exactly 1, identical to the
+   * chord's own untouched baseline mix, so a profile with no active gesture
+   * (or the `none` interaction kind, which never calls this at all) hears
+   * nothing different. The redistribution is a reallocation, not an
+   * addition - weights average to 1 across the stack - so it happens
+   * upstream of the drone bus's own normalised, ceilinged output and cannot
+   * raise the wash past what droneGainAt already allows.
+   */
+  function droneEmphasisWeights(drone, pitchAxis, magnitude) {
+    var n = dronePitches(drone).length;
+    if (n <= 1) return [1];
+    var focus = clamp01(pitchAxis) * (n - 1);
+    var tents = [], sumTent = 0, i;
+    for (i = 0; i < n; i++) {
+      var t = Math.max(0, 1 - Math.abs(i - focus));
+      tents.push(t);
+      sumTent += t;
+    }
+    var avg = sumTent / n;
+    var pull = clamp01(magnitude) * SHELL.DRONE_EMPHASIS_STRENGTH;
+    return tents.map(function (t) {
+      return Math.max(SHELL.DRONE_EMPHASIS_FLOOR, 1 + pull * (t - avg));
+    });
   }
 
   // Sessions may declare a fadeOut as a fraction of their length (oliveros.06
@@ -242,6 +282,7 @@
     droneGainAt: droneGainAt,
     orbitPanAt: orbitPanAt,
     voiceOrbitPanAt: voiceOrbitPanAt,
+    droneEmphasisWeights: droneEmphasisWeights,
     fadeOutFactor: fadeOutFactor,
     voiceGainFor: voiceGainFor,
     voiceAttack: voiceAttack,
