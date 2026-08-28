@@ -92,7 +92,7 @@
   }
 
   /* ---- orbit --------------------------------------------------------------
-   * The wash's position in the stereo field, GEN-0101. A profile that declares
+   * The wash's position in the stereo field, GEN-0100. A profile that declares
    * no `orbit` gets a wash that stays dead centre for the whole session, which
    * is still valid: motion is optional, not owed. Declared as a period and a
    * width for the same reason the swell is: "drifts slowly side to side"
