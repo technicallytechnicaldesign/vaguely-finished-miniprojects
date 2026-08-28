@@ -16,6 +16,10 @@
     "ratios": [1, 1.5, 2, 3, 4],
     "swellPeriod": 28,
     "swellDepth": 0.55,
+    "orbit": {
+      "period": 47,
+      "width": 0.55
+    },
     "timbre": {
       "cutoff": 620,
       "detune": 4

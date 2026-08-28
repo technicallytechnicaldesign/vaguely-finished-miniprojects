@@ -172,6 +172,46 @@
     }
   };
 
+  /* ---- orbit --------------------------------------------------------------
+   * A StereoPannerNode per bus, both driven off one shared sine oscillator
+   * (an audio-rate LFO, not a JS timer) so the drift is sample-accurate and
+   * immune to the tab-throttling that motivated the wash's own lookahead
+   * scheduling above. The oscillator's gain-scaled fan-out to two AudioParams
+   * is the same trick Workspace Radio's headphone orbit uses (GEN-0087):
+   * one LFO, two depths, no per-frame JS at all.
+   *
+   * Built once and left running; if a profile declares no `orbit` the depths
+   * stay at their built-in zero and both panners simply sit centred.
+   */
+  RGAudio.prototype._buildOrbit = function () {
+    var ctx = this.ctx;
+    if (!ctx.createStereoPanner) { this.dronePanner = null; this.voicePanner = null; return; }
+
+    this.dronePanner = ctx.createStereoPanner();
+    this.voicePanner = ctx.createStereoPanner();
+
+    var o = this.profile.drone.orbit;
+    if (!o || !o.width) return; // panners stay wired, just never modulated
+
+    var period = Math.max(Core.SHELL.ORBIT_PERIOD_MIN, o.period || 40);
+    var width = Math.min(Core.SHELL.ORBIT_WIDTH_MAX, Math.max(0, o.width));
+
+    var lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 1 / period;
+
+    var droneDepth = ctx.createGain();
+    droneDepth.gain.value = width;
+    var voiceDepth = ctx.createGain();
+    voiceDepth.gain.value = width * Core.SHELL.ORBIT_VOICE_RATIO; // negative: opposite side
+
+    lfo.connect(droneDepth); droneDepth.connect(this.dronePanner.pan);
+    lfo.connect(voiceDepth); voiceDepth.connect(this.voicePanner.pan);
+    lfo.start();
+
+    this.orbitLfo = lfo;
+  };
+
   /* ---- reverb -----------------------------------------------------------
    * A generated impulse response, not a loaded file: the app ships as five
    * static files and stays that way. This is a SEND, tapped from the same
@@ -238,10 +278,16 @@
       if (!self.droneGain) self._buildDrone();
       if (!self.voiceGain) self._buildVoice();
       if (!self.reverbSend) self._buildReverb();
-      self.droneGain.connect(self.ctx.destination);
-      self.voiceGain.connect(self.ctx.destination);
-      self.droneGain.connect(self.reverbSend);
-      self.voiceGain.connect(self.reverbSend);
+      if (!self.dronePanner) self._buildOrbit();
+
+      if (self.dronePanner) self.droneGain.connect(self.dronePanner);
+      if (self.voicePanner) self.voiceGain.connect(self.voicePanner);
+      var droneOut = self.dronePanner || self.droneGain;
+      var voiceOut = self.voicePanner || self.voiceGain;
+      droneOut.connect(self.ctx.destination);
+      voiceOut.connect(self.ctx.destination);
+      droneOut.connect(self.reverbSend);
+      voiceOut.connect(self.reverbSend);
 
       self.startTime = self.ctx.currentTime + 0.15;
       self.scheduledTo = self.startTime;

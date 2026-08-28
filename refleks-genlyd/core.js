@@ -24,7 +24,10 @@
     VOICE_CEILING_RATIO: 0.6, // the played voice's share of the drone's peak
     VOICE_ATTACK_FLOOR: 0.8,  // seconds; no bright transient is possible below this
     SWELL_PERIOD_MIN: 8,      // seconds; a "wash" faster than this is a tremolo
-    SWELL_DEPTH_MAX: 0.85     // never fully silent mid-session, that reads as a fault
+    SWELL_DEPTH_MAX: 0.85,    // never fully silent mid-session, that reads as a fault
+    ORBIT_PERIOD_MIN: 20,     // seconds; a full pan sweep faster than this reads as a wobble, not a drift
+    ORBIT_WIDTH_MAX: 0.85,    // never fully hard-panned - the wash stays present in a single earbud
+    ORBIT_VOICE_RATIO: -0.6   // the played voice answers from the opposite side, at this fraction of the drone's width
   };
 
   // The voice ceiling is derived from the drone's QUIETEST moment, not its
@@ -86,6 +89,30 @@
     var g = SHELL.DRONE_PEAK * swellAt(drone, t);
     var f = fadeOutFactor(session, t);
     return g * f;
+  }
+
+  /* ---- orbit --------------------------------------------------------------
+   * The wash's position in the stereo field, GEN-0101. A profile that declares
+   * no `orbit` gets a wash that stays dead centre for the whole session, which
+   * is still valid: motion is optional, not owed. Declared as a period and a
+   * width for the same reason the swell is: "drifts slowly side to side"
+   * reduces to a sine and two numbers.
+   */
+  function orbitPanAt(drone, t) {
+    var o = drone && drone.orbit;
+    if (!o || !o.width) return 0;
+    var period = Math.max(SHELL.ORBIT_PERIOD_MIN, o.period || 40);
+    var width = Math.min(SHELL.ORBIT_WIDTH_MAX, Math.max(0, o.width));
+    var phase = (t % period) / period;
+    return Math.sin(phase * 2 * Math.PI) * width;
+  }
+
+  // The played voice's position: it answers from the opposite side of the
+  // drone at a shell-fixed fraction of its width (the spatial counterpart of
+  // guarantee 2's level ceiling), so a moving wash and a held voice stay
+  // apart in space instead of collapsing onto the same point.
+  function voiceOrbitPanAt(drone, t) {
+    return orbitPanAt(drone, t) * SHELL.ORBIT_VOICE_RATIO;
   }
 
   // Sessions may declare a fadeOut as a fraction of their length (oliveros.06
@@ -171,6 +198,10 @@
       if (period && period < SHELL.SWELL_PERIOD_MIN) {
         errs.push('swellPeriod ' + period + 's is below the shell floor of ' + SHELL.SWELL_PERIOD_MIN + 's, that is a tremolo not a wash');
       }
+      var orbit = profile.drone.orbit;
+      if (orbit && orbit.width && orbit.period && orbit.period < SHELL.ORBIT_PERIOD_MIN) {
+        errs.push('orbit period ' + orbit.period + 's is below the shell floor of ' + SHELL.ORBIT_PERIOD_MIN + 's, that reads as a wobble not a drift');
+      }
     }
     return errs;
   }
@@ -201,6 +232,8 @@
     pitchForGesture: pitchForGesture,
     swellAt: swellAt,
     droneGainAt: droneGainAt,
+    orbitPanAt: orbitPanAt,
+    voiceOrbitPanAt: voiceOrbitPanAt,
     fadeOutFactor: fadeOutFactor,
     voiceGainFor: voiceGainFor,
     voiceAttack: voiceAttack,
