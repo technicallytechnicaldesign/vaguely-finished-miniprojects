@@ -1,5 +1,5 @@
 <!-- identity: GOBLIN_STARDUST -->
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stardust Goblin Orchestra</title><style>@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Space+Mono&display=swap');
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#7b3fe4"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Goblin Orchestra"><link rel="manifest" href="stardust-goblin.webmanifest"><link rel="apple-touch-icon" href="stardust-goblin-icon.png"><title>Stardust Goblin Orchestra</title><style>@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Space+Mono&display=swap');
 :root{--ink:#261432;
 --cream:#fff7d8;
 --pink:#ff66a9;
@@ -10,7 +10,7 @@ min-height:100vh;
 color:var(--cream);
 background:#1b0d42;
 font-family:Fredoka,sans-serif;
-overflow-x:hidden}main{max-width:960px;
+overflow-x:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}main{max-width:960px;
 margin:auto;
 padding:18px}header{text-align:center;
 text-shadow:3px 3px 0 #421f83}h1{font-size:clamp(34px,8vw,72px);
@@ -79,7 +79,7 @@ color:var(--cream);
 padding:8px 12px;
 font:600 14px Fredoka,sans-serif;
 cursor:pointer}.toggle.on{border-color:var(--yellow);
-color:var(--yellow)}.hint{text-align:center;
+color:var(--yellow)}.toggle:disabled{opacity:.5;cursor:not-allowed}.toggle.choir-ready{border-color:var(--pink);background:#4b1764;color:#fff}.hint{text-align:center;
 font:12px 'Space Mono',monospace;
 margin:13px 0 0;
 color:#ded1ff}.legend{display:grid;
@@ -89,8 +89,8 @@ margin:13px 0 0;
 font-size:13px}.legend div{background:#16082a91;
 border-radius:12px;
 padding:8px 10px}.legend b{color:var(--yellow)}@media(max-width:600px){main{padding:10px}.machine{border-width:4px;
-border-radius:20px}.sky{height:380px}.deck{grid-template-columns:1fr 1fr}.legend{grid-template-columns:1fr}.speech{font-size:12px}}</style><main><header><h1>Stardust <i>Goblin</i><br>Orchestra</h1><p>Tap spells. Poke the sky. Wake a tiny orchestra of glittery creatures.</p></header><section class="machine"><div class="sky"><canvas id="sky"></canvas><div class="speech" id="speech">Tap a spell to wake us up!</div><div class="meter" id="meter">✨ 0 sparkles</div></div><div class="deck"><button class="spell" data-spell="fizz" style="--c:#ff92c7"><b>🫧</b> FIZZ</button><button class="spell" data-spell="boing" style="--c:#ffe95e"><b>🍄</b> BOING</button><button class="spell" data-spell="zap" style="--c:#73e8ff"><b>⚡</b> ZAP</button><button class="spell" data-spell="meteor" style="--c:#bf92ff"><b>☄️</b> METEOR</button></div><div class="toggles"><button class="toggle" id="auto">goblin autopilot: off</button><button class="toggle" id="clear">sweep the sky</button></div><div class="legend"><div><b>FIZZ</b> bright plinks and bubbles</div><div><b>BOING</b> round bloops and bass hops</div><div><b>ZAP</b> tiny electric boops</div><div><b>METEOR</b> rising weees and deep chords</div></div><p class="hint">Every poke makes a new little score. No wrong notes. Headphones make the goblins bigger.</p></section></main><script>(()=>{const c=document.querySelector('#sky'),x=c.getContext('2d'),speech=document.querySelector('#speech'),meter=document.querySelector('#meter'),buttons=[...document.querySelectorAll('.spell')],auto=document.querySelector('#auto');
-let W,H,dpr,stars=[],sparks=[],creatures=[],wonders=[],ctx,master,echo,choirVerb,autopilot=false,timer,wonderTimer,choirTimer,wonderIndex=Math.floor(Math.random()*3),voiceBuffer=null,recorder=null,voiceStream=null,voiceChunks=[],scale=[0,3,5,7,10],tonic=164.81,root=tonic,last=0;
+border-radius:20px}.sky{height:380px}.deck{grid-template-columns:1fr 1fr}.legend{grid-template-columns:1fr}.speech{font-size:12px}}</style><main><header><h1>Stardust <i>Goblin</i><br>Orchestra</h1><p>Tap spells. Poke the sky. Wake a tiny orchestra of glittery creatures.</p></header><section class="machine"><div class="sky"><canvas id="sky"></canvas><div class="speech" id="speech" aria-live="polite">Tap a spell to wake us up!</div><div class="meter" id="meter">✨ 0 sparkles</div></div><div class="deck"><button class="spell" data-spell="fizz" style="--c:#ff92c7"><b>🫧</b> FIZZ</button><button class="spell" data-spell="boing" style="--c:#ffe95e"><b>🍄</b> BOING</button><button class="spell" data-spell="zap" style="--c:#73e8ff"><b>⚡</b> ZAP</button><button class="spell" data-spell="meteor" style="--c:#bf92ff"><b>☄️</b> METEOR</button></div><div class="toggles"><button class="toggle" id="auto">goblin autopilot: off</button><button class="toggle" id="choir" disabled>goblin choir: record a voice first</button><button class="toggle" id="clear">sweep the sky</button></div><div class="legend"><div><b>FIZZ</b> bubble pops and twinkles</div><div><b>BOING</b> rubber hops and wobble bloops</div><div><b>ZAP</b> electric zips and chirpy beeps</div><div><b>METEOR</b> rising weees and falling whoops</div></div><p class="hint">Every poke makes a new little score. No wrong notes. Headphones make the goblins bigger.</p></section></main><script>(()=>{const c=document.querySelector('#sky'),x=c.getContext('2d'),speech=document.querySelector('#speech'),meter=document.querySelector('#meter'),buttons=[...document.querySelectorAll('.spell')],auto=document.querySelector('#auto'),choirButton=document.querySelector('#choir');
+let W,H,dpr,stars=[],sparks=[],creatures=[],wonders=[],ctx,master,echo,choirVerb,autopilot=false,timer,wonderTimer,wonderIndex=Math.floor(Math.random()*3),voiceBuffer=null,recorder=null,voiceStream=null,voiceChunks=[],scale=[0,3,5,7,10],tonic=164.81,root=tonic,last=0;
 buttons[0].querySelector('b').textContent='◌◦';
 const voiceButton=document.createElement('button'),voiceStatus=document.createElement('span');
 voiceButton.type='button';voiceButton.className='toggle';voiceButton.textContent='record a goblin voice';
@@ -128,7 +128,7 @@ for(let ch=0;ch<2;ch++){const data=impulse.getChannelData(ch);for(let i=0;i<data
 choirVerb.buffer=impulse;
 const choirWet=ctx.createGain();choirWet.gain.value=.68;choirVerb.connect(choirWet).connect(master)}
 async function toggleRecording(){if(recorder&&recorder.state==='recording'){recorder.stop();voiceButton.textContent='making the choir...';voiceButton.disabled=true;return}
-try{audio();await ctx.resume();voiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});voiceChunks=[];recorder=new MediaRecorder(voiceStream);recorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};recorder.onstop=async()=>{try{const blob=new Blob(voiceChunks,{type:recorder.mimeType});voiceBuffer=await ctx.decodeAudioData(await blob.arrayBuffer());voiceButton.textContent='record a new voice';voiceStatus.textContent=`voice ready · ${voiceBuffer.duration.toFixed(1)} sec · tab memory only`;speech.textContent='THE CHOIR LEARNED YOUR SONG!';if(autopilot)scheduleChoir(true)}catch(e){voiceStatus.textContent='that voice slipped away, try again'}finally{voiceButton.disabled=false;if(voiceStream)voiceStream.getTracks().forEach(track=>track.stop());voiceStream=null}};recorder.start();voiceButton.textContent='finish recording';voiceButton.classList.add('on');voiceStatus.textContent='listening now...'}catch(e){voiceButton.disabled=false;voiceButton.classList.remove('on');voiceButton.textContent='record a goblin voice';voiceStatus.textContent='microphone unavailable'}}
+try{audio();await ctx.resume();voiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});voiceChunks=[];recorder=new MediaRecorder(voiceStream);recorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};recorder.onstop=async()=>{try{const blob=new Blob(voiceChunks,{type:recorder.mimeType});voiceBuffer=await ctx.decodeAudioData(await blob.arrayBuffer());voiceButton.textContent='record a new voice';voiceStatus.textContent=`voice ready · ${voiceBuffer.duration.toFixed(1)} sec · tab memory only`;choirButton.disabled=false;choirButton.classList.add('choir-ready');choirButton.textContent='summon goblin choir';speech.textContent='THE CHOIR LEARNED YOUR SONG!'}catch(e){voiceStatus.textContent='that voice slipped away, try again'}finally{voiceButton.disabled=false;voiceButton.classList.remove('on');if(voiceStream)voiceStream.getTracks().forEach(track=>track.stop());voiceStream=null}};recorder.start();voiceButton.textContent='finish recording';voiceButton.classList.add('on');voiceStatus.textContent='listening now...'}catch(e){voiceButton.disabled=false;voiceButton.classList.remove('on');voiceButton.textContent='record a goblin voice';voiceStatus.textContent='microphone unavailable'}}
 voiceButton.addEventListener('click',toggleRecording);
 function note(f,when,len,type='sine',vol=.1,slide=0){audio();
 const o=ctx.createOscillator(),g=ctx.createGain(),filter=ctx.createBiquadFilter();
@@ -172,33 +172,17 @@ f.Q.value=5;
 g.gain.value=vol;
 s.connect(f).connect(g).connect(master);
 s.start(when)}function placementPitch(px,py){const slot=Math.max(0,Math.min(scale.length-1,Math.floor(px/Math.max(1,W)*scale.length))),octave=py/Math.max(1,H)<.42?12:0;
-return root*Math.pow(2,(scale[slot]+octave)/12)}function goblinVoice(kind,f,when,index){const offsets={fizz:1,boing:2,zap:0,meteor:3},voices=['boop','plink','bloop','wee'],voice=voices[(index+offsets[kind])%voices.length],lengths={boop:.42,plink:.3,bloop:.58,wee:1.12},len=lengths[voice],o=ctx.createOscillator(),over=ctx.createOscillator(),overGain=ctx.createGain(),g=ctx.createGain(),filter=ctx.createBiquadFilter(),send=ctx.createGain();
-o.type=voice==='plink'?'triangle':voice==='wee'?'triangle':'sine';
-over.type='sine';
-filter.type='lowpass';
-filter.frequency.value=voice==='plink'?6200:voice==='wee'?3800:2900;
-if(voice==='boop'){o.frequency.setValueAtTime(f*1.22,when);o.frequency.exponentialRampToValueAtTime(f,when+.07);o.frequency.setValueAtTime(f,when+len)}
-if(voice==='plink'){o.frequency.setValueAtTime(f*2,when);o.frequency.exponentialRampToValueAtTime(f*1.98,when+len)}
-if(voice==='bloop'){o.frequency.setValueAtTime(f*.7,when);o.frequency.exponentialRampToValueAtTime(f,when+.11);o.frequency.exponentialRampToValueAtTime(f*.86,when+len)}
-if(voice==='wee'){o.frequency.setValueAtTime(f*.72,when);o.frequency.exponentialRampToValueAtTime(f*1.52,when+len)}
-over.frequency.setValueAtTime(f*2,when);
-over.frequency.exponentialRampToValueAtTime(voice==='wee'?f*3.04:f*2,when+len);
-overGain.gain.value=voice==='plink'?.2:.09;
-g.gain.setValueAtTime(.0001,when);
-g.gain.exponentialRampToValueAtTime(voice==='wee'?.082:.095,when+.012);
-g.gain.exponentialRampToValueAtTime(.0001,when+len);
-send.gain.value=.11;
-o.connect(filter);
-over.connect(overGain).connect(filter);
-filter.connect(g).connect(master);
-g.connect(send).connect(echo);
-o.start(when);
-over.start(when);
-o.stop(when+len+.04);
-over.stop(when+len+.04);
-return voice}function addSpark(px,py,color,n=18){for(let i=0;
+return root*Math.pow(2,(scale[slot]+octave)/12)}function goblinVoice(kind,f,when,index){const variant=index%2;
+if(kind==='fizz'&&variant===0){note(f*2.6,when,.2,'sine',.13,.58);note(f*3.4,when+.12,.24,'sine',.09,.7);return 'pop-pop'}
+if(kind==='fizz'){note(f*3.2,when,.52,'triangle',.095,.98);note(f*4.8,when+.09,.34,'sine',.07,.72);return 'twinkle'}
+if(kind==='boing'&&variant===0){note(f*.92,when,.76,'triangle',.15,.48);note(f*.58,when+.16,.52,'sine',.08,.72);return 'rubber boing'}
+if(kind==='boing'){note(f*.62,when,.88,'sine',.14,1.38);note(f*1.02,when+.2,.54,'triangle',.07,.66);return 'wobble bloop'}
+if(kind==='zap'&&variant===0){note(f*2.8,when,.16,'square',.07,.42);note(f*4.2,when+.09,.13,'square',.055,.5);return 'zip-zap'}
+if(kind==='zap'){note(f*1.7,when,.18,'sine',.1,1.55);note(f*2.55,when+.15,.24,'triangle',.075,.72);return 'chirpy beep'}
+if(kind==='meteor'&&variant===0){note(f*.62,when,1.24,'triangle',.1,2.05);note(f*1.3,when+.26,.88,'sine',.055,1.42);return 'rising wee'}
+note(f*1.9,when,1.02,'sine',.11,.38);note(f*.86,when+.22,.72,'triangle',.06,1.32);return 'falling whoop'}function addSpark(px,py,color,n=18){for(let i=0;
 i<n;
-i++)sparks.push({x:px,y:py,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3-1,r:Math.random()*4+1,life:1,color})}function addCreature(kind,px,py,color){creatures.push({kind,x:Math.max(44,Math.min(W-44,px)),y:Math.max(66,Math.min(H-54,py)),r:20+Math.random()*8,color,life:1,phase:Math.random()*7,drift:(Math.random()-.5)*.16})}function spell(kind,px=W/2,py=H/2){audio();
+i++)sparks.push({x:px,y:py,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3-1,r:Math.random()*4+1,life:1,color})}function goblinScale(){return W<=600?Math.max(.62,W/600*.9):1}function addCreature(kind,px,py,color){const size=goblinScale(),margin=Math.max(30,44*size);creatures.push({kind,x:Math.max(margin,Math.min(W-margin,px)),y:Math.max(48*size,Math.min(H-42*size,py)),r:(20+Math.random()*8)*size,color,life:1,phase:Math.random()*7,drift:(Math.random()-.5)*.16})}function spell(kind,px=W/2,py=H/2){audio();
 ctx.resume();
 const now=ctx.currentTime,placed=placementPitch(px,py),voiceIndex=creatures.length;
 let msg,color,n=20;
@@ -231,8 +215,7 @@ auto.classList.toggle('on',autopilot);
 auto.textContent=`goblin autopilot: ${autopilot?'on':'off'}`;
 clearTimeout(timer);
 clearTimeout(wonderTimer);
-clearTimeout(choirTimer);
-if(autopilot){runAuto();scheduleWonder(true);scheduleChoir(true)}});
+if(autopilot){runAuto();scheduleWonder(true)}});
 function wonderPad(intervals,base,when,len,wave='sine'){const bus=ctx.createGain(),filter=ctx.createBiquadFilter();
 filter.type='lowpass';filter.frequency.value=2800;
 bus.gain.setValueAtTime(.0001,when);bus.gain.linearRampToValueAtTime(.06,when+1.1);bus.gain.setValueAtTime(.06,when+len*.7);bus.gain.exponentialRampToValueAtTime(.0001,when+len);
@@ -245,16 +228,16 @@ if(type==='hearts'){wonderPad([0,4,7,11],root,now,8,'sine');[0,4,7,12,16].forEac
 if(type==='rainbow'){wonderPad([0,4,7,9,14],root/2,now,10,'sine');[0,2,4,7,9,11,14].forEach((v,i)=>note(root*Math.pow(2,v/12),now+i*.28,2.4,'triangle',.035));speech.textContent='SECRET RAINBOW!'}
 addSpark(W*.5,H*.38,type==='hearts'?'#ff83bc':type==='rainbow'?'#ffe85e':'#bdefff',50)}
 function scheduleWonder(first=false){clearTimeout(wonderTimer);if(!autopilot)return;wonderTimer=setTimeout(()=>{const types=['meteor','hearts','rainbow'];summonWonder(types[wonderIndex++%types.length]);scheduleWonder(false)},first?3500+Math.random()*2500:11000+Math.random()*12000)}
-function playChoir(){if(!autopilot||!voiceBuffer)return;audio();const now=ctx.currentTime,rates=[.749,1,1.189,1.498],pans=[-.75,-.25,.3,.75],life=Math.max(7,voiceBuffer.duration/.749+2.5);wonderPad([0,4,7,11],root/2,now,life,'sine');
-rates.forEach((rate,i)=>{const source=ctx.createBufferSource(),gain=ctx.createGain(),filter=ctx.createBiquadFilter(),pan=ctx.createStereoPanner();source.buffer=voiceBuffer;source.playbackRate.value=rate;filter.type='lowpass';filter.frequency.value=2400+i*450;pan.pan.value=pans[i];const start=now+i*.22,end=start+voiceBuffer.duration/rate;gain.gain.setValueAtTime(.0001,start);gain.gain.linearRampToValueAtTime(.07,start+.55);gain.gain.setValueAtTime(.07,Math.max(start+.56,end-.65));gain.gain.exponentialRampToValueAtTime(.0001,end);source.connect(filter).connect(gain).connect(pan);pan.connect(master);pan.connect(choirVerb);source.start(start);source.stop(end+.05)});
+function playChoir(){if(!voiceBuffer)return;audio();ctx.resume();const now=ctx.currentTime,rates=[.749,1,1.189,1.498],pans=[-.75,-.25,.3,.75],life=Math.max(7,voiceBuffer.duration/.749+2.5);wonderPad([0,4,7,11],root/2,now,life,'sine');
+rates.forEach((rate,i)=>{const source=ctx.createBufferSource(),gain=ctx.createGain(),filter=ctx.createBiquadFilter(),pan=ctx.createStereoPanner();source.buffer=voiceBuffer;source.playbackRate.value=rate;filter.type='lowpass';filter.frequency.value=2400+i*450;pan.pan.value=pans[i];const start=now+i*.22,end=start+voiceBuffer.duration/rate;gain.gain.setValueAtTime(.0001,start);gain.gain.linearRampToValueAtTime(.13,start+.42);gain.gain.setValueAtTime(.13,Math.max(start+.43,end-.55));gain.gain.exponentialRampToValueAtTime(.0001,end);source.connect(filter).connect(gain).connect(pan);pan.connect(master);pan.connect(choirVerb);source.start(start);source.stop(end+.05)});
 wonders.push({type:'choir',life:1,phase:Math.random()*7,x:W*.5,y:H*.8});speech.textContent='THE LITTLE GOBLIN CHOIR RISES!';addSpark(W*.5,H*.7,'#f7dcff',60)}
-function scheduleChoir(first=false){clearTimeout(choirTimer);if(!autopilot||!voiceBuffer)return;choirTimer=setTimeout(()=>{playChoir();scheduleChoir(false)},first?6500+Math.random()*5500:16000+Math.random()*18000)}
+choirButton.addEventListener('click',playChoir);
 function heartPath(px,py,s){x.moveTo(px,py+s*.28);x.bezierCurveTo(px-s,py-s*.28,px-s*.42,py-s,px,py-s*.42);x.bezierCurveTo(px+s*.42,py-s,px+s,py-s*.28,px,py+s*.28)}
 function drawWonder(w,t){w.life-=.0012;x.save();x.globalAlpha=Math.min(1,w.life*3);
 if(w.type==='meteor'){const p=1-w.life,px=-80+(W+160)*p,py=35+H*.42*p;x.strokeStyle='#d9f8ff';x.lineWidth=10;x.beginPath();x.moveTo(px-100,py-48);x.lineTo(px,py);x.stroke();x.strokeStyle='#ff9fd4';x.lineWidth=4;x.beginPath();x.moveTo(px-145,py-70);x.lineTo(px,py);x.stroke();x.fillStyle='#fff8bd';x.beginPath();x.arc(px,py,13+Math.sin(t*.01)*3,0,7);x.fill()}
 if(w.type==='hearts'){const spread=(1-w.life)*150;x.fillStyle='#ff89bd';for(let i=0;i<12;i++){const a=i/12*7+w.phase,d=24+spread*(.45+(i%3)*.18),px=w.x+Math.cos(a)*d,py=w.y+Math.sin(a)*d;x.beginPath();heartPath(px,py,8+(i%3)*3);x.fill()}}
 if(w.type==='rainbow'){const colors=['#ff78ad','#ffae68','#ffe85e','#85e77c','#65dcff','#ab8cff'];x.lineCap='round';colors.forEach((color,i)=>{x.strokeStyle=color;x.lineWidth=10;x.beginPath();x.arc(W*.5,H+24,150+i*13,Math.PI,Math.PI*2);x.stroke()});x.fillStyle='#fff8dc';x.beginPath();x.arc(W*.5-190,H-20,30,0,7);x.arc(W*.5+190,H-20,30,0,7);x.fill()}
-if(w.type==='choir'){const colors=['#ff9dcc','#ffe36c','#77e4ff','#c9a0ff','#91df61'],rise=Math.min(1,(1-w.life)*4),baseY=H+48-rise*150;colors.forEach((color,i)=>drawCreature({kind:['fizz','boing','zap','meteor','fizz'][i],x:W*.5+(i-2)*62,y:baseY+Math.abs(i-2)*9,r:18,color,life:w.life,phase:w.phase+i},t))}
+if(w.type==='choir'){const colors=['#ff9dcc','#ffe36c','#77e4ff','#c9a0ff','#91df61'],size=goblinScale(),rise=Math.min(1,(1-w.life)*4),baseY=H+48-rise*150;colors.forEach((color,i)=>drawCreature({kind:['fizz','boing','zap','meteor','fizz'][i],x:W*.5+(i-2)*62*size,y:baseY+Math.abs(i-2)*9*size,r:18*size,color,life:w.life,phase:w.phase+i},t))}
 x.restore()}
 function drawCreature(q,t,conductor=false){const bob=Math.sin(t*.002+q.phase)*5,r=q.r;
 x.save();
@@ -341,7 +324,7 @@ i--){const q=creatures[i];
 q.life-=.00035;
 q.x+=q.drift;
 drawCreature(q,t);if(q.life<=0)creatures.splice(i,1)}x.globalAlpha=1;
-drawCreature({kind:'conductor',x:W*.5,y:H*.67,r:31,color:'#91df61',life:1,phase:0},t,true);
+drawCreature({kind:'conductor',x:W*.5,y:H*.67,r:31*goblinScale(),color:'#91df61',life:1,phase:0},t,true);
 meter.textContent=`✨ ${sparks.length} sparkles · ${creatures.length} goblins${wonders.length?' · WONDER!':''}`};
 requestAnimationFrame(draw)})();
 </script></html>
