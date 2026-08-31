@@ -73,7 +73,9 @@
       // in it without anything modulating on a timer.
       [-detune, detune].forEach(function (cents) {
         var o = ctx.createOscillator();
-        o.type = i === 0 ? 'sine' : 'triangle';
+        // Sines keep the upper chord tones from bringing a nasal triangle
+        // edge into the wash. The detuned pair still supplies slow movement.
+        o.type = 'sine';
         o.frequency.value = f;
         o.detune.value = cents;
         var g = ctx.createGain();
@@ -101,19 +103,15 @@
   };
 
   /* ---- the played voice ------------------------------------------------
-   * A bowl: a few slightly inharmonic sine partials, slow in, long out. Its
-   * pitch always comes from Core.pitchForGesture, so it is drawn from the
-   * drone's own set and cannot be a wrong note.
-   *
-   * The detune on each partial has to stay small. A partial beats against its
-   * true harmonic at (fundamental * multiplier * fractional-detune) Hz, and
-   * anywhere in roughly 15-40Hz that beat stops reading as a slow shimmer and
-   * starts reading as buzz. The original set's 4th partial (4.07, i.e. 1.75%
-   * sharp) beat at ~31Hz against the highest playable fundamental (440Hz) -
-   * an actual insect-wing rate, which is what "IS THAT A BEE" was hearing.
-   * This set keeps every partial's worst-case beat under ~4Hz.
+   * A soft two-partial tone bank, one voice per allowed chord tone. Gesture
+   * crossfades neighbouring notes instead of dragging one oscillator through
+   * a long portamento. That keeps every intermediate state harmonic and makes
+   * the player's direction and pauses audible without the old "woooo" whine.
    */
-  var BOWL_PARTIALS = [1, 2.004, 3.002, 3.997];
+  var VOICE_PARTIALS = [
+    { mult: 1, gain: 0.88 },
+    { mult: 2, gain: 0.12 }
+  ];
 
   RGAudio.prototype._buildVoice = function () {
     var ctx = this.ctx;
@@ -126,18 +124,24 @@
     filt.Q.value = 0.7;
     filt.connect(out);
 
-    var coeffSum = BOWL_PARTIALS.reduce(function (a, _, i) { return a + 1 / (i + 1); }, 0);
     var self = this;
     this.voiceOscs = [];
-    BOWL_PARTIALS.forEach(function (mult, i) {
-      var o = ctx.createOscillator();
-      o.type = 'sine';
-      o.frequency.value = self.profile.drone.root * mult;
-      var g = ctx.createGain();
-      g.gain.value = (1 / (i + 1)) / coeffSum; // normalised, see the drone note
-      o.connect(g); g.connect(filt);
-      o.start();
-      self.voiceOscs.push({ osc: o, mult: mult });
+    this.voiceNotes = [];
+    Core.voicePitches(this.profile).forEach(function (frequency) {
+      var note = ctx.createGain();
+      note.gain.value = 0;
+      note.connect(filt);
+      VOICE_PARTIALS.forEach(function (partial) {
+        var o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = frequency * partial.mult;
+        var g = ctx.createGain();
+        g.gain.value = partial.gain;
+        o.connect(g); g.connect(note);
+        o.start();
+        self.voiceOscs.push({ osc: o, frequency: frequency, mult: partial.mult });
+      });
+      self.voiceNotes.push(note);
     });
 
     this.voiceGain = out;
@@ -152,11 +156,11 @@
     var now = this.ctx.currentTime;
     var v = this.profile.interaction.voice || {};
 
-    var target = Core.pitchForGesture(this.profile, pitchAxis);
-    if (target) {
-      var tc = Math.max(0.15, (v.glide || 1.2) / 3);
-      this.voiceOscs.forEach(function (p) {
-        p.osc.frequency.setTargetAtTime(target * p.mult, now, tc);
+    var blend = Core.voiceBlendWeights(this.profile, pitchAxis);
+    if (blend.length) {
+      var flow = Math.max(0.12, (v.glide || 1.2) / 3);
+      this.voiceNotes.forEach(function (note, i) {
+        note.gain.setTargetAtTime(blend[i], now, flow);
       });
     }
 
@@ -174,13 +178,13 @@
     // combination reported as "whiny" and doing nothing distinct on its own
     // axis. Inverted: more present now reads warmer and rounder, so presence
     // and brightness are no longer stacking toward shrill at the same moment.
-    var cut = 1050 - Core.clamp01(magnitude) * 620;
+    var cut = 880 - Core.clamp01(magnitude) * 430;
     this.voiceFilter.frequency.setTargetAtTime(cut, now, 0.3);
 
     // GEN-0103: the gesture reaches into the drone's own mix too, pulling
     // whichever of its tones pitchAxis is nearest to forward and letting the
     // others recede - the same focus a listener hears the voice sitting on,
-    // so the two read as one thing moving rather than a voice laid over a
+    // so the two read as one moving harmony rather than a voice laid over a
     // chord that never answers. Slower time constant than the voice's own
     // (0.6 vs ~0.3-0.7s attack): this is the whole wash's balance shifting,
     // weather rather than a note being struck.

@@ -29,7 +29,10 @@
     ORBIT_WIDTH_MAX: 0.85,    // never fully hard-panned - the wash stays present in a single earbud
     ORBIT_VOICE_RATIO: -0.6,  // the played voice answers from the opposite side, at this fraction of the drone's width
     DRONE_EMPHASIS_STRENGTH: 1.8, // how hard a gesture can lean the drone's own mix toward one of its tones
-    DRONE_EMPHASIS_FLOOR: 0.25    // a de-emphasised tone recedes, it never actually vanishes - still one chord
+    DRONE_EMPHASIS_FLOOR: 0.25,   // a de-emphasised tone recedes, it never actually vanishes - still one chord
+    TILT_ROLL_RANGE: 35,      // degrees either side of the held starting angle for the full pitch field
+    TILT_BOW_RANGE: 26,       // degrees forward from the held starting angle to reach full presence
+    TILT_REST_LEVEL: 0.28     // the voice is present but quiet at the held starting angle
   };
 
   // The voice ceiling is derived from the drone's QUIETEST moment, not its
@@ -81,6 +84,42 @@
     var t = clamp01(x);
     var i = Math.min(set.length - 1, Math.floor(t * set.length));
     return set[i];
+  }
+
+  // The played layer is a flow through the allowed chord tones, not one
+  // oscillator gliding between them. At any position only two neighbouring
+  // pitches can sound and their weights sum to one, so the output stays inside
+  // the same level ceiling while a roll can linger between two consonant tones.
+  function voiceBlendWeights(profile, x) {
+    var set = voicePitches(profile);
+    if (!set.length) return [];
+    if (set.length === 1) return [1];
+    var pos = clamp01(x) * (set.length - 1);
+    var lo = Math.floor(pos);
+    var hi = Math.min(set.length - 1, lo + 1);
+    var mix = pos - lo;
+    // Smoothstep softens the hand-off without creating a third sounding note.
+    mix = mix * mix * (3 - 2 * mix);
+    var out = set.map(function () { return 0; });
+    out[lo] = 1 - mix;
+    out[hi] += mix;
+    return out;
+  }
+
+  // Device motion is interpreted relative to the angle in which the player
+  // starts. Signed roll gives left and right different harmonic directions;
+  // forward/back tilt opens and closes presence around a quiet resting level.
+  function tiltGesture(gamma, beta, neutralGamma, neutralBeta) {
+    var g = (typeof gamma === 'number' && !isNaN(gamma)) ? gamma : neutralGamma;
+    var b = (typeof beta === 'number' && !isNaN(beta)) ? beta : neutralBeta;
+    var ng = (typeof neutralGamma === 'number' && !isNaN(neutralGamma)) ? neutralGamma : 0;
+    var nb = (typeof neutralBeta === 'number' && !isNaN(neutralBeta)) ? neutralBeta : 0;
+    var roll = Math.max(-1, Math.min(1, (g - ng) / SHELL.TILT_ROLL_RANGE));
+    var shapedRoll = roll * (0.72 + 0.28 * Math.abs(roll));
+    return {
+      pitchAxis: clamp01(0.5 + shapedRoll * 0.5),
+      magnitude: clamp01(SHELL.TILT_REST_LEVEL + (b - nb) / SHELL.TILT_BOW_RANGE)
+    };
   }
 
   /* ---- level ------------------------------------------------------------ */
@@ -278,6 +317,8 @@
     dronePitches: dronePitches,
     voicePitches: voicePitches,
     pitchForGesture: pitchForGesture,
+    voiceBlendWeights: voiceBlendWeights,
+    tiltGesture: tiltGesture,
     swellAt: swellAt,
     droneGainAt: droneGainAt,
     orbitPanAt: orbitPanAt,

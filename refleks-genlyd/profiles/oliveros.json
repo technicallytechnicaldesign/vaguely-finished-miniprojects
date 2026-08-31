@@ -13,7 +13,7 @@
   },
   "drone": {
     "root": 110,
-    "ratios": [1, 1.5, 2, 3, 4],
+    "ratios": [1, 1.3333333333, 1.5, 2, 2.6666666667],
     "swellPeriod": 28,
     "swellDepth": 0.55,
     "orbit": {
@@ -21,19 +21,19 @@
       "width": 0.55
     },
     "timbre": {
-      "cutoff": 480,
+      "cutoff": 390,
       "detune": 4
     }
   },
   "interaction": {
     "kind": "tilt",
     "voice": {
-      "family": "bowl",
+      "family": "soft harmonic bank",
       "attack": 2.2,
       "release": 5.5,
-      "glide": 2.6,
-      "minRatio": 1.5,
-      "maxRatio": 3
+      "glide": 1.5,
+      "minRatio": 1.3333333333,
+      "maxRatio": 2.6666666667
     }
   },
   "skin": {

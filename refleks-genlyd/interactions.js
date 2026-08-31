@@ -31,8 +31,8 @@
    * with your eyes closed: no screen to look at, no camera, no permission
    * prompt on Android, and no measurable battery cost across a long session.
    *
-   * gamma (left/right roll) picks the pitch from the drone's own set.
-   * beta (front/back pitch, measured from upright) sets how present the voice is.
+   * gamma (left/right roll) flows through the drone's chord in both directions.
+   * beta (front/back pitch) opens presence relative to the player's starting hold.
    */
   var tiltState = null;
 
@@ -47,29 +47,24 @@
       // tremor into a constantly re-targeted pitch glide, which is a warble on
       // top of the tone rather than a played gesture. Smoothing here, at the
       // source, is the fix - smoothing only the audio side would just re-chase
-      // a new noisy target every call. 0.12 settles a deliberate tilt over
-      // roughly half a second and damps tremor well below audible.
-      var SMOOTH = 0.12;
+      // a new noisy target every call. 0.18 settles a deliberate tilt quickly
+      // enough to phrase with while still damping ordinary hand tremor.
+      var SMOOTH = 0.18;
       var smoothGamma = null, smoothBeta = null;
+      var neutralGamma = null, neutralBeta = null;
 
       function onOrient(e) {
         if (e.gamma === null && e.beta === null) return;
         got = true;
         var rawGamma = e.gamma || 0, rawBeta = e.beta || 0;
+        if (neutralGamma === null) {
+          neutralGamma = rawGamma;
+          neutralBeta = rawBeta;
+        }
         smoothGamma = smoothGamma === null ? rawGamma : smoothGamma + (rawGamma - smoothGamma) * SMOOTH;
         smoothBeta = smoothBeta === null ? rawBeta : smoothBeta + (rawBeta - smoothBeta) * SMOOTH;
-        // gamma runs -90..90 across a roll. Centre is silence-ish, so the axis
-        // is the absolute roll: tilting either way moves up the set.
-        var pitchAxis = Math.min(1, Math.abs(smoothGamma) / 60);
-        // beta 0 is flat on a table, 90 is upright, pointed forward at your
-        // face is commonly 70-90. GEN-0102: the old 10..70 window put that
-        // whole forward-held range at or past its own ceiling, so tilting
-        // further "forward" from there read as dead - there was no headroom
-        // left to move into. Widened to the full 0..90 sweep so presence
-        // keeps changing across the range a phone actually rests in held
-        // upright, not just the range it passes through getting there.
-        var mag = Math.min(1, Math.max(0, smoothBeta / 90));
-        audio.gesture(pitchAxis, mag);
+        var gesture = root.RGCore.tiltGesture(smoothGamma, smoothBeta, neutralGamma, neutralBeta);
+        audio.gesture(gesture.pitchAxis, gesture.magnitude);
       }
 
       // Desktop has no orientation sensor. Rather than silently doing nothing
@@ -79,7 +74,7 @@
       function onPointer(e) {
         if (got) return;
         var w = root.innerWidth || 1, h = root.innerHeight || 1;
-        var rawX = Math.abs((e.clientX / w) * 2 - 1), rawY = 1 - (e.clientY / h);
+        var rawX = e.clientX / w, rawY = 1 - (e.clientY / h);
         smoothPX = smoothPX === null ? rawX : smoothPX + (rawX - smoothPX) * SMOOTH;
         smoothPY = smoothPY === null ? rawY : smoothPY + (rawY - smoothPY) * SMOOTH;
         audio.gesture(smoothPX, smoothPY);
@@ -93,7 +88,9 @@
         setTimeout(function () {
           resolve({
             active: true,
-            note: got ? null : 'No motion sensor here, so the pointer is standing in for tilt.'
+            note: got
+              ? 'Your starting hold is the centre. Roll left and right through the chord; tip forward and back for presence.'
+              : 'No motion sensor here, so left/right pointer position plays the chord and height shapes presence.'
           });
         }, 1200);
       });
