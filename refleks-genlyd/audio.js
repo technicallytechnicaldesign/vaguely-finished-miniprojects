@@ -16,9 +16,11 @@
   var LOOKAHEAD = 4.0;   // seconds of wash scheduled in advance
   var TICK_MS = 900;     // scheduler wake-up; safe below the ~1s throttle floor
   var STEP = 0.2;        // resolution of the scheduled ramp
-  var REVERB_SECONDS = 3.2; // decay tail length: a room, not a canyon
+  var REVERB_SECONDS = 2.6; // shorter impulse keeps the phone path light without drying it out
   var REVERB_DECAY = 2.4;   // exponential falloff shape of the generated impulse
-  var REVERB_WET = 0.3;     // send level; the dry signal (and its ceiling) is untouched
+  var REVERB_WET = 0.26;    // send level; the dry signal (and its ceiling) is untouched
+  var MASTER_HEADROOM = 0.78; // dry and wet share one guarded output instead of summing at the speaker
+  var GESTURE_INTERVAL = 1 / 30; // sensor events may arrive at 60-120Hz; audio control does not need to
 
   function RGAudio(profile) {
     this.profile = profile;
@@ -29,6 +31,21 @@
     this.timer = null;
     this.voiceOn = false;
     this.onended = null;
+    this.lastGestureAt = -Infinity;
+    this.graphConnected = false;
+  }
+
+  // Replace the previous automation target before adding the next one. Without
+  // this, a phone can accumulate hundreds of setTarget events every second for
+  // the whole session, even though only the latest orientation matters.
+  function retarget(param, value, now, timeConstant) {
+    if (typeof param.cancelAndHoldAtTime === 'function') {
+      param.cancelAndHoldAtTime(now);
+    } else if (typeof param.cancelScheduledValues === 'function') {
+      param.cancelScheduledValues(now);
+      if (typeof param.setValueAtTime === 'function') param.setValueAtTime(param.value, now);
+    }
+    param.setTargetAtTime(value, now, timeConstant);
   }
 
   RGAudio.prototype.resume = function () {
@@ -154,13 +171,15 @@
   RGAudio.prototype.gesture = function (pitchAxis, magnitude) {
     if (!this.ctx || !this.voiceGain || !this.voiceOn) return;
     var now = this.ctx.currentTime;
+    if (now - this.lastGestureAt < GESTURE_INTERVAL) return;
+    this.lastGestureAt = now;
     var v = this.profile.interaction.voice || {};
 
     var blend = Core.voiceBlendWeights(this.profile, pitchAxis);
     if (blend.length) {
       var flow = Math.max(0.12, (v.glide || 1.2) / 3);
       this.voiceNotes.forEach(function (note, i) {
-        note.gain.setTargetAtTime(blend[i], now, flow);
+        retarget(note.gain, blend[i], now, flow);
       });
     }
 
@@ -169,7 +188,7 @@
     var fade = this.session ? Core.fadeOutFactor(this.session, this.elapsed()) : 1;
     var g = Core.voiceGainFor(this.profile, magnitude, fade);
     var attack = Core.voiceAttack(this.profile);
-    this.voiceGain.gain.setTargetAtTime(g, now, attack / 3);
+    retarget(this.voiceGain.gain, g, now, attack / 3);
 
     // Timbre follows the same gesture: this is the "how you play shapes the
     // sound" half of GEN-0060, brightness rather than more notes. GEN-0102:
@@ -179,7 +198,7 @@
     // axis. Inverted: more present now reads warmer and rounder, so presence
     // and brightness are no longer stacking toward shrill at the same moment.
     var cut = 880 - Core.clamp01(magnitude) * 430;
-    this.voiceFilter.frequency.setTargetAtTime(cut, now, 0.3);
+    retarget(this.voiceFilter.frequency, cut, now, 0.3);
 
     // GEN-0103: the gesture reaches into the drone's own mix too, pulling
     // whichever of its tones pitchAxis is nearest to forward and letting the
@@ -191,7 +210,7 @@
     if (this.droneEmphGains) {
       var weights = Core.droneEmphasisWeights(this.profile.drone, pitchAxis, magnitude);
       this.droneEmphGains.forEach(function (g, i) {
-        g.gain.setTargetAtTime(weights[i], now, 0.6);
+        retarget(g.gain, weights[i], now, 0.6);
       });
     }
   };
@@ -206,27 +225,27 @@
 
   /* ---- motion strike ---------------------------------------------------
    * A small temple-gong accent for a quick physical swing. The pitch comes
-   * from the same playable chord as the continuous voice; exact 1x, 1.5x and
-   * 2x sine partials keep it consonant, while progressively shorter upper
-   * decays give the struck onset some metal without reviving the old whine.
+   * from the same playable chord as the continuous voice, lifted one octave so
+   * its body survives a phone speaker; exact 1x, 1.5x and 2x sine partials keep
+   * it consonant while shorter upper decays add metal without sustained whine.
    */
   RGAudio.prototype.strike = function (pitchAxis, strength) {
     if (!this.ctx || !this.session || !this.voiceOn) return;
     var ctx = this.ctx, now = ctx.currentTime;
     var fade = Core.fadeOutFactor(this.session, this.elapsed());
     var peak = Core.strikeGainFor(this.profile, strength, fade);
-    var base = Core.pitchForGesture(this.profile, pitchAxis);
+    var base = Core.pitchForGesture(this.profile, pitchAxis) * 2;
     if (!base || peak <= 0) return;
 
     var filt = ctx.createBiquadFilter();
     filt.type = 'lowpass';
-    filt.frequency.value = Math.min(1050, base * 4.2);
+    filt.frequency.value = Math.min(1800, base * 3.8);
     filt.Q.value = 0.55;
 
     [
-      { mult: 1, gain: 0.72, decay: 3.6 },
-      { mult: 1.5, gain: 0.20, decay: 2.1 },
-      { mult: 2, gain: 0.08, decay: 1.15 }
+      { mult: 1, gain: 0.60, decay: 3.2 },
+      { mult: 1.5, gain: 0.28, decay: 1.5 },
+      { mult: 2, gain: 0.12, decay: 0.65 }
     ].forEach(function (partial) {
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
@@ -246,9 +265,36 @@
     if (this.voicePanner) {
       filt.connect(this.voicePanner);
     } else {
-      filt.connect(ctx.destination);
+      filt.connect(this.masterInput || ctx.destination);
       if (this.reverbSend) filt.connect(this.reverbSend);
     }
+  };
+
+  /* ---- guarded output --------------------------------------------------
+   * Dry and reverberant signals used to meet independently at destination.
+   * One headroom stage and a transparent peak guard now own their sum, which
+   * protects a small phone speaker when several chord components align.
+   */
+  RGAudio.prototype._buildMaster = function () {
+    var ctx = this.ctx;
+    var input = ctx.createGain();
+    input.gain.value = MASTER_HEADROOM;
+
+    if (ctx.createDynamicsCompressor) {
+      var guard = ctx.createDynamicsCompressor();
+      guard.threshold.value = -8;
+      guard.knee.value = 6;
+      guard.ratio.value = 12;
+      guard.attack.value = 0.003;
+      guard.release.value = 0.18;
+      input.connect(guard);
+      guard.connect(ctx.destination);
+      this.peakGuard = guard;
+    } else {
+      input.connect(ctx.destination);
+    }
+    this.masterInput = input;
+    return input;
   };
 
   /* ---- orbit --------------------------------------------------------------
@@ -304,7 +350,7 @@
     var wet = ctx.createGain();
     wet.gain.value = REVERB_WET;
     convolver.connect(wet);
-    wet.connect(ctx.destination);
+    wet.connect(this.masterInput || ctx.destination);
 
     var send = ctx.createGain();
     send.gain.value = 1;
@@ -354,22 +400,27 @@
     var self = this;
     return this.resume().then(function () {
       self.session = session;
+      if (!self.masterInput) self._buildMaster();
       if (!self.droneGain) self._buildDrone();
       if (!self.voiceGain) self._buildVoice();
       if (!self.reverbSend) self._buildReverb();
       if (!self.dronePanner) self._buildOrbit();
 
-      if (self.dronePanner) self.droneGain.connect(self.dronePanner);
-      if (self.voicePanner) self.voiceGain.connect(self.voicePanner);
-      var droneOut = self.dronePanner || self.droneGain;
-      var voiceOut = self.voicePanner || self.voiceGain;
-      droneOut.connect(self.ctx.destination);
-      voiceOut.connect(self.ctx.destination);
-      droneOut.connect(self.reverbSend);
-      voiceOut.connect(self.reverbSend);
+      if (!self.graphConnected) {
+        if (self.dronePanner) self.droneGain.connect(self.dronePanner);
+        if (self.voicePanner) self.voiceGain.connect(self.voicePanner);
+        var droneOut = self.dronePanner || self.droneGain;
+        var voiceOut = self.voicePanner || self.voiceGain;
+        droneOut.connect(self.masterInput);
+        voiceOut.connect(self.masterInput);
+        droneOut.connect(self.reverbSend);
+        voiceOut.connect(self.reverbSend);
+        self.graphConnected = true;
+      }
 
       self.startTime = self.ctx.currentTime + 0.15;
       self.scheduledTo = self.startTime;
+      self.lastGestureAt = -Infinity;
       self.droneGain.gain.cancelScheduledValues(0);
       self.droneGain.gain.setValueAtTime(0, self.ctx.currentTime);
 

@@ -33,10 +33,10 @@
     TILT_ROLL_RANGE: 35,      // degrees either side of the held starting angle for the full pitch field
     TILT_BOW_RANGE: 26,       // degrees forward from the held starting angle to reach full presence
     TILT_REST_LEVEL: 0.28,    // the voice is present but quiet at the held starting angle
-    STRIKE_SPEED_MIN: 260,    // degrees/second below this is phrasing, not a strike
-    STRIKE_SPEED_MAX: 760,    // degrees/second at which the gong reaches its quiet ceiling
-    STRIKE_COOLDOWN_MS: 520,  // one physical swing makes one gong, not a sensor burst
-    STRIKE_CEILING_RATIO: 0.38 // gong peak as a fraction of the already-limited voice peak
+    STRIKE_SPEED_MIN: 170,    // degrees/second below this is phrasing, not a strike
+    STRIKE_SPEED_MAX: 520,    // degrees/second at which the gong reaches its quiet ceiling
+    STRIKE_COOLDOWN_MS: 650,  // one physical swing makes one gong, not a sensor burst
+    STRIKE_CEILING_RATIO: 0.66 // gong peak as a fraction of the already-limited voice peak
   };
 
   // The voice ceiling is derived from the drone's QUIETEST moment, not its
