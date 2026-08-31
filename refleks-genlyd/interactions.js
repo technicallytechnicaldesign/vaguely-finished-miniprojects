@@ -52,6 +52,22 @@
       var SMOOTH = 0.18;
       var smoothGamma = null, smoothBeta = null;
       var neutralGamma = null, neutralBeta = null;
+      var lastMotion = null, lastStrikeAt = -Infinity;
+
+      function maybeStrike(gamma, beta, pitchAxis, at) {
+        if (lastMotion) {
+          var strength = root.RGCore.strikeStrength(
+            gamma - lastMotion.gamma,
+            beta - lastMotion.beta,
+            at - lastMotion.at
+          );
+          if (strength > 0 && at - lastStrikeAt >= root.RGCore.SHELL.STRIKE_COOLDOWN_MS) {
+            audio.strike(pitchAxis, strength);
+            lastStrikeAt = at;
+          }
+        }
+        lastMotion = { gamma: gamma, beta: beta, at: at };
+      }
 
       function onOrient(e) {
         if (e.gamma === null && e.beta === null) return;
@@ -64,6 +80,7 @@
         smoothGamma = smoothGamma === null ? rawGamma : smoothGamma + (rawGamma - smoothGamma) * SMOOTH;
         smoothBeta = smoothBeta === null ? rawBeta : smoothBeta + (rawBeta - smoothBeta) * SMOOTH;
         var gesture = root.RGCore.tiltGesture(smoothGamma, smoothBeta, neutralGamma, neutralBeta);
+        maybeStrike(rawGamma, rawBeta, gesture.pitchAxis, e.timeStamp || Date.now());
         audio.gesture(gesture.pitchAxis, gesture.magnitude);
       }
 
@@ -77,6 +94,12 @@
         var rawX = e.clientX / w, rawY = 1 - (e.clientY / h);
         smoothPX = smoothPX === null ? rawX : smoothPX + (rawX - smoothPX) * SMOOTH;
         smoothPY = smoothPY === null ? rawY : smoothPY + (rawY - smoothPY) * SMOOTH;
+        maybeStrike(
+          (rawX - 0.5) * root.RGCore.SHELL.TILT_ROLL_RANGE * 2,
+          (rawY - 0.5) * root.RGCore.SHELL.TILT_BOW_RANGE * 2,
+          smoothPX,
+          e.timeStamp || Date.now()
+        );
         audio.gesture(smoothPX, smoothPY);
       }
 
@@ -89,8 +112,8 @@
           resolve({
             active: true,
             note: got
-              ? 'Your starting hold is the centre. Roll left and right through the chord; tip forward and back for presence.'
-              : 'No motion sensor here, so left/right pointer position plays the chord and height shapes presence.'
+              ? 'Your starting hold is the centre. Roll through the chord, tip for presence, or make one quick striking motion for a quiet gong.'
+              : 'No motion sensor here, so pointer position plays the chord; a quick pointer sweep tests the quiet gong.'
           });
         }, 1200);
       });

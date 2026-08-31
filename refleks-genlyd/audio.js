@@ -204,6 +204,53 @@
     }
   };
 
+  /* ---- motion strike ---------------------------------------------------
+   * A small temple-gong accent for a quick physical swing. The pitch comes
+   * from the same playable chord as the continuous voice; exact 1x, 1.5x and
+   * 2x sine partials keep it consonant, while progressively shorter upper
+   * decays give the struck onset some metal without reviving the old whine.
+   */
+  RGAudio.prototype.strike = function (pitchAxis, strength) {
+    if (!this.ctx || !this.session || !this.voiceOn) return;
+    var ctx = this.ctx, now = ctx.currentTime;
+    var fade = Core.fadeOutFactor(this.session, this.elapsed());
+    var peak = Core.strikeGainFor(this.profile, strength, fade);
+    var base = Core.pitchForGesture(this.profile, pitchAxis);
+    if (!base || peak <= 0) return;
+
+    var filt = ctx.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.value = Math.min(1050, base * 4.2);
+    filt.Q.value = 0.55;
+
+    [
+      { mult: 1, gain: 0.72, decay: 3.6 },
+      { mult: 1.5, gain: 0.20, decay: 2.1 },
+      { mult: 2, gain: 0.08, decay: 1.15 }
+    ].forEach(function (partial) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      var frequency = base * partial.mult;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequency * 1.012, now);
+      osc.frequency.exponentialRampToValueAtTime(frequency, now + 0.24);
+      gain.gain.setValueAtTime(0.00001, now);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.00002, peak * partial.gain), now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.00001, now + partial.decay);
+      osc.connect(gain); gain.connect(filt);
+      osc.start(now); osc.stop(now + partial.decay + 0.08);
+    });
+
+    // Share the played layer's counter-orbit and existing reverb send. With no
+    // StereoPanner support, connect the same dry + wet pair explicitly.
+    if (this.voicePanner) {
+      filt.connect(this.voicePanner);
+    } else {
+      filt.connect(ctx.destination);
+      if (this.reverbSend) filt.connect(this.reverbSend);
+    }
+  };
+
   /* ---- orbit --------------------------------------------------------------
    * A StereoPannerNode per bus, both driven off one shared sine oscillator
    * (an audio-rate LFO, not a JS timer) so the drift is sample-accurate and

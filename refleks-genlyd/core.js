@@ -32,7 +32,11 @@
     DRONE_EMPHASIS_FLOOR: 0.25,   // a de-emphasised tone recedes, it never actually vanishes - still one chord
     TILT_ROLL_RANGE: 35,      // degrees either side of the held starting angle for the full pitch field
     TILT_BOW_RANGE: 26,       // degrees forward from the held starting angle to reach full presence
-    TILT_REST_LEVEL: 0.28     // the voice is present but quiet at the held starting angle
+    TILT_REST_LEVEL: 0.28,    // the voice is present but quiet at the held starting angle
+    STRIKE_SPEED_MIN: 260,    // degrees/second below this is phrasing, not a strike
+    STRIKE_SPEED_MAX: 760,    // degrees/second at which the gong reaches its quiet ceiling
+    STRIKE_COOLDOWN_MS: 520,  // one physical swing makes one gong, not a sensor burst
+    STRIKE_CEILING_RATIO: 0.38 // gong peak as a fraction of the already-limited voice peak
   };
 
   // The voice ceiling is derived from the drone's QUIETEST moment, not its
@@ -120,6 +124,28 @@
       pitchAxis: clamp01(0.5 + shapedRoll * 0.5),
       magnitude: clamp01(SHELL.TILT_REST_LEVEL + (b - nb) / SHELL.TILT_BOW_RANGE)
     };
+  }
+
+  // A strike is the speed of one raw orientation step, before the continuous
+  // gesture smoothing removes exactly the sharp edge we need to recognise.
+  // It is deliberately about angular speed, not absolute orientation: the
+  // same quick wrist motion works wherever the player is inside the chord.
+  function strikeStrength(deltaGamma, deltaBeta, dtMs) {
+    if (typeof deltaGamma !== 'number' || isNaN(deltaGamma) ||
+        typeof deltaBeta !== 'number' || isNaN(deltaBeta) ||
+        typeof dtMs !== 'number' || isNaN(dtMs) || dtMs <= 0) return 0;
+    var dt = Math.max(16, dtMs) / 1000;
+    var speed = Math.sqrt(deltaGamma * deltaGamma + deltaBeta * deltaBeta) / dt;
+    if (speed <= SHELL.STRIKE_SPEED_MIN) return 0;
+    var span = SHELL.STRIKE_SPEED_MAX - SHELL.STRIKE_SPEED_MIN;
+    return Math.pow(clamp01((speed - SHELL.STRIKE_SPEED_MIN) / span), 0.7);
+  }
+
+  // A gong is an accent inside the played layer, never a third level system.
+  // Its ceiling is derived from the voice ceiling and follows the session fade.
+  function strikeGainFor(profile, strength, fade) {
+    var f = (fade === undefined) ? 1 : clamp01(fade);
+    return voicePeak(profile) * SHELL.STRIKE_CEILING_RATIO * clamp01(strength) * f;
   }
 
   /* ---- level ------------------------------------------------------------ */
@@ -319,6 +345,8 @@
     pitchForGesture: pitchForGesture,
     voiceBlendWeights: voiceBlendWeights,
     tiltGesture: tiltGesture,
+    strikeStrength: strikeStrength,
+    strikeGainFor: strikeGainFor,
     swellAt: swellAt,
     droneGainAt: droneGainAt,
     orbitPanAt: orbitPanAt,
