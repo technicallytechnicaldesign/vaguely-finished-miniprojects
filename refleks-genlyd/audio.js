@@ -16,10 +16,8 @@
   var LOOKAHEAD = 4.0;   // seconds of wash scheduled in advance
   var TICK_MS = 900;     // scheduler wake-up; safe below the ~1s throttle floor
   var STEP = 0.2;        // resolution of the scheduled ramp
-  var REVERB_SECONDS = 2.6; // shorter impulse keeps the phone path light without drying it out
-  var REVERB_DECAY = 2.4;   // exponential falloff shape of the generated impulse
-  var REVERB_WET = 0.26;    // send level; the dry signal (and its ceiling) is untouched
-  var MASTER_HEADROOM = 0.78; // dry and wet share one guarded output instead of summing at the speaker
+  var MASTER_HEADROOM = 0.78;
+  var CONTEXT_CLOSE_DELAY_MS = 1200;
   var GESTURE_INTERVAL = 1 / 30; // sensor events may arrive at 60-120Hz; audio control does not need to
   var DRONE_PARTS = [
     { detuneScale: 0, gain: 0.82 },
@@ -37,6 +35,7 @@
     this.onended = null;
     this.lastGestureAt = -Infinity;
     this.graphConnected = false;
+    this.closeTimer = null;
   }
 
   // Replace the previous automation target before adding the next one. Without
@@ -53,12 +52,41 @@
   }
 
   RGAudio.prototype.resume = function () {
-    if (!this.ctx) {
+    if (!this.ctx || this.ctx.state === 'closed') {
       var AC = root.AudioContext || root.webkitAudioContext;
       this.ctx = new AC();
     }
     if (this.ctx.state === 'suspended') return this.ctx.resume();
     return Promise.resolve();
+  };
+
+  // Every listening session owns one complete context. Closing it is the only
+  // reliable way to release every connection, processor and stopped source;
+  // reconnecting a later session onto the old destination let silent graphs
+  // accumulate until even a plain reference tone crackled on the phone.
+  RGAudio.prototype._destroyContext = function () {
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
+    if (this.closeTimer) { clearTimeout(this.closeTimer); this.closeTimer = null; }
+    var old = this.ctx;
+    this.ctx = null;
+    this.graphConnected = false;
+    this.masterInput = null;
+    this.peakGuard = null;
+    this.droneGain = null;
+    this.droneOscs = [];
+    this.droneEmphGains = [];
+    this.voiceGain = null;
+    this.voiceFilter = null;
+    this.voiceOscs = [];
+    this.voiceNotes = [];
+    this.dronePanner = null;
+    this.voicePanner = null;
+    this.orbitLfo = null;
+    this.reverbSend = null;
+    if (!old || old.state === 'closed' || typeof old.close !== 'function') return Promise.resolve();
+    return old.close().catch(function (e) {
+      if (root.console && root.console.warn) root.console.warn('GENLYD could not close its audio context', e);
+    });
   };
 
   /* ---- the drone ------------------------------------------------------- */
@@ -264,13 +292,12 @@
       osc.start(now); osc.stop(now + partial.decay + 0.08);
     });
 
-    // Share the played layer's counter-orbit and existing reverb send. With no
-    // StereoPanner support, connect the same dry + wet pair explicitly.
+    // Share the played layer's counter-orbit. With no StereoPanner support,
+    // connect directly to the guarded dry output.
     if (this.voicePanner) {
       filt.connect(this.voicePanner);
     } else {
       filt.connect(this.masterInput || ctx.destination);
-      if (this.reverbSend) filt.connect(this.reverbSend);
     }
   };
 
@@ -341,42 +368,6 @@
     this.orbitLfo = lfo;
   };
 
-  /* ---- reverb -----------------------------------------------------------
-   * A generated impulse response, not a loaded file: the app ships as five
-   * static files and stays that way. This is a SEND, tapped from the same
-   * post-fader gain nodes the dry signal already goes through, so it adds
-   * space without touching either level ceiling guarantee2b asserts on.
-   */
-  RGAudio.prototype._buildReverb = function () {
-    var ctx = this.ctx;
-    var convolver = ctx.createConvolver();
-    convolver.buffer = this._impulseResponse(REVERB_SECONDS, REVERB_DECAY);
-    var wet = ctx.createGain();
-    wet.gain.value = REVERB_WET;
-    convolver.connect(wet);
-    wet.connect(this.masterInput || ctx.destination);
-
-    var send = ctx.createGain();
-    send.gain.value = 1;
-    send.connect(convolver);
-    this.reverbSend = send;
-    return send;
-  };
-
-  RGAudio.prototype._impulseResponse = function (duration, decay) {
-    var ctx = this.ctx;
-    var rate = ctx.sampleRate;
-    var length = Math.max(1, Math.floor(rate * duration));
-    var impulse = ctx.createBuffer(2, length, rate);
-    for (var c = 0; c < impulse.numberOfChannels; c++) {
-      var data = impulse.getChannelData(c);
-      for (var i = 0; i < length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
-      }
-    }
-    return impulse;
-  };
-
   /* ---- the wash scheduler ---------------------------------------------- */
 
   RGAudio.prototype._schedule = function () {
@@ -402,13 +393,12 @@
 
   RGAudio.prototype.startSession = function (session) {
     var self = this;
-    return this.resume().then(function () {
+    return this._destroyContext().then(function () { return self.resume(); }).then(function () {
       self.session = session;
-      if (!self.masterInput) self._buildMaster();
-      if (!self.droneGain) self._buildDrone();
-      if (!self.voiceGain) self._buildVoice();
-      if (!self.reverbSend) self._buildReverb();
-      if (!self.dronePanner) self._buildOrbit();
+      self._buildMaster();
+      self._buildDrone();
+      self._buildVoice();
+      self._buildOrbit();
 
       if (!self.graphConnected) {
         if (self.dronePanner) self.droneGain.connect(self.dronePanner);
@@ -417,8 +407,6 @@
         var voiceOut = self.voicePanner || self.voiceGain;
         droneOut.connect(self.masterInput);
         voiceOut.connect(self.masterInput);
-        droneOut.connect(self.reverbSend);
-        voiceOut.connect(self.reverbSend);
         self.graphConnected = true;
       }
 
@@ -456,12 +444,16 @@
     if (this.ctx && this.droneGain) {
       var t = this.ctx.currentTime;
       this.droneGain.gain.cancelScheduledValues(t);
-      this.droneGain.gain.setTargetAtTime(0, t, 0.8);
-      if (this.voiceGain) this.voiceGain.gain.setTargetAtTime(0, t, 0.8);
+      this.droneGain.gain.setTargetAtTime(0, t, 0.18);
+      if (this.voiceGain) this.voiceGain.gain.setTargetAtTime(0, t, 0.18);
     }
     this.voiceOn = false;
     var cb = this.onended;
     this.session = null;
+    var self = this;
+    this.closeTimer = setTimeout(function () {
+      if (!self.session) self._destroyContext();
+    }, CONTEXT_CLOSE_DELAY_MS);
     if (cb) cb();
   };
 

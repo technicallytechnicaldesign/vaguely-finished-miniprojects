@@ -266,6 +266,7 @@
   }
 
   function interpretation() {
+    if (results.A === 'crackles' && results.E === 'clean' && results.F === 'clean') return 'Fresh reference contexts are clean: phone output and buffer size are healthy; the full graph or reused graph lifecycle is implicated.';
     if (results.E === 'crackles' && (results.F === 'clean' || results.F === 'less')) return 'Playback buffering improves the same sine: default-buffer underruns are implicated.';
     if (results.E === 'crackles' && results.F === 'same/worse') return 'Playback buffering does not improve the sine: the fault remains in the device or operating-system output route.';
     if (results.E === 'crackles' && !results.F) return 'Default reference crackles: run F to test whether a larger playback buffer helps.';
