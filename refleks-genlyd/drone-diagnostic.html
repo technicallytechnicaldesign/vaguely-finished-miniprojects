@@ -62,7 +62,7 @@
   <section class="intro">
     <p style="font:700 12px var(--font-mono);color:var(--accent);text-transform:uppercase;letter-spacing:.08em">GENLYD phone probe</p>
     <h1>Where is the background crackle?</h1>
-    <p>Set the phone volume where you normally use the piece. Tap A, listen for ten seconds, rate it, then continue in order.</p>
+    <p>Set the phone volume where you normally use the piece. Tap a test, listen for ten seconds, then rate it. For the output-buffer check, you can jump straight to E and F.</p>
     <p class="notice"><strong>One variable changes at a time.</strong> Nothing is recorded or sent anywhere. Your ratings live only on this page until you copy them.</p>
   </section>
 
@@ -87,11 +87,13 @@
     { id:'B', name:'No reverb', note:'Exactly A with only the generated reverb removed.', companion:true, reverb:false, level:1 },
     { id:'C', name:'Single tones', note:'Exactly A with the detuned shimmer companion removed from every note.', companion:false, reverb:true, level:1 },
     { id:'D', name:'Quiet full background', note:'Exactly A at one quarter of its output level.', companion:true, reverb:true, level:.25 },
-    { id:'E', name:'Plain reference sine', note:'One quiet 220 Hz sine with no chord, filter, reverb, orbit, or compressor.', reference:true }
+    { id:'E', name:'Default-buffer reference', note:'One quiet 220 Hz sine in a fresh default AudioContext, with no GENLYD graph.', reference:true, contextMode:'default' },
+    { id:'F', name:'Playback-buffer reference', note:'Exactly E, but requesting the browser\'s larger playback-latency buffer.', reference:true, contextMode:'playback', answers:['clean','less','same/worse','not sure'] }
   ];
   var RATIOS = [1, 4/3, 1.5, 2, 8/3];
   var ROOT = 110;
   var results = {};
+  var contextMeta = {};
   var ctx = null;
   var active = null;
   var readyTimer = null;
@@ -115,7 +117,7 @@
       play.addEventListener('click', function () { start(test); }); card.appendChild(play);
       var timer = node('div', 'timer'); timer.appendChild(node('i')); card.appendChild(timer);
       var rate = node('div', 'rate');
-      ['clean','crackles','not sure'].forEach(function (answer) {
+      (test.answers || ['clean','crackles','not sure']).forEach(function (answer) {
         var b = node('button', '', answer); b.type = 'button';
         b.addEventListener('click', function () { rateTest(test.id, answer, b); }); rate.appendChild(b);
       });
@@ -123,12 +125,32 @@
     });
   }
 
-  function ensureContext() {
-    if (!ctx) {
-      var AC = window.AudioContext || window.webkitAudioContext;
+  function openContext(mode) {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (mode === 'playback') {
+      try { ctx = new AC({ latencyHint:'playback' }); }
+      catch (e) { ctx = new AC(); }
+    } else {
       ctx = new AC();
     }
     return ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+  }
+
+  function ensureContext(mode) {
+    if (!mode) return ctx ? (ctx.state === 'suspended' ? ctx.resume() : Promise.resolve()) : openContext('default');
+    stopActive();
+    var old = ctx;
+    ctx = null;
+    var closed = old && old.state !== 'closed' ? old.close().catch(function () {}) : Promise.resolve();
+    return closed.then(function () { return openContext(mode); });
+  }
+
+  function rememberContext(test) {
+    if (!test.contextMode) return;
+    var bits = [Math.round(ctx.sampleRate) + ' Hz'];
+    if (typeof ctx.baseLatency === 'number') bits.push('base ' + Math.round(ctx.baseLatency * 1000) + ' ms');
+    if (typeof ctx.outputLatency === 'number') bits.push('output ' + Math.round(ctx.outputLatency * 1000) + ' ms');
+    contextMeta[test.id] = bits.join(', ');
   }
 
   function stopActive() {
@@ -223,13 +245,15 @@
   }
 
   function start(test) {
-    ensureContext().then(function () {
+    ensureContext(test.contextMode).then(function () {
       stopActive();
       var card = document.getElementById('test-' + test.id);
       card.classList.remove('ready');
       card.classList.add('active');
       card.querySelector('.play').classList.add('active');
       active = test.reference ? buildReference() : buildBackground(test);
+      rememberContext(test);
+      updateSummary();
       readyTimer = setTimeout(function () { card.classList.add('ready'); }, 10000);
     });
   }
@@ -242,18 +266,23 @@
   }
 
   function interpretation() {
-    if (results.E === 'crackles') return 'Reference sine crackles: the fault is below the GENLYD graph, in browser or device output.';
+    if (results.E === 'crackles' && (results.F === 'clean' || results.F === 'less')) return 'Playback buffering improves the same sine: default-buffer underruns are implicated.';
+    if (results.E === 'crackles' && results.F === 'same/worse') return 'Playback buffering does not improve the sine: the fault remains in the device or operating-system output route.';
+    if (results.E === 'crackles' && !results.F) return 'Default reference crackles: run F to test whether a larger playback buffer helps.';
     if (results.A === 'clean') return 'Full probe is clean: the fault needs a main-app-only stage such as live interaction or session routing.';
     if (results.A === 'crackles' && results.B === 'clean') return 'Removing reverb cleans it: the generated convolver path is implicated.';
     if (results.A === 'crackles' && results.C === 'clean') return 'Removing shimmer companions cleans it: the detuned pair structure is implicated.';
     if (results.A === 'crackles' && results.D === 'clean') return 'Lowering only level cleans it: phone output overload is implicated.';
-    if (Object.keys(results).length < TESTS.length) return 'Complete A through E for a useful comparison.';
+    if (Object.keys(results).length < TESTS.length) return 'Complete A through F for the full comparison.';
     return 'The tested single removals did not isolate one stage; send the pattern back unchanged.';
   }
 
   function updateSummary() {
     var lines = ['GENLYD background probe'];
-    TESTS.forEach(function (t) { lines.push(t.id + ' ' + t.name + ': ' + (results[t.id] || 'not tested')); });
+    TESTS.forEach(function (t) {
+      var meta = contextMeta[t.id] ? ' [' + contextMeta[t.id] + ']' : '';
+      lines.push(t.id + ' ' + t.name + ': ' + (results[t.id] || 'not tested') + meta);
+    });
     lines.push('Read: ' + interpretation());
     document.getElementById('result').textContent = lines.join('\n');
     document.getElementById('summary').classList.add('visible');
