@@ -63,6 +63,13 @@
       .sort(function (a, b) { return a - b; });
   }
 
+  // The audio layer uses the same coefficient for each stacked drone tone.
+  // Keeping it here lets emphasis preserve the bus's real weighted sum rather
+  // than the arithmetic average of controls attached to unequal tones.
+  function droneToneWeight(index) {
+    return 1 / (index + 1);
+  }
+
   // The played voice draws from the drone's own set, so no gesture can play a
   // wrong note. Guarantee 2, first constraint. `maxRatio` is optional and
   // symmetric with `minRatio`: a profile that finds its top note too bright
@@ -223,9 +230,23 @@
     }
     var avg = sumTent / n;
     var pull = clamp01(magnitude) * SHELL.DRONE_EMPHASIS_STRENGTH;
-    return tents.map(function (t) {
+    var moved = tents.map(function (t) {
       return Math.max(SHELL.DRONE_EMPHASIS_FLOOR, 1 + pull * (t - avg));
     });
+    if (pull === 0) return moved;
+
+    // The lower tones carry larger oscillator coefficients. An arithmetic
+    // average of these controls used to let a focus on the lowest tone push
+    // the actual drone 43 percent above its declared ceiling. Normalise by the
+    // coefficients the audio graph really uses so every focus preserves level.
+    var baseline = 0, focused = 0;
+    moved.forEach(function (w, i) {
+      var coefficient = droneToneWeight(i);
+      baseline += coefficient;
+      focused += coefficient * w;
+    });
+    var scale = focused > 0 ? baseline / focused : 1;
+    return moved.map(function (w) { return w * scale; });
   }
 
   // Sessions may declare a fadeOut as a fraction of their length (oliveros.06
@@ -341,6 +362,7 @@
     droneTrough: droneTrough,
     voicePeak: voicePeak,
     dronePitches: dronePitches,
+    droneToneWeight: droneToneWeight,
     voicePitches: voicePitches,
     pitchForGesture: pitchForGesture,
     voiceBlendWeights: voiceBlendWeights,

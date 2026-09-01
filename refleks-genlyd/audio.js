@@ -21,6 +21,10 @@
   var REVERB_WET = 0.26;    // send level; the dry signal (and its ceiling) is untouched
   var MASTER_HEADROOM = 0.78; // dry and wet share one guarded output instead of summing at the speaker
   var GESTURE_INTERVAL = 1 / 30; // sensor events may arrive at 60-120Hz; audio control does not need to
+  var DRONE_PARTS = [
+    { detuneScale: 0, gain: 0.82 },
+    { detuneScale: 1, gain: 0.18 }
+  ]; // a stable centre plus shimmer; unlike equal pairs, this cannot beat down to silence
 
   function RGAudio(profile) {
     this.profile = profile;
@@ -86,19 +90,19 @@
       emph.connect(filt);
       self.droneEmphGains.push(emph);
 
-      // Two oscillators a few cents apart per pitch, so the wash has movement
-      // in it without anything modulating on a timer.
-      [-detune, detune].forEach(function (cents) {
+      // One centred oscillator carries the tone and one quiet detuned companion
+      // supplies movement. The old equal-strength pair could cancel almost to
+      // silence, then rebound to full amplitude, which reads as snaps on a
+      // phone speaker even though each oscillator is a smooth sine.
+      DRONE_PARTS.forEach(function (part) {
         var o = ctx.createOscillator();
-        // Sines keep the upper chord tones from bringing a nasal triangle
-        // edge into the wash. The detuned pair still supplies slow movement.
         o.type = 'sine';
         o.frequency.value = f;
-        o.detune.value = cents;
+        o.detune.value = detune * part.detuneScale;
         var g = ctx.createGain();
         // Higher partials quieter, and normalised across the stack so the sum
         // cannot run past the intended peak when they drift into phase.
-        g.gain.value = 1 / (i + 1);
+        g.gain.value = Core.droneToneWeight(i) * part.gain;
         o.connect(g); g.connect(emph);
         o.start();
         self.droneOscs.push(o);
@@ -107,10 +111,10 @@
 
     // Normalise: divide the whole stack by the sum of its coefficients.
     var sum = 0;
-    for (var i = 0; i < freqs.length; i++) sum += 1 / (i + 1);
+    for (var i = 0; i < freqs.length; i++) sum += Core.droneToneWeight(i);
     filt.Q.value = 0.4;
     var norm = ctx.createGain();
-    norm.gain.value = 1 / (sum * 2);
+    norm.gain.value = 1 / sum;
     filt.disconnect();
     filt.connect(norm);
     norm.connect(out);
