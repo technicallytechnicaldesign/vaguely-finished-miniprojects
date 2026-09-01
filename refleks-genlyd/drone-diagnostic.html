@@ -1,0 +1,274 @@
+<!doctype html>
+<!-- identity: WORKSPACE -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f9f9f7">
+  <title>GENLYD background A/B test</title>
+  <style>
+    :root {
+      --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#73716c;
+      --grid:#e1e0d9; --ring:rgba(11,11,11,.10); --accent:#2a78d6; --on-accent:#fff;
+      --accent-2:#4a3aa7; --good:#0ca30c; --warn:#b07900; --crit:#d03b3b;
+      --font-body:system-ui,-apple-system,"Segoe UI",sans-serif;
+      --font-head:system-ui,-apple-system,"Segoe UI",sans-serif;
+      --font-mono:ui-monospace,Consolas,monospace; --radius:10px;
+    }
+    @media (prefers-color-scheme:dark) {
+      :root {
+        --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+        --grid:#2c2c2a; --ring:rgba(255,255,255,.10); --accent:#3987e5; --on-accent:#0d0d0d;
+        --accent-2:#9085e9; --good:#0ca30c; --warn:#fab219; --crit:#e66767;
+      }
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--page); color:var(--ink); font:16px/1.45 var(--font-body); }
+    main { width:min(720px,100%); margin:0 auto; padding:24px 16px 56px; }
+    h1 { margin:0 0 8px; font-size:26px; line-height:1.15; }
+    h2 { margin:0; font-size:17px; }
+    p { margin:0; color:var(--ink-2); }
+    .intro { display:grid; gap:10px; margin-bottom:18px; }
+    .notice { padding:13px 15px; border:1px solid var(--grid); border-radius:var(--radius); background:var(--surface); }
+    .tests { display:grid; gap:10px; }
+    .test { display:grid; gap:11px; padding:15px; border:1px solid var(--grid); border-radius:var(--radius); background:var(--surface); }
+    .test.active { border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent); }
+    .test-head { display:flex; gap:12px; align-items:flex-start; }
+    .letter { display:grid; place-items:center; width:30px; height:30px; flex:0 0 auto; border-radius:50%; background:var(--grid); font:700 14px var(--font-mono); }
+    .active .letter { background:var(--accent); color:var(--on-accent); }
+    .explain { margin-top:3px; font-size:14px; color:var(--muted); }
+    button { appearance:none; border:1px solid var(--grid); border-radius:9px; min-height:48px; padding:10px 14px; background:var(--page); color:var(--ink); font:700 15px var(--font-body); cursor:pointer; }
+    button:focus-visible { outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent); outline-offset:2px; }
+    .play { width:100%; border-color:var(--accent); color:var(--accent); }
+    .play.active { background:var(--accent); color:var(--on-accent); }
+    .rate { display:none; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .test.ready .rate { display:grid; }
+    .rate button { min-height:42px; padding:8px; font-size:13px; }
+    .rate button.chosen { border-color:var(--accent-2); background:color-mix(in srgb,var(--accent-2) 14%,var(--surface)); }
+    .timer { height:4px; overflow:hidden; border-radius:2px; background:var(--grid); }
+    .timer > i { display:block; width:0; height:100%; background:var(--accent); }
+    .active .timer > i { animation:listen 10s linear forwards; }
+    @keyframes listen { to { width:100%; } }
+    .summary { display:none; gap:10px; margin-top:18px; padding:15px; border:1px solid var(--grid); border-radius:var(--radius); background:var(--surface); }
+    .summary.visible { display:grid; }
+    #result { min-height:76px; margin:0; padding:11px; overflow:auto; border-radius:8px; background:var(--page); color:var(--ink); font:13px/1.45 var(--font-mono); white-space:pre-wrap; }
+    .copy { background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+    .stop { width:100%; margin-top:12px; color:var(--crit); }
+    footer { margin-top:24px; color:var(--muted); font-size:12px; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="intro">
+    <p style="font:700 12px var(--font-mono);color:var(--accent);text-transform:uppercase;letter-spacing:.08em">GENLYD phone probe</p>
+    <h1>Where is the background crackle?</h1>
+    <p>Set the phone volume where you normally use the piece. Tap A, listen for ten seconds, rate it, then continue in order.</p>
+    <p class="notice"><strong>One variable changes at a time.</strong> Nothing is recorded or sent anywhere. Your ratings live only on this page until you copy them.</p>
+  </section>
+
+  <section class="tests" id="tests"></section>
+  <button class="stop" id="stop" type="button">stop sound</button>
+
+  <section class="summary" id="summary">
+    <h2>Result to send back</h2>
+    <pre id="result"></pre>
+    <button class="copy" id="copy" type="button">copy result</button>
+  </section>
+
+  <footer>REFLEKS x GENLYD diagnostic. WORKSPACE identity. No storage, analytics, recording, or network writes.</footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var TESTS = [
+    { id:'A', name:'Full background', note:'The current chord, shimmer, slow swell, orbit, reverb, and guarded master.', companion:true, reverb:true, level:1 },
+    { id:'B', name:'No reverb', note:'Exactly A with only the generated reverb removed.', companion:true, reverb:false, level:1 },
+    { id:'C', name:'Single tones', note:'Exactly A with the detuned shimmer companion removed from every note.', companion:false, reverb:true, level:1 },
+    { id:'D', name:'Quiet full background', note:'Exactly A at one quarter of its output level.', companion:true, reverb:true, level:.25 },
+    { id:'E', name:'Plain reference sine', note:'One quiet 220 Hz sine with no chord, filter, reverb, orbit, or compressor.', reference:true }
+  ];
+  var RATIOS = [1, 4/3, 1.5, 2, 8/3];
+  var ROOT = 110;
+  var results = {};
+  var ctx = null;
+  var active = null;
+  var readyTimer = null;
+
+  function node(tag, cls, text) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
+  function render() {
+    var host = document.getElementById('tests');
+    TESTS.forEach(function (test) {
+      var card = node('article', 'test'); card.id = 'test-' + test.id;
+      var head = node('div', 'test-head');
+      head.appendChild(node('span', 'letter', test.id));
+      var copy = node('div'); copy.appendChild(node('h2', '', test.name)); copy.appendChild(node('p', 'explain', test.note));
+      head.appendChild(copy); card.appendChild(head);
+      var play = node('button', 'play', 'play ' + test.id); play.type = 'button';
+      play.addEventListener('click', function () { start(test); }); card.appendChild(play);
+      var timer = node('div', 'timer'); timer.appendChild(node('i')); card.appendChild(timer);
+      var rate = node('div', 'rate');
+      ['clean','crackles','not sure'].forEach(function (answer) {
+        var b = node('button', '', answer); b.type = 'button';
+        b.addEventListener('click', function () { rateTest(test.id, answer, b); }); rate.appendChild(b);
+      });
+      card.appendChild(rate); host.appendChild(card);
+    });
+  }
+
+  function ensureContext() {
+    if (!ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      ctx = new AC();
+    }
+    return ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+  }
+
+  function stopActive() {
+    clearTimeout(readyTimer);
+    if (!active || !ctx) return;
+    var now = ctx.currentTime;
+    active.gain.gain.cancelScheduledValues(now);
+    active.gain.gain.setTargetAtTime(0.00001, now, .035);
+    active.oscs.forEach(function (osc) { try { osc.stop(now + .22); } catch (e) {} });
+    if (active.lfo) { try { active.lfo.stop(now + .22); } catch (e) {} }
+    active = null;
+    document.querySelectorAll('.test.active').forEach(function (el) { el.classList.remove('active'); });
+    document.querySelectorAll('.play.active').forEach(function (el) { el.classList.remove('active'); });
+  }
+
+  function makeMaster() {
+    var input = ctx.createGain(); input.gain.value = .78;
+    var guard = ctx.createDynamicsCompressor();
+    guard.threshold.value = -8; guard.knee.value = 6; guard.ratio.value = 12;
+    guard.attack.value = .003; guard.release.value = .18;
+    input.connect(guard); guard.connect(ctx.destination);
+    return input;
+  }
+
+  function makeImpulse() {
+    var length = Math.floor(ctx.sampleRate * 2.6);
+    var impulse = ctx.createBuffer(2, length, ctx.sampleRate);
+    for (var c = 0; c < 2; c++) {
+      var data = impulse.getChannelData(c);
+      for (var i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.4);
+    }
+    return impulse;
+  }
+
+  function scheduleWash(param, start, level) {
+    param.setValueAtTime(.00001, ctx.currentTime);
+    for (var t = 0; t <= 60; t += .2) {
+      var wave = (1 - Math.cos((t % 28) / 28 * Math.PI * 2)) / 2;
+      var value = .18 * (.45 + .55 * wave) * level;
+      param.linearRampToValueAtTime(Math.max(.00001, value), start + t);
+    }
+  }
+
+  function buildReference() {
+    var gain = ctx.createGain(); gain.gain.value = .00001; gain.connect(ctx.destination);
+    var osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 220; osc.connect(gain); osc.start();
+    gain.gain.setTargetAtTime(.025, ctx.currentTime, .08);
+    return { gain:gain, oscs:[osc], lfo:null };
+  }
+
+  function buildBackground(test) {
+    var master = makeMaster();
+    var gain = ctx.createGain();
+    var filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 390; filter.Q.value = .4;
+    var norm = ctx.createGain();
+    var coefficientSum = 0;
+    RATIOS.forEach(function (_, i) { coefficientSum += 1 / (i + 1); });
+    norm.gain.value = 1 / coefficientSum;
+    filter.connect(norm); norm.connect(gain);
+
+    var panner = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    var dryOut = panner || gain;
+    if (panner) gain.connect(panner);
+    dryOut.connect(master);
+
+    if (test.reverb) {
+      var convolver = ctx.createConvolver(); convolver.buffer = makeImpulse();
+      var wet = ctx.createGain(); wet.gain.value = .26;
+      dryOut.connect(convolver); convolver.connect(wet); wet.connect(master);
+    }
+
+    var oscs = [];
+    RATIOS.forEach(function (ratio, i) {
+      var coefficient = 1 / (i + 1);
+      var parts = test.companion ? [{ cents:0, share:.82 }, { cents:4, share:.18 }] : [{ cents:0, share:1 }];
+      parts.forEach(function (part) {
+        var osc = ctx.createOscillator(); var partGain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = ROOT * ratio; osc.detune.value = part.cents;
+        partGain.gain.value = coefficient * part.share;
+        osc.connect(partGain); partGain.connect(filter); osc.start(); oscs.push(osc);
+      });
+    });
+
+    var lfo = null;
+    if (panner) {
+      lfo = ctx.createOscillator(); var depth = ctx.createGain();
+      lfo.type = 'sine'; lfo.frequency.value = 1 / 47; depth.gain.value = .55;
+      lfo.connect(depth); depth.connect(panner.pan); lfo.start();
+    }
+    scheduleWash(gain.gain, ctx.currentTime + .08, test.level);
+    return { gain:gain, oscs:oscs, lfo:lfo };
+  }
+
+  function start(test) {
+    ensureContext().then(function () {
+      stopActive();
+      var card = document.getElementById('test-' + test.id);
+      card.classList.remove('ready');
+      card.classList.add('active');
+      card.querySelector('.play').classList.add('active');
+      active = test.reference ? buildReference() : buildBackground(test);
+      readyTimer = setTimeout(function () { card.classList.add('ready'); }, 10000);
+    });
+  }
+
+  function rateTest(id, answer, button) {
+    results[id] = answer;
+    button.parentNode.querySelectorAll('button').forEach(function (b) { b.classList.remove('chosen'); });
+    button.classList.add('chosen');
+    updateSummary();
+  }
+
+  function interpretation() {
+    if (results.E === 'crackles') return 'Reference sine crackles: the fault is below the GENLYD graph, in browser or device output.';
+    if (results.A === 'clean') return 'Full probe is clean: the fault needs a main-app-only stage such as live interaction or session routing.';
+    if (results.A === 'crackles' && results.B === 'clean') return 'Removing reverb cleans it: the generated convolver path is implicated.';
+    if (results.A === 'crackles' && results.C === 'clean') return 'Removing shimmer companions cleans it: the detuned pair structure is implicated.';
+    if (results.A === 'crackles' && results.D === 'clean') return 'Lowering only level cleans it: phone output overload is implicated.';
+    if (Object.keys(results).length < TESTS.length) return 'Complete A through E for a useful comparison.';
+    return 'The tested single removals did not isolate one stage; send the pattern back unchanged.';
+  }
+
+  function updateSummary() {
+    var lines = ['GENLYD background probe'];
+    TESTS.forEach(function (t) { lines.push(t.id + ' ' + t.name + ': ' + (results[t.id] || 'not tested')); });
+    lines.push('Read: ' + interpretation());
+    document.getElementById('result').textContent = lines.join('\n');
+    document.getElementById('summary').classList.add('visible');
+  }
+
+  document.getElementById('stop').addEventListener('click', stopActive);
+  document.getElementById('copy').addEventListener('click', function () {
+    var text = document.getElementById('result').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { document.getElementById('copy').textContent = 'copied'; });
+    }
+  });
+  window.addEventListener('pagehide', stopActive);
+  render(); updateSummary();
+}());
+</script>
+</body>
+</html>
