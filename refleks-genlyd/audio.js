@@ -54,7 +54,11 @@
   RGAudio.prototype.resume = function () {
     if (!this.ctx || this.ctx.state === 'closed') {
       var AC = root.AudioContext || root.webkitAudioContext;
-      this.ctx = new AC();
+      // The affected phone ran this exact full graph clean at 21 ms playback
+      // latency and cracked intermittently at its 4 ms default. Request the
+      // larger deadline, with a no-options fallback for older WebKit builds.
+      try { this.ctx = new AC({ latencyHint: 'playback' }); }
+      catch (e) { this.ctx = new AC(); }
     }
     if (this.ctx.state === 'suspended') return this.ctx.resume();
     return Promise.resolve();
