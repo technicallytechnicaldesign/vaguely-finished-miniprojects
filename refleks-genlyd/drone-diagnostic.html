@@ -62,7 +62,7 @@
   <section class="intro">
     <p style="font:700 12px var(--font-mono);color:var(--accent);text-transform:uppercase;letter-spacing:.08em">GENLYD phone probe</p>
     <h1>Where is the background crackle?</h1>
-    <p>Set the phone volume where you normally use the piece. Tap a test, listen for ten seconds, then rate it. For the output-buffer check, you can jump straight to E and F.</p>
+    <p>Set the phone volume where you normally use the piece. Tap a test, listen for ten seconds, then rate it. For the current full-graph buffer check, jump straight to G and H.</p>
     <p class="notice"><strong>One variable changes at a time.</strong> Nothing is recorded or sent anywhere. Your ratings live only on this page until you copy them.</p>
   </section>
 
@@ -88,7 +88,9 @@
     { id:'C', name:'Single tones', note:'Exactly A with the detuned shimmer companion removed from every note.', companion:false, reverb:true, level:1 },
     { id:'D', name:'Quiet full background', note:'Exactly A at one quarter of its output level.', companion:true, reverb:true, level:.25 },
     { id:'E', name:'Default-buffer reference', note:'One quiet 220 Hz sine in a fresh default AudioContext, with no GENLYD graph.', reference:true, contextMode:'default' },
-    { id:'F', name:'Playback-buffer reference', note:'Exactly E, but requesting the browser\'s larger playback-latency buffer.', reference:true, contextMode:'playback', answers:['clean','less','same/worse','not sure'] }
+    { id:'F', name:'Playback-buffer reference', note:'Exactly E, but requesting the browser\'s larger playback-latency buffer.', reference:true, contextMode:'playback', answers:['clean','less','same/worse','not sure'] },
+    { id:'G', name:'Dry graph, default buffer', note:'The current convolver-free background in a fresh default AudioContext.', companion:true, reverb:false, level:1, contextMode:'default' },
+    { id:'H', name:'Dry graph, playback buffer', note:'Exactly G, but requesting the browser\'s larger playback-latency buffer.', companion:true, reverb:false, level:1, contextMode:'playback', answers:['clean','less','same/worse','not sure'] }
   ];
   var RATIOS = [1, 4/3, 1.5, 2, 8/3];
   var ROOT = 110;
@@ -266,6 +268,10 @@
   }
 
   function interpretation() {
+    if (results.G === 'crackles' && (results.H === 'clean' || results.H === 'less')) return 'Playback buffering improves the current full graph: its default audio deadline is too tight on this phone.';
+    if (results.G === 'crackles' && results.H === 'same/worse') return 'Playback buffering does not improve the current full graph: the remaining fault is elsewhere in the app path.';
+    if (results.G === 'clean' && results.H === 'clean') return 'The current full graph is clean in both fresh contexts: the remaining fault needs an app-only stage such as scheduling, UI updates, or live interaction.';
+    if (results.G && !results.H) return 'Run H to compare the same current graph with a larger playback buffer.';
     if (results.A === 'crackles' && results.E === 'clean' && results.F === 'clean') return 'Fresh reference contexts are clean: phone output and buffer size are healthy; the full graph or reused graph lifecycle is implicated.';
     if (results.E === 'crackles' && (results.F === 'clean' || results.F === 'less')) return 'Playback buffering improves the same sine: default-buffer underruns are implicated.';
     if (results.E === 'crackles' && results.F === 'same/worse') return 'Playback buffering does not improve the sine: the fault remains in the device or operating-system output route.';
@@ -274,7 +280,7 @@
     if (results.A === 'crackles' && results.B === 'clean') return 'Removing reverb cleans it: the generated convolver path is implicated.';
     if (results.A === 'crackles' && results.C === 'clean') return 'Removing shimmer companions cleans it: the detuned pair structure is implicated.';
     if (results.A === 'crackles' && results.D === 'clean') return 'Lowering only level cleans it: phone output overload is implicated.';
-    if (Object.keys(results).length < TESTS.length) return 'Complete A through F for the full comparison.';
+    if (Object.keys(results).length < TESTS.length) return 'Complete A through H for the full comparison.';
     return 'The tested single removals did not isolate one stage; send the pattern back unchanged.';
   }
 
