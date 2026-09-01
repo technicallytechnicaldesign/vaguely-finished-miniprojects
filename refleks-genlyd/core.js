@@ -213,10 +213,9 @@
    * to lean: at rest (0) every multiplier is exactly 1, identical to the
    * chord's own untouched baseline mix, so a profile with no active gesture
    * (or the `none` interaction kind, which never calls this at all) hears
-   * nothing different. The redistribution is a reallocation, not an
-   * addition - weights average to 1 across the stack - so it happens
-   * upstream of the drone bus's own normalised, ceilinged output and cannot
-   * raise the wash past what droneGainAt already allows.
+   * nothing different. The redistribution is a reallocation, not an addition.
+   * Its weighted sum stays constant against the unequal tone coefficients used
+   * by the audio graph, so it cannot exceed what droneGainAt already allows.
    */
   function droneEmphasisWeights(drone, pitchAxis, magnitude) {
     var n = dronePitches(drone).length;
