@@ -40,10 +40,25 @@
     .station strong,.station span { display:block; }
     .station strong { font:14px var(--font-head); letter-spacing:.04em; }
     .station span { color:var(--muted); font-size:13px; margin-top:4px; }
+    .player { display:grid; grid-template-columns:1.1fr .9fr; gap:20px; padding:8px 0 28px; }
+    .now-title { margin:9px 0 0; font:20px/1.2 var(--font-head); letter-spacing:.03em; }
+    .now-subtitle { color:var(--ink-2); margin:5px 0 0; }
+    .break-note { color:var(--muted); font-size:13px; margin:16px 0 0; }
+    .controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+    .play,.skip { border:1px solid var(--ring); border-radius:var(--radius); padding:10px 13px; cursor:pointer; }
+    .play { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+    .skip { background:transparent; color:var(--ink); }
+    .play:disabled { cursor:not-allowed; opacity:.45; }
+    .queue { list-style:none; padding:0; margin:13px 0 0; }
+    .queue li { display:grid; grid-template-columns:24px 1fr; gap:6px 10px; padding:11px 0; border-top:1px solid var(--grid); }
+    .queue li span { grid-row:span 2; color:var(--accent); font:13px var(--font-mono); }
+    .queue li strong { font:13px/1.25 var(--font-head); letter-spacing:.02em; }
+    .queue li small { color:var(--muted); font-size:12px; }
+    .queue li.empty { display:block; color:var(--muted); }
     .how { border-top:1px solid var(--grid); padding-top:25px; color:var(--ink-2); max-width:720px; }
     .how p { margin:8px 0 0; }
     footer { border-top:1px solid var(--grid); margin-top:36px; padding-top:18px; color:var(--muted); font:11px/1.4 var(--font-mono); }
-    @media (max-width:680px) { .shell { width:min(100% - 24px,1040px); padding-top:24px; } header { padding-bottom:18px; } .signal { grid-template-columns:1fr; } .station-list { grid-template-columns:1fr; } }
+    @media (max-width:680px) { .shell { width:min(100% - 24px,1040px); padding-top:24px; } header { padding-bottom:18px; } .signal,.player { grid-template-columns:1fr; } .station-list { grid-template-columns:1fr; } }
     @media (prefers-reduced-motion:reduce) { *,*:before,*:after { transition:none!important; transform:none!important; } }
   </style>
 </head>
@@ -70,41 +85,31 @@
       <h2 id="station-title">Choose a station</h2>
       <div class="station-list" id="station-list"></div>
     </section>
+    <section class="player" aria-label="Radio player">
+      <article class="panel on-air">
+        <p class="label">Now transmitting</p>
+        <p class="now-title" id="now-title">Off air</p>
+        <p class="now-subtitle" id="now-subtitle">Choose a station with cleared tracks.</p>
+        <p class="break-note" id="break-note"></p>
+        <div class="controls">
+          <button class="play" id="play" type="button">Start broadcast</button>
+          <button class="skip" id="skip" type="button">Skip</button>
+        </div>
+        <audio id="audio" preload="metadata"></audio>
+      </article>
+      <article class="panel">
+        <p class="label">On deck</p>
+        <p class="status" id="track-count"></p>
+        <ol class="queue" id="queue"></ol>
+      </article>
+    </section>
     <section class="how" aria-labelledby="how-title">
       <h2 id="how-title">What is being built</h2>
-      <p>Each station has its own setting, host voice, and broadcast grammar. Local programmes will interleave music, station IDs, and generated spoken links, then publish only audio with an explicit public release record.</p>
+      <p>Each station selects a random run of two to five songs, then tries a station ID, host bridge, caller update, or notice. A missing interlude clip is skipped immediately, so the broadcast remains music-only until that voice asset exists.</p>
     </section>
-    <footer>PUBLIC STATION SHELL · NO AUDIO UPLOADED · FREE_STREET</footer>
+    <footer>PUBLIC RADIO PROTOTYPE · ONE CLEARED TRACK · FREE_STREET</footer>
   </main>
   <script src="stations.data.js"></script>
-  <script>
-    (() => {
-      const data = window.SIGNAL_STATIONS;
-      const byId = id => document.getElementById(id);
-      const select = id => {
-        const station = data.stations.find(item => item.id === id) || data.stations[0];
-        byId('frequency').textContent = station.frequency;
-        byId('name').textContent = station.name;
-        byId('tagline').textContent = station.tagline;
-        byId('host').textContent = `Host: ${station.host}`;
-        byId('line').textContent = `“${station.sampleLine}”`;
-        document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
-      };
-      byId('notice').textContent = data.notice;
-      const list = byId('station-list');
-      data.stations.forEach((station, index) => {
-        const button = document.createElement('button');
-        button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
-        button.innerHTML = `<strong>${station.frequency} · ${station.name}</strong><span>${station.theme}</span>`;
-        button.addEventListener('click', () => select(station.id));
-        list.append(button);
-        if (index === 0) select(station.id);
-      });
-      byId('theme').addEventListener('click', () => {
-        const root = document.documentElement;
-        root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
-      });
-    })();
-  </script>
+  <script src="radio-player.js"></script>
 </body>
 </html>
