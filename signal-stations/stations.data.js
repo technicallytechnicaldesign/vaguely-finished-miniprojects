@@ -37,7 +37,8 @@ window.SIGNAL_STATIONS = {
       "sampleLine": "Your backup is not a replacement. It is a second window with the same weather.",
       "tracks": [
         {"title": "Accelerando: Neon Syllabus", "artist": "GENLYD / BOGLYD", "audio": "audio/accelerando-neon-syllabus-track.mp3"},
-        {"title": "Magic Kingdom: Glass Lecture", "artist": "GENLYD / BOGLYD", "audio": "audio/magickingdom-glass-lecture-track.mp3"}
+        {"title": "Magic Kingdom: Glass Lecture", "artist": "GENLYD / BOGLYD", "audio": "audio/magickingdom-glass-lecture-track.mp3"},
+        {"title": "Snow Crash: Ne Flesh", "artist": "GENLYD / BOGLYD", "audio": "audio/snowcrash-ne-flesh-track.mp3"}
       ],
       "interludes": [
         {"kind": "station ID", "copy": "AFTERHUMAN RADIO. Signals for bodies still becoming.", "audio": null},
