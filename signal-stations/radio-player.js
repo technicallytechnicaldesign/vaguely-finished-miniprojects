@@ -4,26 +4,29 @@
   const pick = items => items[Math.floor(Math.random() * items.length)];
   // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
   // overlap, not an outro guess (that's for actual songs, which have real musical structure).
-  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice';
+  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report';
 
   // --- crossfade/timing tuning -------------------------------------------------
-  const FADE_S = 2.2;          // song<->liner crossfade duration
-  const EARLY_CUT_CHANCE = 0.18; // "sometimes" cuts in before the detected outro, over the last section
-  const TAIL_BUFFER_S = 1.5;   // never schedule a cut-in closer than this to a track's hard end
-  const LINER_OVERLAP_S = 1.6; // how much of a liner's tail overlaps the next song's intro
+  // Songs always play out, essentially to their real end -- no more cutting in over the
+  // last chorus. The host is always the dominant, intelligible voice on entry: a fast duck
+  // (not a slow symmetric blend), the outgoing song drops to a low background level rather
+  // than an even 50/50 mix, then finishes fading out shortly after while the host talks.
+  const SONG_TAIL_WINDOW_S = 8;   // trigger the transition somewhere in the song's final N seconds
+  const TAIL_BUFFER_S = 1.5;      // never schedule a cut-in closer than this to a track's hard end
+  const HOST_RISE_S = 0.4;        // fast rise to full gain for the incoming host content
+  const SONG_DUCK_S = 0.6;        // fast duck of the outgoing song down to background level
+  const SONG_DUCK_LEVEL = 0.18;   // background level the song bleeds under the host at
+  const SONG_FULL_FADE_S = 1.8;   // after the duck, how long until the song is fully silent
+  const FADE_S = 2.2;             // symmetric crossfade duration for entering a song (liner/song -> song)
+  const LINER_OVERLAP_S = 1.6;    // how much of a liner's tail overlaps whatever comes next
 
   function pickCutInSeconds(track) {
     const dur = track.durationSeconds;
     if (!dur || dur < 6) return Math.max(0, (dur || 6) - TAIL_BUFFER_S);
-    const outro = track.outroStartSeconds != null ? track.outroStartSeconds : dur * 0.85;
-    const lateEnd = Math.max(outro + 0.5, dur - TAIL_BUFFER_S);
-    if (Math.random() < EARLY_CUT_CHANCE) {
-      const earlyStart = Math.max(dur * 0.55, outro - 40);
-      const earlyEnd = Math.max(earlyStart + 1, outro - 2);
-      return earlyStart + Math.random() * (earlyEnd - earlyStart);
-    }
-    const lateStart = Math.min(outro, lateEnd - 0.5);
-    return lateStart + Math.random() * Math.max(0.5, lateEnd - lateStart);
+    const outro = track.outroStartSeconds != null ? track.outroStartSeconds : dur * 0.9;
+    const latest = dur - TAIL_BUFFER_S;
+    const earliest = Math.min(Math.max(outro, dur - SONG_TAIL_WINDOW_S), latest);
+    return earliest + Math.random() * Math.max(0.3, latest - earliest);
   }
 
   class Deck {
@@ -126,15 +129,12 @@
     const pool = (state.station.interludes || []).filter(x => x.audio);
     if (!pool.length) return null;
     const ads = pool.filter(x => x.kind === 'sponsored notice');
+    // every non-ad kind (host liner, host bridge, street report, ...) draws from one shared
+    // pool with equal weight -- every transition here is already song-to-song by construction
+    // (there's no separate ad-break/station-ID slot), so "host bridge" doesn't need to be
+    // preferred over the rest; it just used to crowd everything else out of rotation entirely.
     const nonAds = pool.filter(x => x.kind !== 'sponsored notice');
-    let candidates;
-    if (ads.length && Math.random() < SPONSOR_CHANCE) {
-      candidates = ads;
-    } else {
-      const bridges = nonAds.filter(x => x.kind === 'host bridge');
-      candidates = bridges.length ? bridges : nonAds;
-    }
-    if (!candidates.length) candidates = pool;
+    const candidates = (ads.length && Math.random() < SPONSOR_CHANCE) ? ads : (nonAds.length ? nonAds : pool);
     const liner = pick(candidates);
     return { type: liner.kind || 'host liner', title: liner.kind || 'Host', subtitle: liner.copy, audio: liner.audio, durationSeconds: liner.durationSeconds };
   }
@@ -202,13 +202,26 @@
     if (!next) return;
     toDeck.load(next);
     toDeck.play();
-    fromDeck.fadeTo(0, state.ctx, FADE_S);
-    toDeck.fadeTo(1, state.ctx, FADE_S);
+
+    let totalFadeS;
+    if (isSpokenKind(next.type)) {
+      // duck, don't blend: the host needs to be intelligible immediately, the outgoing song
+      // bleeds under it at a low level for a moment (it's already near its own natural end,
+      // see pickCutInSeconds) rather than competing at equal volume, then finishes fading out.
+      toDeck.fadeTo(1, state.ctx, HOST_RISE_S);
+      fromDeck.fadeTo(SONG_DUCK_LEVEL, state.ctx, SONG_DUCK_S);
+      setTimeout(() => fromDeck.fadeTo(0, state.ctx, SONG_FULL_FADE_S), SONG_DUCK_S * 1000);
+      totalFadeS = SONG_DUCK_S + SONG_FULL_FADE_S;
+    } else {
+      fromDeck.fadeTo(0, state.ctx, FADE_S);
+      toDeck.fadeTo(1, state.ctx, FADE_S);
+      totalFadeS = FADE_S;
+    }
     // fromDeck would otherwise keep decoding/playing silently in the background for
     // whatever's left of its track until this same Deck object gets reused
-    setTimeout(() => fromDeck.audio.pause(), (FADE_S + 0.2) * 1000);
+    setTimeout(() => fromDeck.audio.pause(), (totalFadeS + 0.2) * 1000);
 
-    const isHostLine = next.type === 'host liner' || next.type === 'host bridge';
+    const isHostLine = next.type === 'host liner' || next.type === 'host bridge' || next.type === 'street report';
     if (isHostLine && state.station.jingle && Math.random() < (state.station.jingle.chance || 0)) {
       state.jingle.play(state.station.jingle.audio, state.ctx, state.station.jingle.peak || 0.7);
     }
@@ -217,20 +230,12 @@
     const statusLabel = () => {
       if (next.type === 'sponsored notice') return 'Sponsored transmission.';
       if (isHostLine) return 'On the air, live.';
-      return describeCutIn(toDeck);
+      return 'Song plays out, host cuts in on the tail.';
     };
     const showStatus = () => renderNow(toDeck, statusLabel());
     toDeck.audio.onloadedmetadata = () => { armCutIn(toDeck); showStatus(); };
     if (toDeck.audio.readyState >= 1) armCutIn(toDeck);
     showStatus(); // cheap immediate label; onloadedmetadata upgrades it once duration/outro are known
-  }
-
-  function describeCutIn(deck) {
-    if (deck.cutInAt == null || !deck.item || deck.item.type !== 'song') return '';
-    const dur = deck.audio.duration || deck.item.durationSeconds || 0;
-    const outro = deck.item.outroStartSeconds != null ? deck.item.outroStartSeconds : dur * 0.85;
-    const early = deck.cutInAt < outro - 2;
-    return early ? 'Host is cutting in early, over the last section.' : 'Host waits for the outro before cutting in.';
   }
 
   function selectStation(id) {
@@ -258,7 +263,7 @@
     deck.gain.gain.setValueAtTime(1, state.ctx.currentTime);
     state.activeIndex = 0;
     state.started = true;
-    const showStatus = () => renderNow(deck, describeCutIn(deck));
+    const showStatus = () => renderNow(deck, isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
     deck.audio.onloadedmetadata = () => { armCutIn(deck); showStatus(); };
     if (deck.audio.readyState >= 1) armCutIn(deck);
     showStatus();
