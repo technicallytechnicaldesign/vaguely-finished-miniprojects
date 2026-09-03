@@ -1,5 +1,5 @@
 window.SIGNAL_STATIONS = {
-  "notice": "Station identities are live. Audio is not yet cleared for public broadcast.",
+  "notice": "A cleared source catalog is ready for local radio assembly. No programme is on air yet.",
   "stations": [
     {
       "id": "cybersprawl",
