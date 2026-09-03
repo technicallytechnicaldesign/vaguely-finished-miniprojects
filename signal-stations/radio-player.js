@@ -2,6 +2,9 @@
   const data = window.SIGNAL_STATIONS;
   const byId = id => document.getElementById(id);
   const pick = items => items[Math.floor(Math.random() * items.length)];
+  // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
+  // overlap, not an outro guess (that's for actual songs, which have real musical structure).
+  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice';
 
   // --- crossfade/timing tuning -------------------------------------------------
   const FADE_S = 2.2;          // song<->liner crossfade duration
@@ -73,6 +76,10 @@
       this.gain.gain.setValueAtTime(0, ctx.currentTime);
       this.gain.gain.linearRampToValueAtTime(peak, ctx.currentTime + 0.05);
       this.audio.play().catch(() => {});
+      // the jingle asset already tapers to near-silence by its own envelope (make_jingle.py),
+      // so this doesn't change what's audible -- just leaves the gain node zeroed afterward
+      // instead of pinned at `peak` indefinitely.
+      this.audio.onended = () => this.gain.gain.setValueAtTime(0, ctx.currentTime);
     }
   }
 
@@ -113,11 +120,21 @@
     return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds };
   }
 
+  const SPONSOR_CHANCE = 0.12; // "sometimes" a sponsored notice runs the song-to-song slot instead of a host line
+
   function pickLiner() {
     const pool = (state.station.interludes || []).filter(x => x.audio);
     if (!pool.length) return null;
-    const bridges = pool.filter(x => x.kind === 'host bridge');
-    const candidates = bridges.length ? bridges : pool;
+    const ads = pool.filter(x => x.kind === 'sponsored notice');
+    const nonAds = pool.filter(x => x.kind !== 'sponsored notice');
+    let candidates;
+    if (ads.length && Math.random() < SPONSOR_CHANCE) {
+      candidates = ads;
+    } else {
+      const bridges = nonAds.filter(x => x.kind === 'host bridge');
+      candidates = bridges.length ? bridges : nonAds;
+    }
+    if (!candidates.length) candidates = pool;
     const liner = pick(candidates);
     return { type: liner.kind || 'host liner', title: liner.kind || 'Host', subtitle: liner.copy, audio: liner.audio, durationSeconds: liner.durationSeconds };
   }
@@ -170,8 +187,7 @@
 
   // --- the actual crossfade sequencer ------------------------------------------
   function armCutIn(deck) {
-    if (!deck.item || deck.item.type === 'host liner' || deck.item.type === 'host bridge') {
-      // liners transition on a fixed tail overlap, not an outro guess
+    if (!deck.item || isSpokenKind(deck.item.type)) {
       deck.cutInAt = Math.max(0, (deck.item ? deck.audio.duration || deck.item.durationSeconds || 6 : 6) - LINER_OVERLAP_S);
     } else {
       deck.cutInAt = pickCutInSeconds({ durationSeconds: deck.audio.duration || deck.item.durationSeconds, outroStartSeconds: deck.item.outroStartSeconds });
@@ -192,13 +208,18 @@
     // whatever's left of its track until this same Deck object gets reused
     setTimeout(() => fromDeck.audio.pause(), (FADE_S + 0.2) * 1000);
 
-    const isLinerNext = next.type === 'host liner' || next.type === 'host bridge';
-    if (isLinerNext && state.station.jingle && Math.random() < (state.station.jingle.chance || 0)) {
+    const isHostLine = next.type === 'host liner' || next.type === 'host bridge';
+    if (isHostLine && state.station.jingle && Math.random() < (state.station.jingle.chance || 0)) {
       state.jingle.play(state.station.jingle.audio, state.ctx, state.station.jingle.peak || 0.7);
     }
 
     state.activeIndex = toIndex;
-    const showStatus = () => renderNow(toDeck, isLinerNext ? 'On the air, live.' : describeCutIn(toDeck));
+    const statusLabel = () => {
+      if (next.type === 'sponsored notice') return 'Sponsored transmission.';
+      if (isHostLine) return 'On the air, live.';
+      return describeCutIn(toDeck);
+    };
+    const showStatus = () => renderNow(toDeck, statusLabel());
     toDeck.audio.onloadedmetadata = () => { armCutIn(toDeck); showStatus(); };
     if (toDeck.audio.readyState >= 1) armCutIn(toDeck);
     showStatus(); // cheap immediate label; onloadedmetadata upgrades it once duration/outro are known
