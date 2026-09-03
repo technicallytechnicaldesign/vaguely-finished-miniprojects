@@ -1,0 +1,110 @@
+<!-- identity: FREE_STREET -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="SIGNAL STATIONS: themed game-radio experiments from GENLYD.">
+  <title>SIGNAL STATIONS</title>
+  <style>
+    :root { --page:#f2f4fa; --surface:#fff; --ink:#10142b; --ink-2:#454e6e; --muted:#636e8d; --grid:#d8ddec; --ring:rgba(16,20,43,.14); --accent:#00789c; --on-accent:#fff; --accent-2:#b81683; --good:#0c8a54; --warn:#9a6b00; --crit:#c8322b; --font-body:system-ui,-apple-system,"Segoe UI",sans-serif; --font-head:"Cascadia Code",ui-monospace,Consolas,monospace; --font-mono:ui-monospace,Consolas,monospace; --radius:10px; }
+    @media (prefers-color-scheme:dark) { :root { --page:#07080f; --surface:#0e1220; --ink:#eef4ff; --ink-2:#a8b6d4; --muted:#6c7996; --grid:#1c2440; --ring:rgba(84,240,255,.18); --accent:#54f0ff; --on-accent:#07080f; --accent-2:#ff5fd2; --good:#57f2a4; --warn:#ffd23e; --crit:#ff5d5d; } }
+    :root[data-theme="dark"] { --page:#07080f; --surface:#0e1220; --ink:#eef4ff; --ink-2:#a8b6d4; --muted:#6c7996; --grid:#1c2440; --ring:rgba(84,240,255,.18); --accent:#54f0ff; --on-accent:#07080f; --accent-2:#ff5fd2; }
+    :root[data-theme="light"] { --page:#f2f4fa; --surface:#fff; --ink:#10142b; --ink-2:#454e6e; --muted:#636e8d; --grid:#d8ddec; --ring:rgba(16,20,43,.14); --accent:#00789c; --on-accent:#fff; --accent-2:#b81683; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--page); color:var(--ink); font:16px/1.55 var(--font-body); }
+    button { font:inherit; }
+    .shell { width:min(1040px,calc(100% - 32px)); margin:0 auto; padding:44px 0 56px; }
+    header { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; border-bottom:1px solid var(--grid); padding-bottom:24px; }
+    .eyebrow,.label { margin:0; color:var(--muted); font:11px/1.2 var(--font-head); letter-spacing:.1em; text-transform:uppercase; }
+    h1,h2,h3 { font-family:var(--font-head); text-transform:uppercase; letter-spacing:.06em; }
+    h1 { margin:7px 0 0; font-size:clamp(25px,5vw,43px); line-height:1.08; }
+    h2 { margin:0; font-size:15px; }
+    .theme { border:1px solid var(--ring); background:transparent; color:var(--ink-2); border-radius:var(--radius); padding:9px 11px; cursor:pointer; }
+    .theme:hover,.theme:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .signal { display:grid; grid-template-columns:1.1fr .9fr; gap:20px; padding:28px 0; }
+    .panel { border:1px solid var(--grid); border-radius:var(--radius); background:var(--surface); padding:22px; }
+    .on-air { border-color:var(--accent); box-shadow:0 0 28px color-mix(in srgb,var(--accent) 10%,transparent); }
+    .frequency { margin:8px 0 0; font:clamp(40px,8vw,72px)/.9 var(--font-head); letter-spacing:-.08em; }
+    .station-name { margin:15px 0 0; font:18px/1.25 var(--font-head); letter-spacing:.05em; }
+    .tagline { color:var(--ink-2); margin:6px 0 0; }
+    .host-line { border-left:2px solid var(--accent); padding:12px 0 12px 15px; color:var(--ink-2); margin:17px 0 0; }
+    .host-line strong { color:var(--ink); }
+    .status { display:inline-flex; align-items:center; gap:8px; margin-top:18px; font:12px/1.2 var(--font-mono); color:var(--muted); }
+    .dot { width:8px; height:8px; background:var(--accent-2); border-radius:50%; }
+    .stations { padding:7px 0 20px; }
+    .station-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .station { text-align:left; cursor:pointer; padding:17px; border:1px solid var(--grid); border-radius:var(--radius); color:var(--ink); background:var(--surface); }
+    .station:hover { border-color:var(--ring); transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,0,0,.08); }
+    .station[aria-pressed="true"] { border-color:var(--accent); }
+    .station strong,.station span { display:block; }
+    .station strong { font:14px var(--font-head); letter-spacing:.04em; }
+    .station span { color:var(--muted); font-size:13px; margin-top:4px; }
+    .how { border-top:1px solid var(--grid); padding-top:25px; color:var(--ink-2); max-width:720px; }
+    .how p { margin:8px 0 0; }
+    footer { border-top:1px solid var(--grid); margin-top:36px; padding-top:18px; color:var(--muted); font:11px/1.4 var(--font-mono); }
+    @media (max-width:680px) { .shell { width:min(100% - 24px,1040px); padding-top:24px; } header { padding-bottom:18px; } .signal { grid-template-columns:1fr; } .station-list { grid-template-columns:1fr; } }
+    @media (prefers-reduced-motion:reduce) { *,*:before,*:after { transition:none!important; transform:none!important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div><p class="eyebrow">GENLYD / themed radio experiments</p><h1>Signal Stations</h1></div>
+      <button class="theme" id="theme" type="button" aria-label="Toggle colour theme">Theme</button>
+    </header>
+    <section class="signal" aria-label="Current station">
+      <article class="panel on-air">
+        <p class="label">Selected frequency</p>
+        <p class="frequency" id="frequency"></p>
+        <p class="station-name" id="name"></p>
+        <p class="tagline" id="tagline"></p>
+      </article>
+      <article class="panel">
+        <p class="label">Host channel</p>
+        <p class="host-line"><strong id="host"></strong><br><span id="line"></span></p>
+        <p class="status"><span class="dot"></span><span id="notice"></span></p>
+      </article>
+    </section>
+    <section class="stations" aria-labelledby="station-title">
+      <h2 id="station-title">Choose a station</h2>
+      <div class="station-list" id="station-list"></div>
+    </section>
+    <section class="how" aria-labelledby="how-title">
+      <h2 id="how-title">What is being built</h2>
+      <p>Each station has its own setting, host voice, and broadcast grammar. Local programmes will interleave music, station IDs, and generated spoken links, then publish only audio with an explicit public release record.</p>
+    </section>
+    <footer>PUBLIC STATION SHELL · NO AUDIO UPLOADED · FREE_STREET</footer>
+  </main>
+  <script src="stations.data.js"></script>
+  <script>
+    (() => {
+      const data = window.SIGNAL_STATIONS;
+      const byId = id => document.getElementById(id);
+      const select = id => {
+        const station = data.stations.find(item => item.id === id) || data.stations[0];
+        byId('frequency').textContent = station.frequency;
+        byId('name').textContent = station.name;
+        byId('tagline').textContent = station.tagline;
+        byId('host').textContent = `Host: ${station.host}`;
+        byId('line').textContent = `“${station.sampleLine}”`;
+        document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
+      };
+      byId('notice').textContent = data.notice;
+      const list = byId('station-list');
+      data.stations.forEach((station, index) => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
+        button.innerHTML = `<strong>${station.frequency} · ${station.name}</strong><span>${station.theme}</span>`;
+        button.addEventListener('click', () => select(station.id));
+        list.append(button);
+        if (index === 0) select(station.id);
+      });
+      byId('theme').addEventListener('click', () => {
+        const root = document.documentElement;
+        root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      });
+    })();
+  </script>
+</body>
+</html>
