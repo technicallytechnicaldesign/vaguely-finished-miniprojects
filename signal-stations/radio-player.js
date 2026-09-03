@@ -4,7 +4,10 @@
   const audio = byId('audio');
   const state = { station: null, queue: [], lastTrack: '', songsSinceBreak: 0, breakAfter: 0, current: null };
   const pick = items => items[Math.floor(Math.random() * items.length)];
-  const rollRunLength = () => 2 + Math.floor(Math.random() * 4);
+  const rollRunLength = () => {
+    const range = state.station.runLength || {min: 2, max: 5};
+    return range.min + Math.floor(Math.random() * (range.max - range.min + 1));
+  };
 
   function renderStation(station) {
     byId('frequency').textContent = station.frequency;

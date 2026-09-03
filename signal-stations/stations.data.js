@@ -1,6 +1,16 @@
+const hostTestTracks = ["001", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012"].map(id => ({
+  title: `Accelerando signal ${id}`,
+  artist: "GENLYD / BOGLYD",
+  audio: `audio/test-tracks/ACC-${id}_neon-syllabus.mp3`
+}));
+const hostTestLiners = Array.from({length: 50}, (_, index) => {
+  const id = `AFH-${String(index + 1).padStart(3, "0")}`;
+  return {kind: "Kite host liner", copy: `Test liner ${id}`, audio: `audio/host/${id}.wav`};
+});
+
 window.SIGNAL_STATIONS = {
-  "notice": "Broadcast queue ready. Host audio falls back to music-only play until clips are installed.",
-  "defaultStation": "afterhuman",
+  "notice": "HOST LOOPBACK is in test rotation: one short song, then a Kite liner.",
+  "defaultStation": "afterhuman-loopback",
   "stations": [
     {
       "id": "cybersprawl",
@@ -34,6 +44,18 @@ window.SIGNAL_STATIONS = {
         {"kind": "caller update", "copy": "An incoming caller has not been rendered yet.", "audio": null},
         {"kind": "sponsored notice", "copy": "No sponsor clip is installed yet.", "audio": null}
       ]
+    },
+    {
+      "id": "afterhuman-loopback",
+      "name": "AFTERHUMAN LOOPBACK",
+      "frequency": "00.1",
+      "tagline": "A fast test transmission for Kite's new liners.",
+      "host": "Kite / host test",
+      "theme": "Transhumanism / host audio check",
+      "sampleLine": "One short Accelerando signal, then a different host liner.",
+      "runLength": {"min": 1, "max": 1},
+      "tracks": hostTestTracks,
+      "interludes": hostTestLiners
     }
   ]
 };
