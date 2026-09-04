@@ -510,7 +510,29 @@
     root.style.setProperty('--station-secondary', profile.secondary || '#ff4eb8');
     root.style.setProperty('--station-rgb', profile.rgb || '86,229,255');
     if (byId('world-label')) byId('world-label').textContent = profile.label || station.theme;
-    if (byId('world-tag')) byId('world-tag').textContent = profile.label || 'visual layer';
+  }
+
+  // The identity panel's left column: a small mode-reactive glitch visual instead of a
+  // static watermark -- a spinning wireframe head for spoken content, a corporate-satire
+  // glitch marquee for ads, an audio-reactive bar viz (plus the track title, since no real
+  // lyric data exists yet -- see the maker note in DECISIONS.md) for songs.
+  function renderIdentityVisual(mode, item) {
+    const el = byId('identity-visual');
+    if (!el) return;
+    if (mode.id === 'ad') {
+      el.innerHTML = '<div class="glitch-ad"><i>BUY MORE</i><i>CONSUME</i><i>UPGRADE YOUR SOUL</i><i>NO REFUNDS</i><i>OBEY THE BRAND</i></div>';
+      return;
+    }
+    if (mode.id === 'song') {
+      const bars = Array.from({ length: 22 }, () => `<i style="--h:${(0.2 + Math.random() * 0.8).toFixed(2)}"></i>`).join('');
+      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz">${bars}</div><p class="glitch-lyric">${item ? item.title : ''}</p></div>`;
+      return;
+    }
+    if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
+      el.innerHTML = `<div class="glitch-host"><div class="glitch-head"></div><span class="glitch-tag">${mode.label}</span></div>`;
+      return;
+    }
+    el.innerHTML = '<div class="glitch-idle"></div>';
   }
 
   function broadcastMode(item) {
@@ -526,9 +548,7 @@
   function renderStation(station) {
     applyVisualProfile(station);
     byId('reception-label').textContent = 'locked station';
-    byId('frequency').textContent = station.frequency;
-    byId('name').textContent = station.name;
-    byId('tagline').textContent = station.tagline;
+    byId('dial-station').textContent = station.name;
     byId('host').textContent = `Host: ${station.host}`;
     byId('line').textContent = `"${station.sampleLine}"`;
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
@@ -541,6 +561,7 @@
     const item = deck && deck.item;
     const mode = broadcastMode(item);
     document.documentElement.dataset.broadcast = mode.id;
+    renderIdentityVisual(mode, item);
     if (byId('mode-label')) byId('mode-label').textContent = mode.label;
     if (byId('signal-lock')) byId('signal-lock').textContent = state.started ? 'signal locked' : 'receiver ready';
     byId('now-title').textContent = item ? item.title : 'Off air';
@@ -757,12 +778,9 @@
     const frequency = formatDial(value);
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
-    byId('frequency').textContent = frequency;
     byId('reception-label').textContent = 'open spectrum';
-    byId('name').textContent = 'DEAD BAND';
-    byId('tagline').textContent = 'Unmapped spectrum. Something may be listening back.';
+    byId('dial-station').textContent = 'DEAD BAND';
     byId('world-label').textContent = 'multipath snow';
-    byId('world-tag').textContent = 'no stable reality';
     byId('host').textContent = 'Origin: unresolved';
     byId('line').textContent = '"No licensed source. Keep the dial moving."';
     byId('notice').textContent = 'Static is live. Hidden carriers only lock inside a narrow frequency window.';
@@ -774,6 +792,7 @@
     byId('break-note').textContent = 'Sweep slowly. Pirate carriers do not advertise themselves.';
     byId('queue').innerHTML = '<li class="empty">Only static is queued here.</li>';
     byId('skip').disabled = true;
+    renderIdentityVisual({ id: 'signal' }, null);
   }
 
   function pirateProfile(signal) {
@@ -790,9 +809,7 @@
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
     byId('reception-label').textContent = 'unstable carrier';
-    byId('frequency').textContent = signal.frequency;
-    byId('name').textContent = signal.source;
-    byId('tagline').textContent = 'Unlicensed transmission bleeding through the mapped band.';
+    byId('dial-station').textContent = signal.source;
     byId('host').textContent = `Origin: ${signal.source}`;
     byId('line').textContent = '"No callsign. No permission. Signal riding the gaps."';
     byId('notice').textContent = `${signal.id} was not on the carrier map. It will vanish when the transmission ends.`;
@@ -804,6 +821,7 @@
     byId('break-note').textContent = 'Hold frequency. Signal integrity is collapsing.';
     byId('queue').innerHTML = `<li><span>!</span><strong>${signal.id}</strong><small>signal ends without warning</small></li>`;
     byId('skip').disabled = true;
+    renderIdentityVisual({ id: 'host', label: 'intercepted signal' }, null);
   }
 
   function enterDeadBand(value, options = {}) {
@@ -967,7 +985,7 @@
     document.documentElement.dataset.power = on ? 'on' : 'off';
     byId('power').dataset.on = String(on);
     byId('power').setAttribute('aria-pressed', String(on));
-    byId('power-label').textContent = on ? 'ON AIR' : 'OFF AIR';
+    byId('power').textContent = on ? 'ON AIR' : 'OFF AIR';
     if (!on) {
       stopScan();
       if (state.staticChannel) state.staticChannel.setLevel(0, 0.1);
@@ -981,14 +999,24 @@
     ensureAudioGraph();
     await state.ctx.resume();
     if (state.reception === 'locked' && state.station) {
-      if (!state.started) await startBroadcast();
+      if (!state.started) {
+        // quietProgramme() (run on the last power-off) empties state.plan and never gets
+        // refilled until a station is (re)selected -- without this, startBroadcast() shifts
+        // an empty plan, gets nothing back, and returns having loaded silence. Real bug,
+        // caught by testing an off/on cycle while already parked on a locked station.
+        refillPlan();
+        renderQueue();
+        await startBroadcast();
+      }
     } else {
       enterDeadBand(Number(byId('tuner').value), { scanning: false });
     }
   }
 
   const list = byId('station-list');
-  data.stations.forEach((station, index) => {
+  // Ordered by dial position (lowest frequency first), not catalog order -- so the preset
+  // row reads left-to-right the same way the band itself does.
+  data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b)).forEach((station, index) => {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
@@ -1031,10 +1059,6 @@
     if (!state.power || !state.started) return;
     const active = state.decks[state.activeIndex];
     if (active.item) startCrossfade(active, 1 - state.activeIndex);
-  });
-  byId('theme').addEventListener('click', () => {
-    const root = document.documentElement;
-    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
   });
 
   if (byId('waveform')) {
