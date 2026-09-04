@@ -117,12 +117,12 @@
   }
 
   const state = {
-    station: null, ctx: null, decks: null, jingle: null,
+    station: null, ctx: null, decks: null, jingle: null, master: null, analyser: null,
     activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
     callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
-    started: false,
+    started: false, visualizerStarted: false, tuneTimer: null,
   };
 
   function onDeckTimeUpdate(deck) {
@@ -146,9 +146,39 @@
     if (state.ctx) return;
     const Ctx = window.AudioContext || window.webkitAudioContext;
     state.ctx = new Ctx();
-    const dest = state.ctx.destination;
+    state.master = state.ctx.createGain();
+    state.analyser = state.ctx.createAnalyser();
+    state.analyser.fftSize = 256;
+    state.analyser.smoothingTimeConstant = 0.82;
+    state.master.connect(state.analyser);
+    state.analyser.connect(state.ctx.destination);
+    const dest = state.master;
     state.decks = [new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded), new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded)];
     state.jingle = new JingleChannel(state.ctx, dest);
+    startVisualizer();
+  }
+
+  function startVisualizer() {
+    if (state.visualizerStarted || !state.analyser) return;
+    state.visualizerStarted = true;
+    const bins = new Uint8Array(state.analyser.frequencyBinCount);
+    const root = document.documentElement;
+    const average = (start, end) => {
+      let total = 0;
+      for (let index = start; index < end; index += 1) total += bins[index];
+      return total / Math.max(1, end - start) / 255;
+    };
+    const frame = () => {
+      state.analyser.getByteFrequencyData(bins);
+      const low = average(1, 9);
+      const mid = average(9, 34);
+      const high = average(34, 92);
+      root.style.setProperty('--audio-low', low.toFixed(3));
+      root.style.setProperty('--audio-mid', mid.toFixed(3));
+      root.style.setProperty('--audio-high', high.toFixed(3));
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
   }
 
   const rollRunLength = () => {
@@ -340,7 +370,29 @@
     return chooseTrack();
   }
 
+  function applyVisualProfile(station) {
+    const profile = station.visualProfile || {};
+    const root = document.documentElement;
+    root.dataset.station = profile.world || station.id;
+    root.style.setProperty('--station-accent', profile.accent || '#56e5ff');
+    root.style.setProperty('--station-secondary', profile.secondary || '#ff4eb8');
+    root.style.setProperty('--station-rgb', profile.rgb || '86,229,255');
+    if (byId('world-label')) byId('world-label').textContent = profile.label || station.theme;
+    if (byId('world-tag')) byId('world-tag').textContent = profile.label || 'visual layer';
+  }
+
+  function broadcastMode(item) {
+    if (!item) return { id: 'idle', label: 'carrier idle' };
+    if (isCallIn(item.type)) return { id: 'call', label: 'open line / caller' };
+    if (item.type === 'sponsored notice' || AD_BLOCK_KINDS.has(item.type)) return { id: 'ad', label: 'commercial incursion' };
+    if (item.type === 'street report') return { id: 'report', label: 'field report' };
+    if (item.type === 'host liner' || item.type === 'host bridge') return { id: 'host', label: 'host transmission' };
+    if (item.type === 'song') return { id: 'song', label: 'music carrier' };
+    return { id: 'signal', label: 'signal fragment' };
+  }
+
   function renderStation(station) {
+    applyVisualProfile(station);
     byId('frequency').textContent = station.frequency;
     byId('name').textContent = station.name;
     byId('tagline').textContent = station.tagline;
@@ -353,6 +405,10 @@
 
   function renderNow(deck, cutInLabel) {
     const item = deck && deck.item;
+    const mode = broadcastMode(item);
+    document.documentElement.dataset.broadcast = mode.id;
+    if (byId('mode-label')) byId('mode-label').textContent = mode.label;
+    if (byId('signal-lock')) byId('signal-lock').textContent = state.started ? 'signal locked' : 'receiver ready';
     byId('now-title').textContent = item ? item.title : 'Off air';
     byId('now-subtitle').textContent = item ? item.subtitle : 'Choose a station with cleared tracks.';
     byId('break-note').textContent = item ? cutInLabel || '' : 'Crossfades in live -- press play to start the broadcast.';
@@ -436,6 +492,10 @@
   function selectStation(id) {
     const station = data.stations.find(item => item.id === id) || data.stations[0];
     ensureAudioGraph();
+    const root = document.documentElement;
+    root.dataset.tuning = 'true';
+    clearTimeout(state.tuneTimer);
+    state.tuneTimer = setTimeout(() => { root.dataset.tuning = 'false'; }, 760);
     state.decks.forEach(deck => deck.reset());
     Object.assign(state, {
       station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
