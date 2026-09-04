@@ -202,8 +202,22 @@
     reception: 'locked', pirateSignal: null,
   };
 
+  function formatClock(seconds) {
+    const safe = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
+    return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
+  }
+
+  function renderProgress(deck) {
+    const current = deck && Number.isFinite(deck.audio.currentTime) ? deck.audio.currentTime : 0;
+    const duration = deck && Number.isFinite(deck.audio.duration) ? deck.audio.duration : 0;
+    if (byId('elapsed')) byId('elapsed').textContent = formatClock(current);
+    if (byId('duration')) byId('duration').textContent = formatClock(duration);
+    if (byId('progress-fill')) byId('progress-fill').style.width = `${duration ? Math.min(100, current / duration * 100) : 0}%`;
+  }
+
   function onDeckTimeUpdate(deck) {
     if (state.decks[state.activeIndex] !== deck) return; // only the currently-active deck can trigger a transition
+    renderProgress(deck);
     if (deck.item && deck.cutInAt != null && !deck.firedCutIn && deck.audio.currentTime >= deck.cutInAt) {
       deck.firedCutIn = true;
       startCrossfade(deck, 1 - state.activeIndex);
@@ -495,6 +509,7 @@
     byId('now-title').textContent = item ? item.title : 'Off air';
     byId('now-subtitle').textContent = item ? item.subtitle : 'Choose a station with cleared tracks.';
     byId('break-note').textContent = item ? cutInLabel || '' : 'Crossfades in live -- press play to start the broadcast.';
+    renderProgress(deck);
   }
 
   function renderQueue() {
@@ -636,6 +651,7 @@
     byId('queue').innerHTML = '<li class="empty">Only static is queued here.</li>';
     byId('play').disabled = true;
     byId('play').textContent = 'No carrier';
+    byId('play').dataset.playing = 'false';
     byId('skip').disabled = true;
   }
 
@@ -668,6 +684,7 @@
     byId('queue').innerHTML = `<li><span>!</span><strong>${signal.id}</strong><small>signal ends without warning</small></li>`;
     byId('play').disabled = true;
     byId('play').textContent = 'Carrier seized';
+    byId('play').dataset.playing = 'false';
     byId('skip').disabled = true;
   }
 
@@ -804,6 +821,7 @@
     byId('play').disabled = !trackCount;
     byId('skip').disabled = false;
     byId('play').textContent = trackCount ? 'Start broadcast' : 'No tracks loaded';
+    byId('play').dataset.playing = 'false';
   }
 
   async function startBroadcast() {
@@ -824,6 +842,7 @@
     if (deck.audio.readyState >= 1) armCutIn(deck);
     showStatus();
     byId('play').textContent = 'Pause broadcast';
+    byId('play').dataset.playing = 'true';
   }
 
   const list = byId('station-list');
@@ -833,6 +852,7 @@
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
     button.setAttribute('aria-label', `Preset ${index + 1}: ${station.frequency} ${station.name}`);
     button.title = `${station.frequency} / ${station.name}`;
+    button.innerHTML = `<b>${station.frequency}</b><small>${station.name}</small>`;
     button.addEventListener('click', () => selectStation(station.id));
     list.append(button);
   });
@@ -867,8 +887,8 @@
     stopScan();
     if (!state.started) { await startBroadcast(); return; }
     const active = state.decks[state.activeIndex];
-    if (active.audio.paused) { await active.audio.play(); byId('play').textContent = 'Pause broadcast'; }
-    else { state.decks.forEach(d => d.audio.pause()); byId('play').textContent = 'Resume broadcast'; }
+    if (active.audio.paused) { await active.audio.play(); byId('play').textContent = 'Pause broadcast'; byId('play').dataset.playing = 'true'; }
+    else { state.decks.forEach(d => d.audio.pause()); byId('play').textContent = 'Resume broadcast'; byId('play').dataset.playing = 'false'; }
   });
   byId('skip').addEventListener('click', () => {
     if (!state.started) return;
@@ -879,6 +899,10 @@
     const root = document.documentElement;
     root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
   });
+
+  if (byId('waveform')) {
+    byId('waveform').innerHTML = Array.from({ length: 48 }, (_, index) => `<i style="--h:${(.18 + ((index * 37) % 71) / 100).toFixed(2)}"></i>`).join('');
+  }
 
   selectStation(data.defaultStation || data.stations[0].id);
 })();
