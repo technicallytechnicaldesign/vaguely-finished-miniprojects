@@ -4,20 +4,20 @@ const hostTestTracks = ["001", "003", "004", "005", "006", "007", "008", "009", 
   audio: `audio/test-tracks/ACC-${id}_neon-syllabus.mp3`
 }));
 const callInTestLiners = [
-  {kind: "caller talk-back", copy: "SNC-CALL-001: Kourier lane report", audio: "audio/callins/SNC-CALL-001.wav", durationSeconds: 37.45},
-  {kind: "caller talk-back", copy: "SNC-CALL-002: Thirty-minute theology", audio: "audio/callins/SNC-CALL-002.wav", durationSeconds: 30.01},
-  {kind: "caller talk-back", copy: "SNC-CALL-003: Gargoyle weather eye", audio: "audio/callins/SNC-CALL-003.wav", durationSeconds: 32.65},
-  {kind: "caller talk-back", copy: "SNC-CALL-004: Tongues on the pirate line", audio: "audio/callins/SNC-CALL-004.wav", durationSeconds: 31.97},
-  {kind: "caller talk-back", copy: "SNC-CALL-005: BimboBox roadside assistance", audio: "audio/callins/SNC-CALL-005.wav", durationSeconds: 29.15},
-  {kind: "caller talk-back", copy: "SNC-CALL-006: Cloakroom daemon after-hours", audio: "audio/callins/SNC-CALL-006.wav", durationSeconds: 31.33},
-  {kind: "caller talk-back", copy: "SNC-CALL-007: Raft signal", audio: "audio/callins/SNC-CALL-007.wav", durationSeconds: 32.57},
-  {kind: "caller talk-back", copy: "SNC-CALL-008: Burbclave perimeter breach", audio: "audio/callins/SNC-CALL-008.wav", durationSeconds: 32.31},
-  {kind: "caller talk-back", copy: "SNC-CALL-009: Nam-shub hygiene", audio: "audio/callins/SNC-CALL-009.wav", durationSeconds: 32.01},
-  {kind: "caller talk-back", copy: "SNC-CALL-010: Sword-for-hire request", audio: "audio/callins/SNC-CALL-010.wav", durationSeconds: 28.85}
+  {id: "SNC-CALL-001", kind: "caller talk-back", callerName: "Zero Margin", callerRole: "Kourier", copy: "Kourier lane report", audio: "audio/callins/SNC-CALL-001.wav", durationSeconds: 37.45, release: "public", rotation: "live", requestTags: {tempo: ["fast"], style: ["thrash", "industrial"]}},
+  {id: "SNC-CALL-002", kind: "caller talk-back", callerName: "Redline Thirty", callerRole: "Deliverator", copy: "Thirty-minute theology", audio: "audio/callins/SNC-CALL-002.wav", durationSeconds: 30.01, release: "public", rotation: "live", requestTags: {tempo: ["fast"], style: ["thrash", "metal"]}},
+  {id: "SNC-CALL-003", kind: "caller talk-back", callerName: "Eyestack", callerRole: "Gargoyle", copy: "Gargoyle weather eye", audio: "audio/callins/SNC-CALL-003.wav", durationSeconds: 32.65, release: "public", rotation: "live", requestTags: {tempo: ["slow", "mid"], style: ["dark", "bass", "industrial"]}},
+  {id: "SNC-CALL-004", kind: "caller talk-back", callerName: "Tongues McGee", callerRole: "freelance glossolaliac", copy: "Tongues on the pirate line", audio: "audio/callins/SNC-CALL-004.wav", durationSeconds: 31.97, release: "public", rotation: "live", requestTags: {tempo: ["fast", "mid"], style: ["percussive", "experimental"]}},
+  {id: "SNC-CALL-005", kind: "caller talk-back", callerName: "Sprocket", callerRole: "BimboBox field mechanic", copy: "BimboBox roadside assistance", audio: "audio/callins/SNC-CALL-005.wav", durationSeconds: 29.15, release: "public", rotation: "live", requestTags: {tempo: ["mid", "fast"], style: ["industrial", "mechanical"]}},
+  {id: "SNC-CALL-006", kind: "caller talk-back", callerName: "Velvet Polygon", callerRole: "Black Sun cloakroom daemon", copy: "Cloakroom daemon after-hours", audio: "audio/callins/SNC-CALL-006.wav", durationSeconds: 31.33, release: "public", rotation: "live", requestTags: {tempo: ["mid"], style: ["dark", "elegant", "hostile"]}},
+  {id: "SNC-CALL-007", kind: "caller talk-back", callerName: "Pallet Jack", callerRole: "Raft deckhand", copy: "Raft signal", audio: "audio/callins/SNC-CALL-007.wav", durationSeconds: 32.57, release: "public", rotation: "live", requestTags: {tempo: ["slow", "mid"], style: ["heavy", "doom"]}},
+  {id: "SNC-CALL-008", kind: "caller talk-back", callerName: "Citizen Eighty-Eight", callerRole: "burbclave night guard", copy: "Burbclave perimeter breach", audio: "audio/callins/SNC-CALL-008.wav", durationSeconds: 32.31, release: "public", rotation: "live", requestTags: {tempo: ["fast"], style: ["punk", "thrash"]}},
+  {id: "SNC-CALL-009", kind: "caller talk-back", callerName: "Null Saint", callerRole: "nam-shub survivor", copy: "Nam-shub hygiene", audio: "audio/callins/SNC-CALL-009.wav", durationSeconds: 32.01, release: "public", rotation: "live", requestTags: {tempo: ["slow", "mid"], style: ["instrumental", "experimental"]}},
+  {id: "SNC-CALL-010", kind: "caller talk-back", callerName: "ASCII Witch", callerRole: "Metaverse sword-for-hire", copy: "Sword-for-hire request", audio: "audio/callins/SNC-CALL-010.wav", durationSeconds: 28.85, release: "public", rotation: "live", requestTags: {tempo: ["fast"], style: ["precise", "thrash"]}}
 ];
 
 window.SIGNAL_STATIONS = {
-  "notice": "SNOW CRASH RADIO is live: sushiK's your host, 20 songs, and the crossfade engine ducks every song into a host line off its own measured outro -- sometimes early, mostly late, sometimes without the jingle.",
+  "notice": "SNOW CRASH RADIO is live: sushiK, 20 songs, Street reports, ad blocks, and ten open-line callers now share one weighted broadcast flow.",
   "defaultStation": "snowcrash",
   "stations": [
     {
@@ -112,28 +112,29 @@ window.SIGNAL_STATIONS = {
       "theme": "Metaverse / hacker chaos / thrash",
       "sampleLine": "SNOW CRASH RADIO. No daemon can shut us down. Believe that. Turn it up.",
       "runLength": {"min": 2, "max": 5},
+      "breakRouting": {"weights": {"host": 0.5, "callIn": 0.3, "adBlock": 0.2}, "callCooldownBreaks": 2, "maxBreaksWithoutCall": 4, "callRotations": ["live"]},
       "jingle": {"audio": "assets/jingle-snowcrash.wav", "chance": 0.6, "peak": 0.6, "note": "Heard and approved by the maker 2026-09-03."},
       "tracks": [
-        {"title": "Better Face Than Mine", "artist": "Faceswap Riot", "audio": "audio/snowcrash/better-face-than-mine.mp3", "durationSeconds": 323.3, "outroStartSeconds": 302.0},
-        {"title": "Citizenship", "artist": "Burbclave Static", "audio": "audio/snowcrash/citizenship.mp3", "durationSeconds": 278.0, "outroStartSeconds": 260.0},
-        {"title": "Face Code", "artist": "Cipher Gargoyle", "audio": "audio/snowcrash/face-code.mp3", "durationSeconds": 353.8, "outroStartSeconds": 346.0},
-        {"title": "gargoyles rest", "artist": "Rooftop Daemon", "audio": "audio/snowcrash/gargoyles-rest.mp3", "durationSeconds": 212.6, "outroStartSeconds": 191.0},
-        {"title": "Good Dog, Bad Machine", "artist": "Loyal Corrupt", "audio": "audio/snowcrash/good-dog-bad-machine.mp3", "durationSeconds": 305.0, "outroStartSeconds": 301.0},
-        {"title": "Gospel of the Raft", "artist": "The Drowned Chorus", "audio": "audio/snowcrash/gospel-of-the-raft.mp3", "durationSeconds": 480.0, "outroStartSeconds": 479.0},
-        {"title": "Grind The System", "artist": "Nam-Shub Overdrive", "audio": "audio/snowcrash/grind-the-system.mp3", "durationSeconds": 420.0, "outroStartSeconds": 408.0},
-        {"title": "Language Error", "artist": "Syntax Casualty", "audio": "audio/snowcrash/language-error.mp3", "durationSeconds": 420.0, "outroStartSeconds": 407.0},
-        {"title": "Not On The List", "artist": "Blacklist Kids", "audio": "audio/snowcrash/not-on-the-list.mp3", "durationSeconds": 317.5, "outroStartSeconds": 311.0},
-        {"title": "Poon That Bimbo Box (Remix)", "artist": "DJ Bimbobox", "audio": "audio/snowcrash/poon-that-bimbo-box-remix.mp3", "durationSeconds": 160.4, "outroStartSeconds": 159.0},
-        {"title": "Poor Impulse Control", "artist": "Reflex Daemon", "audio": "audio/snowcrash/poor-impulse-control-take1.mp3", "durationSeconds": 304.2, "outroStartSeconds": 300.0},
-        {"title": "Poor Impulse Control", "artist": "Reflex Daemon", "audio": "audio/snowcrash/poor-impulse-control-take2.mp3", "durationSeconds": 250.2, "outroStartSeconds": 249.2},
-        {"title": "Query Me", "artist": "Query Overflow", "audio": "audio/snowcrash/query-me.mp3", "durationSeconds": 293.5, "outroStartSeconds": 286.0},
-        {"title": "Root Blade", "artist": "sudo Katana", "audio": "audio/snowcrash/root-blade.mp3", "durationSeconds": 188.3, "outroStartSeconds": 183.0},
-        {"title": "Snow Crash", "artist": "Nam-Shub Zero", "audio": "audio/snowcrash/snow-crash-take1.mp3", "durationSeconds": 352.2, "outroStartSeconds": 340.0},
-        {"title": "Snow Crash", "artist": "Nam-Shub Zero", "audio": "audio/snowcrash/snow-crash-take2.mp3", "durationSeconds": 351.2, "outroStartSeconds": 344.0},
-        {"title": "The Street Never Ends", "artist": "Loglo Eternal", "audio": "audio/snowcrash/the-street-never-ends.mp3", "durationSeconds": 347.0, "outroStartSeconds": 325.0},
-        {"title": "Thirty Minutes or Blood", "artist": "The Deliverators", "audio": "audio/snowcrash/thirty-minutes-or-blood-take1.mp3", "durationSeconds": 186.6, "outroStartSeconds": 183.0},
-        {"title": "Thirty Minutes or Blood", "artist": "The Deliverators", "audio": "audio/snowcrash/thirty-minutes-or-blood-take2.mp3", "durationSeconds": 217.6, "outroStartSeconds": 214.0},
-        {"title": "Tongues Protocol", "artist": "Glossolalia Engine", "audio": "audio/snowcrash/tongues-protocol.mp3", "durationSeconds": 448.9, "outroStartSeconds": 442.0}
+        {"title": "Better Face Than Mine", "artist": "Faceswap Riot", "audio": "audio/snowcrash/better-face-than-mine.mp3", "durationSeconds": 323.3, "outroStartSeconds": 302.0, "tags": {"source": ["snowcrash"], "tempo": ["mid"], "style": []}},
+        {"title": "Citizenship", "artist": "Burbclave Static", "audio": "audio/snowcrash/citizenship.mp3", "durationSeconds": 278.0, "outroStartSeconds": 260.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Face Code", "artist": "Cipher Gargoyle", "audio": "audio/snowcrash/face-code.mp3", "durationSeconds": 353.8, "outroStartSeconds": 346.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "gargoyles rest", "artist": "Rooftop Daemon", "audio": "audio/snowcrash/gargoyles-rest.mp3", "durationSeconds": 212.6, "outroStartSeconds": 191.0, "tags": {"source": ["snowcrash"], "tempo": ["mid"], "style": []}},
+        {"title": "Good Dog, Bad Machine", "artist": "Loyal Corrupt", "audio": "audio/snowcrash/good-dog-bad-machine.mp3", "durationSeconds": 305.0, "outroStartSeconds": 301.0, "tags": {"source": ["snowcrash"], "tempo": ["mid"], "style": []}},
+        {"title": "Gospel of the Raft", "artist": "The Drowned Chorus", "audio": "audio/snowcrash/gospel-of-the-raft.mp3", "durationSeconds": 480.0, "outroStartSeconds": 479.0, "tags": {"source": ["snowcrash"], "tempo": ["fast"], "style": []}},
+        {"title": "Grind The System", "artist": "Nam-Shub Overdrive", "audio": "audio/snowcrash/grind-the-system.mp3", "durationSeconds": 420.0, "outroStartSeconds": 408.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Language Error", "artist": "Syntax Casualty", "audio": "audio/snowcrash/language-error.mp3", "durationSeconds": 420.0, "outroStartSeconds": 407.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Not On The List", "artist": "Blacklist Kids", "audio": "audio/snowcrash/not-on-the-list.mp3", "durationSeconds": 317.5, "outroStartSeconds": 311.0, "tags": {"source": ["snowcrash"], "tempo": ["mid"], "style": []}},
+        {"title": "Poon That Bimbo Box (Remix)", "artist": "DJ Bimbobox", "audio": "audio/snowcrash/poon-that-bimbo-box-remix.mp3", "durationSeconds": 160.4, "outroStartSeconds": 159.0, "tags": {"source": ["snowcrash"], "tempo": ["mid"], "style": []}},
+        {"title": "Poor Impulse Control", "artist": "Reflex Daemon", "audio": "audio/snowcrash/poor-impulse-control-take1.mp3", "durationSeconds": 304.2, "outroStartSeconds": 300.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Poor Impulse Control", "artist": "Reflex Daemon", "audio": "audio/snowcrash/poor-impulse-control-take2.mp3", "durationSeconds": 250.2, "outroStartSeconds": 249.2, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Query Me", "artist": "Query Overflow", "audio": "audio/snowcrash/query-me.mp3", "durationSeconds": 293.5, "outroStartSeconds": 286.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Root Blade", "artist": "sudo Katana", "audio": "audio/snowcrash/root-blade.mp3", "durationSeconds": 188.3, "outroStartSeconds": 183.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Snow Crash", "artist": "Nam-Shub Zero", "audio": "audio/snowcrash/snow-crash-take1.mp3", "durationSeconds": 352.2, "outroStartSeconds": 340.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Snow Crash", "artist": "Nam-Shub Zero", "audio": "audio/snowcrash/snow-crash-take2.mp3", "durationSeconds": 351.2, "outroStartSeconds": 344.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "The Street Never Ends", "artist": "Loglo Eternal", "audio": "audio/snowcrash/the-street-never-ends.mp3", "durationSeconds": 347.0, "outroStartSeconds": 325.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Thirty Minutes or Blood", "artist": "The Deliverators", "audio": "audio/snowcrash/thirty-minutes-or-blood-take1.mp3", "durationSeconds": 186.6, "outroStartSeconds": 183.0, "tags": {"source": ["snowcrash"], "tempo": ["mid"], "style": []}},
+        {"title": "Thirty Minutes or Blood", "artist": "The Deliverators", "audio": "audio/snowcrash/thirty-minutes-or-blood-take2.mp3", "durationSeconds": 217.6, "outroStartSeconds": 214.0, "tags": {"source": ["snowcrash"], "tempo": ["slow"], "style": []}},
+        {"title": "Tongues Protocol", "artist": "Glossolalia Engine", "audio": "audio/snowcrash/tongues-protocol.mp3", "durationSeconds": 448.9, "outroStartSeconds": 442.0, "tags": {"source": ["snowcrash"], "tempo": ["fast"], "style": []}}
       ],
       "interludes": [
         {"kind": "host liner", "copy": "SUSHIK IN THE BUILDING—well, there is no building, there’s just the Street, and I am WIDE OPEN on it, so buckle your avatar in, we are going in loud.", "audio": "audio/host/SNC-001.wav", "durationSeconds": 8.0},
@@ -190,7 +191,8 @@ window.SIGNAL_STATIONS = {
         {"kind": "ad block intro", "copy": "Quick word from the people who keep the lights and the loosh flowing.", "audio": "audio/host/SNC-048.wav", "durationSeconds": 4.3},
         {"kind": "ad block outro", "copy": "And we're back. No refunds, no regrets.", "audio": "audio/host/SNC-049.wav", "durationSeconds": 3.1},
         {"kind": "ad block outro", "copy": "That's the ad block. The Street resumes.", "audio": "audio/host/SNC-050.wav", "durationSeconds": 3.2},
-        {"kind": "ad block outro", "copy": "Thanks for holding still for that. Music's back.", "audio": "audio/host/SNC-051.wav", "durationSeconds": 3.6}
+        {"kind": "ad block outro", "copy": "Thanks for holding still for that. Music's back.", "audio": "audio/host/SNC-051.wav", "durationSeconds": 3.6},
+        ...callInTestLiners
       ]
     },
     {
@@ -202,6 +204,7 @@ window.SIGNAL_STATIONS = {
       "theme": "Snow Crash / caller audio check",
       "sampleLine": "One short signal, then a different caller from somewhere unsafe.",
       "runLength": {"min": 1, "max": 1},
+      "breakRouting": {"weights": {"host": 0, "callIn": 1, "adBlock": 0}, "callCooldownBreaks": 0, "maxBreaksWithoutCall": 0, "callRotations": ["audition", "live"]},
       "tracks": hostTestTracks,
       "interludes": callInTestLiners
     }

@@ -4,7 +4,8 @@
   const pick = items => items[Math.floor(Math.random() * items.length)];
   // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
   // overlap, not an outro guess (that's for actual songs, which have real musical structure).
-  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro';
+  const isCallIn = type => type === 'caller talk-back';
+  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro' || isCallIn(type);
   const AD_BLOCK_KINDS = new Set(['ad block intro', 'ad block outro']);
 
   // --- crossfade/timing tuning -------------------------------------------------
@@ -20,6 +21,7 @@
   const SONG_FULL_FADE_S = 1.8;   // after the duck, how long until the song is fully silent
   const FADE_S = 2.2;             // symmetric crossfade duration for entering a song (liner/song -> song)
   const LINER_OVERLAP_S = 1.6;    // how much of a liner's tail overlaps whatever comes next
+  const CALL_POST_GAP_MS = 300;   // let the mixed disconnect land before the requested song starts
 
   function pickCutInSeconds(track) {
     const dur = track.durationSeconds;
@@ -31,7 +33,7 @@
   }
 
   class Deck {
-    constructor(ctx, dest, onTimeUpdate) {
+    constructor(ctx, dest, onTimeUpdate, onEnded) {
       this.audio = new Audio();
       this.audio.preload = 'auto';
       this.audio.crossOrigin = 'anonymous';
@@ -46,6 +48,7 @@
       // throttled hard (sometimes fully paused) in a backgrounded/hidden browser tab, but
       // 'timeupdate' keeps firing off real playback progress regardless of tab visibility.
       this.audio.addEventListener('timeupdate', () => onTimeUpdate(this));
+      this.audio.addEventListener('ended', () => onEnded(this));
     }
     load(item) {
       this.item = item;
@@ -90,6 +93,8 @@
   const state = {
     station: null, ctx: null, decks: null, jingle: null,
     activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
+    callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
+    lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false,
   };
@@ -102,12 +107,21 @@
     }
   }
 
+  function onDeckEnded(deck) {
+    if (state.decks[state.activeIndex] !== deck || !deck.item || !isCallIn(deck.item.type)) return;
+    setTimeout(() => {
+      if (state.decks[state.activeIndex] === deck && deck.item && isCallIn(deck.item.type)) {
+        startCrossfade(deck, 1 - state.activeIndex);
+      }
+    }, CALL_POST_GAP_MS);
+  }
+
   function ensureAudioGraph() {
     if (state.ctx) return;
     const Ctx = window.AudioContext || window.webkitAudioContext;
     state.ctx = new Ctx();
     const dest = state.ctx.destination;
-    state.decks = [new Deck(state.ctx, dest, onDeckTimeUpdate), new Deck(state.ctx, dest, onDeckTimeUpdate)];
+    state.decks = [new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded), new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded)];
     state.jingle = new JingleChannel(state.ctx, dest);
   }
 
@@ -116,26 +130,98 @@
     return range.min + Math.floor(Math.random() * (range.max - range.min + 1));
   };
 
+  function tagValues(tags, key) {
+    const value = tags && tags[key];
+    if (!value) return [];
+    return (Array.isArray(value) ? value : [value]).map(item => String(item).toLowerCase());
+  }
+
+  function trackRequestScore(track, requestTags) {
+    if (!requestTags) return 0;
+    const weights = { tempo: 3, style: 1 };
+    return Object.entries(weights).reduce((score, [key, weight]) => {
+      const requested = new Set(tagValues(requestTags, key));
+      return score + tagValues(track.tags, key).filter(value => requested.has(value)).length * weight;
+    }, 0);
+  }
+
   function chooseTrack() {
     const tracks = (state.station.tracks || []).filter(t => t.audio);
     const alternatives = tracks.filter(t => t.title !== state.lastTrackTitle);
-    const track = pick(alternatives.length ? alternatives : tracks);
+    let pool = alternatives.length ? alternatives : tracks;
+    if (state.pendingRequestTags) {
+      const scored = pool.map(track => ({ track, score: trackRequestScore(track, state.pendingRequestTags) }));
+      const bestScore = Math.max(...scored.map(item => item.score));
+      if (bestScore > 0) pool = scored.filter(item => item.score === bestScore).map(item => item.track);
+    }
+    const track = pick(pool);
+    state.pendingRequestTags = null;
     state.lastTrackTitle = track.title;
-    return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds };
+    return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags };
   }
-
-  const AD_BLOCK_CHANCE = 0.2; // roughly 1 in 5 breaks opens a full ad block instead of a single liner; tune by ear
 
   function pickLiner() {
     // ad kinds are never drawn here: sponsored notice only plays inside a block (see
     // buildAdBlock), and ad block intro/outro are block bookends, not general rotation.
-    const pool = (state.station.interludes || []).filter(x => x.audio && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind));
+    const pool = (state.station.interludes || []).filter(x => x.audio && !isCallIn(x.kind) && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind));
     if (!pool.length) return null;
     return toPlanItem(pick(pool));
   }
 
   function toPlanItem(liner) {
-    return { type: liner.kind || 'host liner', title: liner.kind || 'Host', subtitle: liner.copy, audio: liner.audio, durationSeconds: liner.durationSeconds };
+    const callTitle = liner.callerName ? `Open line: ${liner.callerName}` : 'Open line';
+    return {
+      id: liner.id,
+      type: liner.kind || 'host liner',
+      title: isCallIn(liner.kind) ? callTitle : liner.kind || 'Host',
+      subtitle: liner.copy,
+      audio: liner.audio,
+      durationSeconds: liner.durationSeconds,
+      callerRole: liner.callerRole,
+      requestTags: liner.requestTags
+    };
+  }
+
+  function shuffle(items) {
+    const shuffled = items.slice();
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
+    return shuffled;
+  }
+
+  function availableCallIns() {
+    const configured = state.station.breakRouting && state.station.breakRouting.callRotations;
+    const allowedRotations = new Set(configured || ['live', 'audition']);
+    return (state.station.interludes || []).filter(item => item.audio && isCallIn(item.kind) && allowedRotations.has(item.rotation || 'live'));
+  }
+
+  function pickCallIn() {
+    const calls = availableCallIns();
+    if (!calls.length) return null;
+    const byCallId = new Map(calls.map(item => [item.id, item]));
+    state.callBag = state.callBag.filter(id => byCallId.has(id));
+    if (!state.callBag.length) state.callBag = shuffle(calls.map(item => item.id));
+    let bagIndex = state.callBag.findIndex(id => byCallId.get(id).callerRole !== state.lastCallerRole);
+    if (bagIndex < 0) bagIndex = 0;
+    const [callId] = state.callBag.splice(bagIndex, 1);
+    const call = byCallId.get(callId);
+    state.lastCallerRole = call.callerRole || '';
+    state.pendingRequestTags = call.requestTags || null;
+    return toPlanItem(call);
+  }
+
+  function pickWeightedKind(options) {
+    const viable = options.filter(option => option.available && option.weight > 0);
+    if (!viable.length) return null;
+    const total = viable.reduce((sum, option) => sum + option.weight, 0);
+    let roll = Math.random() * total;
+    for (const option of viable) {
+      roll -= option.weight;
+      if (roll <= 0) return option.kind;
+    }
+    return viable[viable.length - 1].kind;
   }
 
   // one hook, 2-4 shuffled sponsored notices with no repeats within the block, one outro --
@@ -148,10 +234,68 @@
     const outros = pool.filter(x => x.kind === 'ad block outro');
     const ads = pool.filter(x => x.kind === 'sponsored notice');
     if (!hooks.length || !outros.length || ads.length < 2) return null;
-    const shuffled = ads.slice().sort(() => Math.random() - 0.5);
+    const shuffled = shuffle(ads);
     const adCount = Math.min(ads.length, 2 + Math.floor(Math.random() * 3)); // 2-4, capped by pool size
     const chosenAds = shuffled.slice(0, adCount);
     return [pick(hooks), ...chosenAds, pick(outros)].map(toPlanItem);
+  }
+
+  function chooseBreak() {
+    const routing = state.station.breakRouting || {};
+    const weights = routing.weights || { host: 0.8, callIn: 0, adBlock: 0.2 };
+    const calls = availableCallIns();
+    const interludes = (state.station.interludes || []).filter(item => item.audio);
+    const hostAvailable = interludes.some(item => !isCallIn(item.kind) && item.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(item.kind));
+    const adAvailable = interludes.some(item => item.kind === 'ad block intro')
+      && interludes.some(item => item.kind === 'ad block outro')
+      && interludes.filter(item => item.kind === 'sponsored notice').length >= 2;
+    const callAllowed = calls.length && state.callCooldown <= 0 && state.lastBreakKind !== 'ad-block';
+    const maxGap = routing.maxBreaksWithoutCall == null ? Infinity : routing.maxBreaksWithoutCall;
+    const adAllowed = adAvailable && state.lastBreakKind !== 'call-in' && state.breaksSinceCall < maxGap - 1;
+    const forcedCall = callAllowed && state.breaksSinceCall >= maxGap;
+    const kind = forcedCall ? 'call-in' : pickWeightedKind([
+      { kind: 'host', weight: weights.host || 0, available: hostAvailable },
+      { kind: 'call-in', weight: weights.callIn || 0, available: callAllowed },
+      { kind: 'ad-block', weight: weights.adBlock || 0, available: adAllowed }
+    ]);
+
+    if (kind === 'call-in') {
+      const call = pickCallIn();
+      if (call) {
+        state.callCooldown = routing.callCooldownBreaks == null ? 2 : routing.callCooldownBreaks;
+        state.breaksSinceCall = 0;
+        state.lastBreakKind = 'call-in';
+        return call;
+      }
+    }
+
+    if (kind === 'ad-block') {
+      const block = buildAdBlock();
+      if (block && block.length) {
+        state.pendingBlock = block.slice(1);
+        state.breaksSinceCall += 1;
+        if (state.callCooldown > 0) state.callCooldown -= 1;
+        state.lastBreakKind = 'ad-block';
+        return block[0];
+      }
+    }
+
+    const liner = pickLiner();
+    if (liner) {
+      state.breaksSinceCall += 1;
+      if (state.callCooldown > 0) state.callCooldown -= 1;
+      state.lastBreakKind = 'host';
+      return liner;
+    }
+
+    const fallbackCall = pickCallIn();
+    if (fallbackCall) {
+      state.callCooldown = routing.callCooldownBreaks == null ? 2 : routing.callCooldownBreaks;
+      state.breaksSinceCall = 0;
+      state.lastBreakKind = 'call-in';
+      return fallbackCall;
+    }
+    return null;
   }
 
   function decideNext() {
@@ -164,15 +308,8 @@
       // song, liner, song instead of repeating liners while the queue refills.
       state.songsSinceBreak = 0;
       state.breakAfter = rollRunLength();
-      if (Math.random() < AD_BLOCK_CHANCE) {
-        const block = buildAdBlock();
-        if (block && block.length) {
-          state.pendingBlock = block.slice(1);
-          return block[0];
-        }
-      }
-      const liner = pickLiner();
-      if (liner) return liner; // song-to-song bridge only, by construction: this branch always sits between two chooseTrack() calls
+      const breakItem = chooseBreak();
+      if (breakItem) return breakItem;
     }
     return chooseTrack();
   }
@@ -212,6 +349,10 @@
 
   // --- the actual crossfade sequencer ------------------------------------------
   function armCutIn(deck) {
+    if (deck.item && isCallIn(deck.item.type)) {
+      deck.cutInAt = null;
+      return;
+    }
     if (!deck.item || isSpokenKind(deck.item.type)) {
       deck.cutInAt = Math.max(0, (deck.item ? deck.audio.duration || deck.item.durationSeconds || 6 : 6) - LINER_OVERLAP_S);
     } else {
@@ -256,6 +397,7 @@
       if (next.type === 'ad block intro') return 'Ad block starting.';
       if (next.type === 'ad block outro') return 'Ad block over.';
       if (next.type === 'sponsored notice') return 'Sponsored transmission.';
+      if (isCallIn(next.type)) return 'Open line to the Street.';
       if (isHostLine) return 'On the air, live.';
       return 'Song plays out, host cuts in on the tail.';
     };
@@ -269,7 +411,11 @@
     const station = data.stations.find(item => item.id === id) || data.stations[0];
     ensureAudioGraph();
     state.decks.forEach(d => { d.audio.pause(); d.gain.gain.value = 0; d.item = null; d.cutInAt = null; d.firedCutIn = false; });
-    Object.assign(state, { station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0, plan: [], pendingBlock: [], started: false });
+    Object.assign(state, {
+      station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
+      plan: [], pendingBlock: [], callBag: [], lastCallerRole: '', callCooldown: 0,
+      breaksSinceCall: 0, lastBreakKind: '', pendingRequestTags: null, started: false
+    });
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
@@ -290,7 +436,7 @@
     deck.gain.gain.setValueAtTime(1, state.ctx.currentTime);
     state.activeIndex = 0;
     state.started = true;
-    const showStatus = () => renderNow(deck, isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
+    const showStatus = () => renderNow(deck, isCallIn(first.type) ? 'Open line to the Street.' : isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
     deck.audio.onloadedmetadata = () => { armCutIn(deck); showStatus(); };
     if (deck.audio.readyState >= 1) armCutIn(deck);
     showStatus();
