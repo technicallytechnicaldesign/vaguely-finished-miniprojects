@@ -123,6 +123,7 @@
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
+    scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1,
   };
 
   function onDeckTimeUpdate(deck) {
@@ -401,6 +402,9 @@
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
     document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
+    const dialValue = stationDialValue(station);
+    byId('tuner').value = dialValue;
+    byId('tuner-output').textContent = formatDial(dialValue);
   }
 
   function renderNow(deck, cutInLabel) {
@@ -489,8 +493,88 @@
     showStatus(); // cheap immediate label; onloadedmetadata upgrades it once duration/outro are known
   }
 
-  function selectStation(id) {
+  function stationDialValue(station) {
+    return Math.round(Number.parseFloat(station.frequency) * 10);
+  }
+
+  function formatDial(value) {
+    return (Number(value) / 10).toFixed(1).padStart(5, '0');
+  }
+
+  function nearestStation(value) {
+    return data.stations.reduce((nearest, station) => {
+      const distance = Math.abs(stationDialValue(station) - value);
+      return !nearest || distance < nearest.distance ? { station, distance } : nearest;
+    }, null).station;
+  }
+
+  function setScannerUI(active, status) {
+    state.scanning = active;
+    document.documentElement.dataset.scanning = String(active);
+    byId('scan').setAttribute('aria-pressed', String(active));
+    byId('scan').textContent = active ? 'Stop scan' : 'Auto scan';
+    byId('tuner-status').textContent = status || (active ? 'seeking carrier' : 'carrier locked');
+  }
+
+  function stopScan(preserveDial) {
+    if (state.scanFrame) cancelAnimationFrame(state.scanFrame);
+    if (state.scanTimer) clearTimeout(state.scanTimer);
+    state.scanFrame = null;
+    state.scanTimer = null;
+    setScannerUI(false, preserveDial ? 'manual seeking' : 'carrier locked');
+    if (!preserveDial && state.station) {
+      const value = stationDialValue(state.station);
+      byId('tuner').value = value;
+      byId('tuner-output').textContent = formatDial(value);
+    }
+  }
+
+  function scanToNextCarrier() {
+    if (!state.scanning) return;
+    const ordered = data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b));
+    state.scanIndex = (state.scanIndex + 1) % ordered.length;
+    const targetStation = ordered[state.scanIndex];
+    const from = Number(byId('tuner').value);
+    const to = stationDialValue(targetStation);
+    const start = performance.now();
+    const duration = 1150;
+    byId('tuner-status').textContent = 'seeking carrier';
+    byId('tuner-note').textContent = 'Scanning the mapped band. Known carriers lock automatically.';
+    const step = now => {
+      if (!state.scanning) return;
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(from + (to - from) * eased);
+      byId('tuner').value = value;
+      byId('tuner-output').textContent = formatDial(value);
+      if (progress < 1) {
+        state.scanFrame = requestAnimationFrame(step);
+        return;
+      }
+      state.scanFrame = null;
+      selectStation(targetStation.id, { fromScan: true });
+      byId('tuner-status').textContent = 'carrier found';
+      byId('tuner-note').textContent = `Locked ${targetStation.frequency} / ${targetStation.name}. Continuing scan.`;
+      state.scanTimer = setTimeout(scanToNextCarrier, 2200);
+    };
+    state.scanFrame = requestAnimationFrame(step);
+  }
+
+  function toggleScan() {
+    if (state.scanning) {
+      stopScan();
+      byId('tuner-note').textContent = 'Scan stopped on the current known carrier.';
+      return;
+    }
+    const ordered = data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b));
+    state.scanIndex = ordered.findIndex(station => station.id === state.station.id);
+    setScannerUI(true, 'seeking carrier');
+    scanToNextCarrier();
+  }
+
+  function selectStation(id, options = {}) {
     const station = data.stations.find(item => item.id === id) || data.stations[0];
+    if (!options.fromScan) stopScan();
     ensureAudioGraph();
     const root = document.documentElement;
     root.dataset.tuning = 'true';
@@ -530,17 +614,31 @@
   }
 
   const list = byId('station-list');
-  data.stations.forEach(station => {
+  data.stations.forEach((station, index) => {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
-    button.innerHTML = `<strong>${station.frequency} · ${station.name}</strong><span>${station.theme}</span>`;
+    button.innerHTML = `<strong>Preset ${String(index + 1).padStart(2, '0')} / ${station.frequency}</strong><span>${station.name}</span>`;
     button.addEventListener('click', () => selectStation(station.id));
     list.append(button);
   });
   byId('notice').textContent = data.notice;
 
+  byId('scan').addEventListener('click', toggleScan);
+  byId('tuner').addEventListener('input', event => {
+    stopScan(true);
+    document.documentElement.dataset.tuning = 'true';
+    byId('tuner-output').textContent = formatDial(event.target.value);
+    byId('tuner-note').textContent = 'Manual sweep active. Release to lock the nearest known carrier.';
+  });
+  byId('tuner').addEventListener('change', event => {
+    const station = nearestStation(Number(event.target.value));
+    selectStation(station.id);
+    byId('tuner-note').textContent = `Nearest mapped carrier: ${station.frequency} / ${station.name}.`;
+  });
+
   byId('play').addEventListener('click', async () => {
+    stopScan();
     if (!state.started) { await startBroadcast(); return; }
     const active = state.decks[state.activeIndex];
     if (active.audio.paused) { await active.audio.play(); byId('play').textContent = 'Pause broadcast'; }
