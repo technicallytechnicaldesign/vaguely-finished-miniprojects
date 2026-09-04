@@ -266,7 +266,10 @@
   // evictLyricWord() when the rolling pool is full. Returns the element so the caller can
   // track it in the pool.
   const LYRIC_VARIANTS = ['v-drift', 'v-drift', 'v-fly', 'v-pulse', 'v-bg'];
-  const LYRIC_FONTS = ['var(--font-head)', 'var(--font-lyric-a)', 'var(--font-lyric-b)', 'var(--font-lyric-c)', 'var(--font-lyric-d)'];
+  const LYRIC_FONTS = [
+    'var(--font-head)', 'var(--font-lyric-a)', 'var(--font-lyric-b)', 'var(--font-lyric-c)', 'var(--font-lyric-d)',
+    'var(--font-lyric-e)', 'var(--font-lyric-f)', 'var(--font-lyric-g)', 'var(--font-lyric-h)', 'var(--font-lyric-i)', 'var(--font-lyric-j)'
+  ];
   function spawnLyricWord(container, text) {
     if (!container || !text) return null;
     const span = document.createElement('span');
