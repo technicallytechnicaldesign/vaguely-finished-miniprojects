@@ -175,7 +175,14 @@ window.SIGNAL_STATIONS = {
         {"kind": "street report", "copy": "Tonight's atmospheric outlook: loglo bright enough to read by, bandwidth thin enough to notice, and a fifteen percent chance somebody tries to sell you real estate in a burbclave that doesn't legally exist yet.", "audio": "audio/host/SNC-041.wav", "durationSeconds": 11.7},
         {"kind": "street report", "copy": "We are getting unconfirmed reports that an entire bimbobox chain just face-planted somewhere out past the toll corridor. If your feed just went silent for a second, that's why, and no, it is not coming back up before your next track.", "audio": "audio/host/SNC-042.wav", "durationSeconds": 12.7},
         {"kind": "street report", "copy": "Every Kourier on the grid tonight is apparently trying to beat the same thirty-minute clock at the same time, which is exactly as safe as it sounds. Watch the crosswalks. Watch the rooftops. Just watch, honestly.", "audio": "audio/host/SNC-043.wav", "durationSeconds": 11.9},
-        {"kind": "street report", "copy": "Quick Street report before we keep moving: weather's ugly, the bimboboxes are dropping like flies, and the Kouriers are somehow both the fastest and most dangerous thing on the grid tonight. Standard Tuesday. Let's get back to it.", "audio": "audio/host/SNC-044.wav", "durationSeconds": 12.9}
+        {"kind": "street report", "copy": "Quick Street report before we keep moving: weather's ugly, the bimboboxes are dropping like flies, and the Kouriers are somehow both the fastest and most dangerous thing on the grid tonight. Standard Tuesday. Let's get back to it.", "audio": "audio/host/SNC-044.wav", "durationSeconds": 12.9},
+        {"kind": "ad block intro", "copy": "We'll be back after these messages from our post-capitalistic overlords.", "audio": "audio/host/SNC-045.wav", "durationSeconds": 5.1},
+        {"kind": "ad block intro", "copy": "Back after these messages, beamed directly into your cortex.", "audio": "audio/host/SNC-046.wav", "durationSeconds": 4.5},
+        {"kind": "ad block intro", "copy": "Our overlords say: don't touch that dial. But the Street doesn't care if you do.", "audio": "audio/host/SNC-047.wav", "durationSeconds": 5.4},
+        {"kind": "ad block intro", "copy": "Quick word from the people who keep the lights and the loosh flowing.", "audio": "audio/host/SNC-048.wav", "durationSeconds": 4.3},
+        {"kind": "ad block outro", "copy": "And we're back. No refunds, no regrets.", "audio": "audio/host/SNC-049.wav", "durationSeconds": 3.1},
+        {"kind": "ad block outro", "copy": "That's the ad block. The Street resumes.", "audio": "audio/host/SNC-050.wav", "durationSeconds": 3.2},
+        {"kind": "ad block outro", "copy": "Thanks for holding still for that. Music's back.", "audio": "audio/host/SNC-051.wav", "durationSeconds": 3.6}
       ]
     },
     {

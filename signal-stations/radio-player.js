@@ -4,7 +4,8 @@
   const pick = items => items[Math.floor(Math.random() * items.length)];
   // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
   // overlap, not an outro guess (that's for actual songs, which have real musical structure).
-  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report';
+  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro';
+  const AD_BLOCK_KINDS = new Set(['ad block intro', 'ad block outro']);
 
   // --- crossfade/timing tuning -------------------------------------------------
   // Songs always play out, essentially to their real end -- no more cutting in over the
@@ -123,29 +124,51 @@
     return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds };
   }
 
-  const SPONSOR_CHANCE = 0.12; // "sometimes" a sponsored notice runs the song-to-song slot instead of a host line
+  const AD_BLOCK_CHANCE = 0.2; // roughly 1 in 5 breaks opens a full ad block instead of a single liner; tune by ear
 
   function pickLiner() {
-    const pool = (state.station.interludes || []).filter(x => x.audio);
+    // ad kinds are never drawn here: sponsored notice only plays inside a block (see
+    // buildAdBlock), and ad block intro/outro are block bookends, not general rotation.
+    const pool = (state.station.interludes || []).filter(x => x.audio && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind));
     if (!pool.length) return null;
-    const ads = pool.filter(x => x.kind === 'sponsored notice');
-    // every non-ad kind (host liner, host bridge, street report, ...) draws from one shared
-    // pool with equal weight -- every transition here is already song-to-song by construction
-    // (there's no separate ad-break/station-ID slot), so "host bridge" doesn't need to be
-    // preferred over the rest; it just used to crowd everything else out of rotation entirely.
-    const nonAds = pool.filter(x => x.kind !== 'sponsored notice');
-    const candidates = (ads.length && Math.random() < SPONSOR_CHANCE) ? ads : (nonAds.length ? nonAds : pool);
-    const liner = pick(candidates);
+    return toPlanItem(pick(pool));
+  }
+
+  function toPlanItem(liner) {
     return { type: liner.kind || 'host liner', title: liner.kind || 'Host', subtitle: liner.copy, audio: liner.audio, durationSeconds: liner.durationSeconds };
+  }
+
+  // one hook, 2-4 shuffled sponsored notices with no repeats within the block, one outro --
+  // queued as a single contiguous run so normal song rotation can't land in the middle of it.
+  // Returns null if a station doesn't have the content to build one (falls back to a normal
+  // liner break).
+  function buildAdBlock() {
+    const pool = (state.station.interludes || []).filter(x => x.audio);
+    const hooks = pool.filter(x => x.kind === 'ad block intro');
+    const outros = pool.filter(x => x.kind === 'ad block outro');
+    const ads = pool.filter(x => x.kind === 'sponsored notice');
+    if (!hooks.length || !outros.length || ads.length < 2) return null;
+    const shuffled = ads.slice().sort(() => Math.random() - 0.5);
+    const adCount = Math.min(ads.length, 2 + Math.floor(Math.random() * 3)); // 2-4, capped by pool size
+    const chosenAds = shuffled.slice(0, adCount);
+    return [pick(hooks), ...chosenAds, pick(outros)].map(toPlanItem);
   }
 
   function decideNext() {
     if (!(state.station.tracks || []).some(t => t.audio)) return null;
+    if (state.pendingBlock && state.pendingBlock.length) return state.pendingBlock.shift();
     if (!state.breakAfter) state.breakAfter = rollRunLength();
     state.songsSinceBreak += 1;
     if (state.songsSinceBreak > state.breakAfter) {
       state.songsSinceBreak = 1;
       state.breakAfter = rollRunLength();
+      if (Math.random() < AD_BLOCK_CHANCE) {
+        const block = buildAdBlock();
+        if (block && block.length) {
+          state.pendingBlock = block.slice(1);
+          return block[0];
+        }
+      }
       const liner = pickLiner();
       if (liner) return liner; // song-to-song bridge only, by construction: this branch always sits between two chooseTrack() calls
     }
@@ -221,13 +244,15 @@
     // whatever's left of its track until this same Deck object gets reused
     setTimeout(() => fromDeck.audio.pause(), (totalFadeS + 0.2) * 1000);
 
-    const isHostLine = next.type === 'host liner' || next.type === 'host bridge' || next.type === 'street report';
+    const isHostLine = next.type === 'host liner' || next.type === 'host bridge' || next.type === 'street report' || next.type === 'ad block intro';
     if (isHostLine && state.station.jingle && Math.random() < (state.station.jingle.chance || 0)) {
       state.jingle.play(state.station.jingle.audio, state.ctx, state.station.jingle.peak || 0.7);
     }
 
     state.activeIndex = toIndex;
     const statusLabel = () => {
+      if (next.type === 'ad block intro') return 'Ad block starting.';
+      if (next.type === 'ad block outro') return 'Ad block over.';
       if (next.type === 'sponsored notice') return 'Sponsored transmission.';
       if (isHostLine) return 'On the air, live.';
       return 'Song plays out, host cuts in on the tail.';
@@ -242,7 +267,7 @@
     const station = data.stations.find(item => item.id === id) || data.stations[0];
     ensureAudioGraph();
     state.decks.forEach(d => { d.audio.pause(); d.gain.gain.value = 0; d.item = null; d.cutInAt = null; d.firedCutIn = false; });
-    Object.assign(state, { station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0, plan: [], started: false });
+    Object.assign(state, { station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0, plan: [], pendingBlock: [], started: false });
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
