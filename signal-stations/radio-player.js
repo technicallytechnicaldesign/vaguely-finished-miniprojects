@@ -253,9 +253,24 @@
     if (byId('progress-fill')) byId('progress-fill').style.width = `${duration ? Math.min(100, current / duration * 100) : 0}%`;
   }
 
+  function updateLyricLine(deck) {
+    const item = deck.item;
+    if (!item || item.type !== 'song' || !item.lyricsLines || !item.lyricsLines.length) return;
+    const el = document.querySelector('#identity-visual .glitch-lyric');
+    if (!el) return;
+    const duration = deck.audio.duration || item.durationSeconds || 1;
+    const progress = duration ? Math.min(1, deck.audio.currentTime / duration) : 0;
+    const index = Math.min(item.lyricsLines.length - 1, Math.floor(progress * item.lyricsLines.length));
+    if (el.dataset.index !== String(index)) {
+      el.dataset.index = String(index);
+      el.textContent = item.lyricsLines[index];
+    }
+  }
+
   function onDeckTimeUpdate(deck) {
     if (state.decks[state.activeIndex] !== deck) return; // only the currently-active deck can trigger a transition
     renderProgress(deck);
+    updateLyricLine(deck);
     if (deck.item && deck.cutInAt != null && !deck.firedCutIn && deck.audio.currentTime >= deck.cutInAt) {
       deck.firedCutIn = true;
       startCrossfade(deck, 1 - state.activeIndex);
@@ -345,7 +360,7 @@
     const track = pick(pool);
     state.pendingRequestTags = null;
     state.lastTrackTitle = track.title;
-    return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags };
+    return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags, lyricsLines: track.lyricsLines };
   }
 
   function pickLiner() {
@@ -525,7 +540,13 @@
     }
     if (mode.id === 'song') {
       const bars = Array.from({ length: 22 }, () => `<i style="--h:${(0.2 + Math.random() * 0.8).toFixed(2)}"></i>`).join('');
-      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz">${bars}</div><p class="glitch-lyric">${item ? item.title : ''}</p></div>`;
+      // Suno embeds real lyrics on every SNOW CRASH track (an ID3 lyrics-eng tag,
+      // extracted by extract_lyrics.py) -- shown here paced against playback progress
+      // via updateLyricLine(), not word-accurate synced (no per-line timestamps exist),
+      // just an even spread across the track's own duration. Falls back to the title
+      // for tracks/stations that don't carry lyricsLines.
+      const firstLine = item && item.lyricsLines && item.lyricsLines.length ? item.lyricsLines[0] : (item ? item.title : '');
+      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz">${bars}</div><p class="glitch-lyric" data-index="0">${firstLine}</p></div>`;
       return;
     }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
