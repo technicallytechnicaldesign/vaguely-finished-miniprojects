@@ -237,7 +237,7 @@
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1, seekFrame: null,
-    reception: 'locked', pirateSignal: null, power: false,
+    reception: 'locked', pirateSignal: null, power: false, lyricTicker: null,
   };
 
   function formatClock(seconds) {
@@ -253,9 +253,55 @@
     if (byId('progress-fill')) byId('progress-fill').style.width = `${duration ? Math.min(100, current / duration * 100) : 0}%`;
   }
 
+  // One floating lyric word: fades in, drifts a little (--dx/--dy), fades back out, then
+  // removes itself. Randomized per-word size/position/rotation/lifespan/color/glitch so a run
+  // of them reads as a chaotic ticker, not a tidy list.
+  function spawnLyricWord(container, text) {
+    if (!container || !text) return;
+    const span = document.createElement('span');
+    const size = 10 + Math.random() * 20;
+    const top = Math.random() * 82;
+    const left = Math.random() * 62;
+    const rot = (Math.random() * 12 - 6).toFixed(1);
+    const dx = (Math.random() * 50 - 25).toFixed(0);
+    const dy = (Math.random() * 50 - 25).toFixed(0);
+    const life = (3.5 + Math.random() * 2.5).toFixed(2);
+    const accent = Math.random() < 0.5 ? 'lyric-word-a' : 'lyric-word-b';
+    span.className = `lyric-word ${accent}${Math.random() < 0.3 ? ' glitch-word' : ''}`;
+    span.textContent = text;
+    span.style.cssText = `font-size:${size.toFixed(0)}px;top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;animation-duration:${life}s`;
+    container.appendChild(span);
+    span.addEventListener('animationend', () => span.remove());
+    while (container.children.length > 10) container.removeChild(container.firstChild); // safety cap
+  }
+
+  // Paces the ticker against real playback progress: every timeupdate, works out which lyric
+  // index *should* be showing by now (progress * total lines) and spawns forward up to it, in
+  // order -- approximate placement in the song, never a jump backward, never out of sequence.
+  // Capped per tick so a seek/big time jump can't dump a flood of lines at once.
+  function tickLyricTicker(deck) {
+    const item = deck.item;
+    const ticker = state.lyricTicker;
+    if (!item || item.type !== 'song' || !item.lyricsLines || !item.lyricsLines.length) return;
+    if (!ticker || ticker.item !== item) return;
+    const field = byId('glitch-lyric-field');
+    if (!field) return;
+    const duration = deck.audio.duration || item.durationSeconds || 1;
+    const progress = duration ? Math.min(1, deck.audio.currentTime / duration) : 0;
+    const targetIndex = Math.min(item.lyricsLines.length - 1, Math.floor(progress * item.lyricsLines.length));
+    let spawned = 0;
+    while (ticker.lastIndex < targetIndex && spawned < 3) {
+      ticker.lastIndex += 1;
+      spawnLyricWord(field, item.lyricsLines[ticker.lastIndex]);
+      spawned += 1;
+    }
+    ticker.lastIndex = Math.max(ticker.lastIndex, targetIndex);
+  }
+
   function onDeckTimeUpdate(deck) {
     if (state.decks[state.activeIndex] !== deck) return; // only the currently-active deck can trigger a transition
     renderProgress(deck);
+    tickLyricTicker(deck);
     if (deck.item && deck.cutInAt != null && !deck.firedCutIn && deck.audio.currentTime >= deck.cutInAt) {
       deck.firedCutIn = true;
       startCrossfade(deck, 1 - state.activeIndex);
@@ -524,29 +570,25 @@
       return;
     }
     if (mode.id === 'song') {
-      // No per-line timestamps exist for Suno's lyrics-eng tag, so a synced single line was
-      // always going to drift out of time with the actual vocal -- per the maker's own call,
-      // this is a style treatment now, not a reader: a full-bleed mirrored equalizer with a
-      // scattered field of ~20 real lyric lines from the track (sampled once per track, not
-      // re-picked mid-song) at varied size/rotation/opacity, some carrying the ad panel's own
-      // glitch treatment for texture. Falls back to just the title for tracks with no lyrics.
+      // No per-line timestamps exist for Suno's lyrics-eng tag, so a synced single line always
+      // drifted out of time, and a one-shot random sample never changed for the whole track --
+      // per the maker's follow-up, this is a live ticker now: every real line from the track,
+      // in order, each spawned roughly where it falls in the song's own timeline (paced against
+      // playback progress in tickLyricTicker/onDeckTimeUpdate, not word-accurate), fading in,
+      // drifting, and fading back out on its own, so several overlap at once for a chaotic,
+      // disjointed feed rather than a static wall of text. Falls back to just the title for
+      // tracks with no lyrics. A per-song-type effect vocabulary (tagging different treatments
+      // to different kinds of songs) is a good next step, logged rather than built here.
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
-      const lines = item && item.lyricsLines && item.lyricsLines.length ? item.lyricsLines : (item ? [item.title] : []);
-      const sliceStart = lines.length > 20 ? Math.floor(Math.random() * (lines.length - 20)) : 0;
-      const sample = lines.slice(sliceStart, sliceStart + 20);
-      const field = sample.map((line, i) => {
-        const size = (10 + Math.random() * 20).toFixed(0);
-        const top = (Math.random() * 86).toFixed(1);
-        const left = (Math.random() * 65).toFixed(1);
-        const rot = (Math.random() * 10 - 5).toFixed(1);
-        const opacity = (0.28 + Math.random() * 0.5).toFixed(2);
-        const accent = i % 2 === 0 ? 'lyric-word-a' : 'lyric-word-b';
-        const glitch = i % 3 === 0 ? ' glitch-word' : '';
-        return `<span class="lyric-word ${accent}${glitch}" style="font-size:${size}px;top:${top}%;left:${left}%;transform:rotate(${rot}deg);opacity:${opacity}">${line}</span>`;
-      }).join('');
-      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="glitch-lyric-field">${field}</div></div>`;
+      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
+      state.lyricTicker = { item, lastIndex: -1 };
+      if (item && item.lyricsLines && item.lyricsLines.length) {
+        state.lyricTicker.lastIndex = 0;
+        spawnLyricWord(byId('glitch-lyric-field'), item.lyricsLines[0]);
+      }
       return;
     }
+    state.lyricTicker = null;
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
       el.innerHTML = `<div class="glitch-host"><div class="glitch-head"></div><span class="glitch-tag">${mode.label}</span></div>`;
       return;
