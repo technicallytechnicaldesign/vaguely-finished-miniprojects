@@ -160,7 +160,9 @@
     if (!state.breakAfter) state.breakAfter = rollRunLength();
     state.songsSinceBreak += 1;
     if (state.songsSinceBreak > state.breakAfter) {
-      state.songsSinceBreak = 1;
+      // The break itself is not a song. Reset to zero so runLength: 1 produces
+      // song, liner, song instead of repeating liners while the queue refills.
+      state.songsSinceBreak = 0;
       state.breakAfter = rollRunLength();
       if (Math.random() < AD_BLOCK_CHANCE) {
         const block = buildAdBlock();

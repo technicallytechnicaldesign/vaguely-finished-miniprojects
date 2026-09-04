@@ -3,10 +3,18 @@ const hostTestTracks = ["001", "003", "004", "005", "006", "007", "008", "009", 
   artist: "GENLYD / BOGLYD",
   audio: `audio/test-tracks/ACC-${id}_neon-syllabus.mp3`
 }));
-const hostTestLiners = Array.from({length: 50}, (_, index) => {
-  const id = `AFH-${String(index + 1).padStart(3, "0")}`;
-  return {kind: "Kite host liner", copy: `Test liner ${id}`, audio: `audio/host/${id}.wav`};
-});
+const callInTestLiners = [
+  {kind: "caller talk-back", copy: "SNC-CALL-001: Kourier lane report", audio: "audio/callins/SNC-CALL-001.wav", durationSeconds: 37.45},
+  {kind: "caller talk-back", copy: "SNC-CALL-002: Thirty-minute theology", audio: "audio/callins/SNC-CALL-002.wav", durationSeconds: 30.01},
+  {kind: "caller talk-back", copy: "SNC-CALL-003: Gargoyle weather eye", audio: "audio/callins/SNC-CALL-003.wav", durationSeconds: 32.65},
+  {kind: "caller talk-back", copy: "SNC-CALL-004: Tongues on the pirate line", audio: "audio/callins/SNC-CALL-004.wav", durationSeconds: 31.97},
+  {kind: "caller talk-back", copy: "SNC-CALL-005: BimboBox roadside assistance", audio: "audio/callins/SNC-CALL-005.wav", durationSeconds: 29.15},
+  {kind: "caller talk-back", copy: "SNC-CALL-006: Cloakroom daemon after-hours", audio: "audio/callins/SNC-CALL-006.wav", durationSeconds: 31.33},
+  {kind: "caller talk-back", copy: "SNC-CALL-007: Raft signal", audio: "audio/callins/SNC-CALL-007.wav", durationSeconds: 32.57},
+  {kind: "caller talk-back", copy: "SNC-CALL-008: Burbclave perimeter breach", audio: "audio/callins/SNC-CALL-008.wav", durationSeconds: 32.31},
+  {kind: "caller talk-back", copy: "SNC-CALL-009: Nam-shub hygiene", audio: "audio/callins/SNC-CALL-009.wav", durationSeconds: 32.01},
+  {kind: "caller talk-back", copy: "SNC-CALL-010: Sword-for-hire request", audio: "audio/callins/SNC-CALL-010.wav", durationSeconds: 28.85}
+];
 
 window.SIGNAL_STATIONS = {
   "notice": "SNOW CRASH RADIO is live: sushiK's your host, 20 songs, and the crossfade engine ducks every song into a host line off its own measured outro -- sometimes early, mostly late, sometimes without the jingle.",
@@ -187,15 +195,15 @@ window.SIGNAL_STATIONS = {
     },
     {
       "id": "afterhuman-loopback",
-      "name": "AFTERHUMAN LOOPBACK",
+      "name": "AFTERHUMAN TALKBACK",
       "frequency": "00.1",
-      "tagline": "A fast test transmission for Kite's new liners.",
-      "host": "Kite / host test",
-      "theme": "Transhumanism / host audio check",
-      "sampleLine": "One short Accelerando signal, then a different host liner.",
+      "tagline": "The Street is calling. Nobody checked the line.",
+      "host": "sushiK plus open lines",
+      "theme": "Snow Crash / caller audio check",
+      "sampleLine": "One short signal, then a different caller from somewhere unsafe.",
       "runLength": {"min": 1, "max": 1},
       "tracks": hostTestTracks,
-      "interludes": hostTestLiners
+      "interludes": callInTestLiners
     }
   ]
 };
