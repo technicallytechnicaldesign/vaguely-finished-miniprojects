@@ -609,10 +609,9 @@
     if (byId('world-label')) byId('world-label').textContent = profile.label || station.theme;
   }
 
-  // The identity panel's left column: a small mode-reactive glitch visual instead of a
-  // static watermark -- a spinning wireframe head for spoken content, a corporate-satire
-  // glitch marquee for ads, an audio-reactive bar viz (plus the track title, since no real
-  // lyric data exists yet -- see the maker note in DECISIONS.md) for songs.
+  // The identity panel's left column: a mode-reactive glitch visual with spoken-head,
+  // ad-marquee, and lyric treatments. Song visuals combine the real rolling lyric pool
+  // with deliberately placeholder programmer-art objects until track tags can select them.
   function renderIdentityVisual(mode, item) {
     const el = byId('identity-visual');
     if (!el) return;
@@ -632,7 +631,7 @@
       // title for tracks with no lyrics. A per-song-type effect vocabulary (tagging different
       // treatments to different kinds of songs) is a good next step, logged rather than built here.
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
-      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
+      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div><div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
       const lines = (item && item.lyricsLines) || [];
       const poolSize = 13 + Math.floor(Math.random() * 9); // 13-21, leaning toward the loud end
       const ticker = { item, lastIndex: -1, poolSize, pool: [] };
@@ -664,6 +663,7 @@
   }
 
   function renderStation(station) {
+    delete document.documentElement.dataset.previewStation;
     applyVisualProfile(station);
     byId('reception-label').textContent = 'locked station';
     byId('dial-station').textContent = station.name;
@@ -875,6 +875,22 @@
     }, null);
   }
 
+  function previewMappedStation(value) {
+    const nearest = data.stations.reduce((best, station) => {
+      const distance = Math.abs(stationDialValue(station) - value);
+      return !best || distance < best.distance ? { station, distance } : best;
+    }, null);
+    const previewRadius = 8 * BLEED_MULT;
+    if (!nearest || nearest.distance > previewRadius) {
+      delete document.documentElement.dataset.previewStation;
+      return null;
+    }
+    applyVisualProfile(nearest.station);
+    document.documentElement.dataset.previewStation = nearest.station.id;
+    byId('dial-station').textContent = nearest.station.name;
+    return nearest.station;
+  }
+
   function setReception(mode) {
     state.reception = mode;
     document.documentElement.dataset.reception = mode;
@@ -894,6 +910,7 @@
 
   function renderDeadBand(value) {
     const frequency = formatDial(value);
+    delete document.documentElement.dataset.previewStation;
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
     byId('reception-label').textContent = 'open spectrum';
@@ -923,6 +940,7 @@
   }
 
   function renderPirate(signal) {
+    delete document.documentElement.dataset.previewStation;
     applyVisualProfile({ id: 'pirate', theme: 'unlicensed carrier', visualProfile: pirateProfile(signal) });
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
@@ -1196,6 +1214,7 @@
     byId('tuner-output').textContent = formatDial(value);
     updateDialNeedle(value);
     enterDeadBand(value);
+    previewMappedStation(value);
     byId('tuner-note').textContent = 'Manual sweep active. The nearer a carrier, the more of it bleeds through.';
   });
   byId('tuner').addEventListener('change', event => {
