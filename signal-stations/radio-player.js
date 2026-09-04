@@ -191,15 +191,53 @@
     }
   }
 
+  // Live proximity preview while the dial is moving but not yet locked: a quiet, low-latency
+  // taste of whatever carrier is nearest, rising as the dial approaches it and receding as it
+  // moves away -- the "you can hear a station before you're on it" behavior real analog tuning
+  // has and a hard digital lock does not. Not the real programme (that only starts on lock);
+  // just a representative loop (a station's own first cleared track, or a pirate's own clip).
+  class PreviewChannel {
+    constructor(ctx, dest) {
+      this.audio = new Audio();
+      this.audio.preload = 'auto';
+      this.audio.crossOrigin = 'anonymous';
+      this.audio.loop = true;
+      this.source = ctx.createMediaElementSource(this.audio);
+      this.gain = ctx.createGain();
+      this.gain.gain.value = 0;
+      this.source.connect(this.gain).connect(dest);
+      this.currentSrc = null;
+    }
+    setTarget(url) {
+      if (!url || url === this.currentSrc) return;
+      this.currentSrc = url;
+      this.audio.src = url;
+      this.audio.currentTime = 0;
+      this.audio.play().catch(() => {});
+    }
+    setLevel(level, ctx, seconds = 0.12) {
+      const g = this.gain.gain;
+      const now = ctx.currentTime;
+      g.cancelScheduledValues(now);
+      g.setValueAtTime(g.value, now);
+      g.linearRampToValueAtTime(level, now + seconds);
+    }
+    clear(ctx) {
+      this.setLevel(0, ctx, 0.15);
+      this.currentSrc = null;
+      setTimeout(() => this.audio.pause(), 200);
+    }
+  }
+
   const state = {
-    station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, master: null, analyser: null,
+    station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, preview: null, master: null, analyser: null,
     activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
     callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1,
-    reception: 'locked', pirateSignal: null,
+    reception: 'locked', pirateSignal: null, power: false,
   };
 
   function formatClock(seconds) {
@@ -248,6 +286,7 @@
     state.jingle = new JingleChannel(state.ctx, dest);
     state.staticChannel = new StaticChannel(state.ctx, dest);
     state.pirate = new PirateChannel(state.ctx, dest);
+    state.preview = new PreviewChannel(state.ctx, dest);
     startVisualizer();
   }
 
@@ -495,9 +534,7 @@
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
     document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
-    const dialValue = stationDialValue(station);
-    byId('tuner').value = dialValue;
-    byId('tuner-output').textContent = formatDial(dialValue);
+    setDialValue(stationDialValue(station));
   }
 
   function renderNow(deck, cutInLabel) {
@@ -599,6 +636,93 @@
     return (Number(value) / 10).toFixed(1).padStart(5, '0');
   }
 
+  // --- dial face geometry -------------------------------------------------------
+  // A continuous semicircle (matches the reference: ticks sweep unbroken from left
+  // horizon to right, a needle rides it, nothing gets clipped). Built once from the
+  // catalog; only the needle transform changes as the dial moves.
+  const DIAL_CX = 320, DIAL_CY = 250, DIAL_MAX = 1400;
+  const arcPoint = (angleDeg, radius) => {
+    const rad = angleDeg * Math.PI / 180;
+    return { x: DIAL_CX + radius * Math.cos(rad), y: DIAL_CY - radius * Math.sin(rad) };
+  };
+  const angleForValue = value => 180 - (Number(value) / DIAL_MAX) * 180;
+
+  function updateDialNeedle(value) {
+    const needle = byId('dial-needle');
+    if (!needle) return;
+    needle.setAttribute('transform', `rotate(${(90 - angleForValue(value)).toFixed(2)} ${DIAL_CX} ${DIAL_CY})`);
+  }
+
+  function setDialValue(value) {
+    byId('tuner').value = value;
+    byId('tuner-output').textContent = formatDial(value);
+    updateDialNeedle(value);
+  }
+
+  function buildDialFace() {
+    const ticks = byId('dial-ticks');
+    const carriers = byId('dial-carriers');
+    if (!ticks || !carriers) return;
+    let ticksMarkup = '';
+    for (let value = 0; value <= DIAL_MAX; value += 50) {
+      const angle = angleForValue(value);
+      const major = value % 200 === 0;
+      const inner = arcPoint(angle, major ? 178 : 195);
+      const outer = arcPoint(angle, 210);
+      ticksMarkup += `<line class="dial-tick${major ? ' major' : ''}" x1="${inner.x.toFixed(1)}" y1="${inner.y.toFixed(1)}" x2="${outer.x.toFixed(1)}" y2="${outer.y.toFixed(1)}"></line>`;
+      if (major) {
+        const label = arcPoint(angle, 163);
+        ticksMarkup += `<text class="dial-tick-label" x="${label.x.toFixed(1)}" y="${label.y.toFixed(1)}" text-anchor="middle">${String(value / 10).padStart(2, '0')}</text>`;
+      }
+    }
+    ticks.innerHTML = ticksMarkup;
+    // Known station presets get a lit position on the arc itself -- pirate carriers
+    // deliberately do not, since seeing them would spoil hunting them by ear alone.
+    carriers.innerHTML = data.stations.map(station => {
+      const pos = arcPoint(angleForValue(stationDialValue(station)), 224);
+      const color = (station.visualProfile && station.visualProfile.accent) || '#56e5ff';
+      return `<circle class="dial-carrier" style="--dot:${color}" cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="4.5"></circle>`;
+    }).join('');
+  }
+
+  // --- proximity tuning -----------------------------------------------------------
+  // Real dial behavior: a carrier bleeds in gradually as you approach it and fades as
+  // you leave, well before it's close enough to actually lock. BLEED_MULT sets how many
+  // multiples of a carrier's own lock width count as "audible before it locks."
+  const BLEED_MULT = 4.5;
+  function proximityFor(value) {
+    const nearest = nearestCarrier(value);
+    if (!nearest) return { proximity: 0, entry: null };
+    const bleedRadius = nearest.entry.width * BLEED_MULT;
+    return { entry: nearest.entry, distance: nearest.distance, proximity: Math.max(0, 1 - nearest.distance / bleedRadius) };
+  }
+
+  function representativeAudio(entry) {
+    if (entry.kind === 'pirate') return entry.item.audio;
+    const station = entry.item;
+    const track = (station.tracks || []).find(t => t.audio);
+    if (track) return track.audio;
+    const liner = (station.interludes || []).find(item => item.audio);
+    return liner ? liner.audio : null;
+  }
+
+  function applyTuningAudio(value, options = {}) {
+    if (!state.power || !state.staticChannel) return;
+    const { proximity, entry } = proximityFor(value);
+    const staticCeiling = options.scanning ? 0.13 : 0.17;
+    state.staticChannel.setLevel(Math.max(0.015, staticCeiling * (1 - proximity * 0.88)), 0.1);
+    if (!state.preview) return;
+    // A registered carrier with nothing cleared to air yet (e.g. CYBERSPRAWL right now) must
+    // stay silent on approach, not keep bleeding in whatever the previous carrier last loaded.
+    const audio = proximity > 0.04 && entry ? representativeAudio(entry) : null;
+    if (audio) {
+      state.preview.setTarget(audio);
+      state.preview.setLevel(proximity * 0.8, state.ctx, 0.12);
+    } else {
+      state.preview.setLevel(0, state.ctx, 0.15);
+    }
+  }
+
   function scannerEntries() {
     const known = data.stations.map(station => ({ kind: 'station', item: station, value: stationDialValue(station), width: 8 }));
     const pirate = (data.pirateSignals || []).map(signal => ({ kind: 'pirate', item: signal, value: pirateDialValue(signal), width: signal.width || 9 }));
@@ -649,9 +773,6 @@
     byId('now-subtitle').textContent = `${frequency} SIG.FM / unlicensed spectrum`;
     byId('break-note').textContent = 'Sweep slowly. Pirate carriers do not advertise themselves.';
     byId('queue').innerHTML = '<li class="empty">Only static is queued here.</li>';
-    byId('play').disabled = true;
-    byId('play').textContent = 'No carrier';
-    byId('play').dataset.playing = 'false';
     byId('skip').disabled = true;
   }
 
@@ -682,9 +803,6 @@
     byId('now-subtitle').textContent = `${signal.id} / ${signal.family} intrusion`;
     byId('break-note').textContent = 'Hold frequency. Signal integrity is collapsing.';
     byId('queue').innerHTML = `<li><span>!</span><strong>${signal.id}</strong><small>signal ends without warning</small></li>`;
-    byId('play').disabled = true;
-    byId('play').textContent = 'Carrier seized';
-    byId('play').dataset.playing = 'false';
     byId('skip').disabled = true;
   }
 
@@ -697,7 +815,8 @@
       state.pirateSignal = null;
     }
     setReception('static');
-    state.staticChannel.setLevel(options.scanning ? 0.13 : 0.17);
+    updateDialNeedle(value);
+    applyTuningAudio(value, options);
     document.documentElement.dataset.tuning = 'true';
     byId('tuner-status').textContent = options.scanning ? 'seeking carrier' : 'no carrier';
     renderDeadBand(value);
@@ -708,11 +827,11 @@
     ensureAudioGraph();
     state.ctx.resume().catch(() => {});
     quietProgramme();
+    if (state.preview) state.preview.clear(state.ctx);
     state.pirateSignal = signal;
     setReception('pirate');
     state.staticChannel.setLevel(0.025, 0.16);
-    byId('tuner').value = pirateDialValue(signal);
-    byId('tuner-output').textContent = formatDial(pirateDialValue(signal));
+    setDialValue(pirateDialValue(signal));
     byId('tuner-status').textContent = 'illegal carrier';
     byId('tuner-note').textContent = `Intercepted ${signal.id} at ${signal.frequency}. Do not expect it to remain.`;
     renderPirate(signal);
@@ -742,9 +861,7 @@
     const status = state.reception === 'pirate' ? 'illegal carrier' : state.reception === 'static' ? 'dead band held' : 'carrier locked';
     setScannerUI(false, preserveDial ? status : 'carrier locked');
     if (!preserveDial && state.station && state.reception === 'locked') {
-      const value = stationDialValue(state.station);
-      byId('tuner').value = value;
-      byId('tuner-output').textContent = formatDial(value);
+      setDialValue(stationDialValue(state.station));
     }
   }
 
@@ -764,8 +881,8 @@
       const progress = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
       const value = Math.round(from + (to - from) * eased);
-      byId('tuner').value = value;
-      byId('tuner-output').textContent = formatDial(value);
+      setDialValue(value);
+      applyTuningAudio(value, { scanning: true });
       if (progress < 1) {
         state.scanFrame = requestAnimationFrame(step);
         return;
@@ -803,6 +920,7 @@
     const root = document.documentElement;
     state.pirate.stop(state.ctx);
     state.staticChannel.setLevel(0, 0.12);
+    if (state.preview) state.preview.clear(state.ctx);
     state.pirateSignal = null;
     setReception('locked');
     root.dataset.tuning = 'true';
@@ -817,11 +935,8 @@
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
     byId('notice').textContent = data.notice;
-    const trackCount = (station.tracks || []).filter(t => t.audio).length;
-    byId('play').disabled = !trackCount;
     byId('skip').disabled = false;
-    byId('play').textContent = trackCount ? 'Start broadcast' : 'No tracks loaded';
-    byId('play').dataset.playing = 'false';
+    if (state.power) startBroadcast();
   }
 
   async function startBroadcast() {
@@ -841,8 +956,35 @@
     deck.audio.onloadedmetadata = () => { armCutIn(deck); showStatus(); };
     if (deck.audio.readyState >= 1) armCutIn(deck);
     showStatus();
-    byId('play').textContent = 'Pause broadcast';
-    byId('play').dataset.playing = 'true';
+  }
+
+  // The power toggle IS the play control here -- a radio has an on/off switch, not a
+  // separate play button. OFF means silent: no static, no preview bleed, no programme,
+  // decks fully reset. ON resumes whatever the dial is already sitting on (a locked
+  // station starts broadcasting; open spectrum gets static/bleed at the current position).
+  async function setPower(on) {
+    state.power = on;
+    document.documentElement.dataset.power = on ? 'on' : 'off';
+    byId('power').dataset.on = String(on);
+    byId('power').setAttribute('aria-pressed', String(on));
+    byId('power-label').textContent = on ? 'ON AIR' : 'OFF AIR';
+    if (!on) {
+      stopScan();
+      if (state.staticChannel) state.staticChannel.setLevel(0, 0.1);
+      if (state.preview) state.preview.clear(state.ctx);
+      if (state.pirate) state.pirate.stop(state.ctx);
+      state.pirateSignal = null;
+      quietProgramme();
+      renderNow(null);
+      return;
+    }
+    ensureAudioGraph();
+    await state.ctx.resume();
+    if (state.reception === 'locked' && state.station) {
+      if (!state.started) await startBroadcast();
+    } else {
+      enterDeadBand(Number(byId('tuner').value), { scanning: false });
+    }
   }
 
   const list = byId('station-list');
@@ -852,10 +994,10 @@
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
     button.setAttribute('aria-label', `Preset ${index + 1}: ${station.frequency} ${station.name}`);
     button.title = `${station.frequency} / ${station.name}`;
-    button.innerHTML = `<b>${station.frequency}</b><small>${station.name}</small>`;
     button.addEventListener('click', () => selectStation(station.id));
     list.append(button);
   });
+  buildDialFace();
   byId('notice').textContent = data.notice;
 
   byId('scan').addEventListener('click', toggleScan);
@@ -863,8 +1005,9 @@
     stopScan(true);
     const value = Number(event.target.value);
     byId('tuner-output').textContent = formatDial(value);
+    updateDialNeedle(value);
     enterDeadBand(value);
-    byId('tuner-note').textContent = 'Manual sweep active. Release near a carrier to catch it.';
+    byId('tuner-note').textContent = 'Manual sweep active. The nearer a carrier, the more of it bleeds through.';
   });
   byId('tuner').addEventListener('change', event => {
     const value = Number(event.target.value);
@@ -883,15 +1026,9 @@
     byId('tuner-note').textContent = `${formatDial(value)} is dead band. Scrub again or start auto scan.`;
   });
 
-  byId('play').addEventListener('click', async () => {
-    stopScan();
-    if (!state.started) { await startBroadcast(); return; }
-    const active = state.decks[state.activeIndex];
-    if (active.audio.paused) { await active.audio.play(); byId('play').textContent = 'Pause broadcast'; byId('play').dataset.playing = 'true'; }
-    else { state.decks.forEach(d => d.audio.pause()); byId('play').textContent = 'Resume broadcast'; byId('play').dataset.playing = 'false'; }
-  });
+  byId('power').addEventListener('click', () => { setPower(!state.power); });
   byId('skip').addEventListener('click', () => {
-    if (!state.started) return;
+    if (!state.power || !state.started) return;
     const active = state.decks[state.activeIndex];
     if (active.item) startCrossfade(active, 1 - state.activeIndex);
   });
