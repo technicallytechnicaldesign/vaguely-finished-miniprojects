@@ -253,32 +253,51 @@
     if (byId('progress-fill')) byId('progress-fill').style.width = `${duration ? Math.min(100, current / duration * 100) : 0}%`;
   }
 
-  // One floating lyric word: fades in, drifts a little (--dx/--dy), fades back out, then
-  // removes itself. Randomized per-word size/position/rotation/lifespan/color/glitch so a run
-  // of them reads as a chaotic ticker, not a tidy list.
+  // One floating lyric word. Picks one of four looping animation variants -- drift (fade,
+  // gentle wander, loops), fly (crosses the whole panel edge to edge), bg (huge, low-opacity,
+  // sits behind the others), pulse (holds position, breathes in and out) -- so a crowded
+  // screen of them reads as chaotic rather than one uniform effect repeated. Loops
+  // continuously once alive; it doesn't self-expire, it waits to be evicted by
+  // evictLyricWord() when the rolling pool is full. Returns the element so the caller can
+  // track it in the pool.
+  const LYRIC_VARIANTS = ['v-drift', 'v-drift', 'v-fly', 'v-pulse', 'v-bg'];
   function spawnLyricWord(container, text) {
-    if (!container || !text) return;
+    if (!container || !text) return null;
     const span = document.createElement('span');
-    const size = 10 + Math.random() * 20;
-    const top = Math.random() * 82;
-    const left = Math.random() * 62;
-    const rot = (Math.random() * 12 - 6).toFixed(1);
-    const dx = (Math.random() * 50 - 25).toFixed(0);
-    const dy = (Math.random() * 50 - 25).toFixed(0);
-    const life = (3.5 + Math.random() * 2.5).toFixed(2);
+    const variant = LYRIC_VARIANTS[Math.floor(Math.random() * LYRIC_VARIANTS.length)];
+    const isBg = variant === 'v-bg';
+    const isFly = variant === 'v-fly';
+    const size = isBg ? 58 + Math.random() * 68 : 9 + Math.random() * 34;
+    const top = Math.random() * 84;
+    const left = isFly ? 0 : Math.random() * 62;
+    const rot = (Math.random() * 14 - 7).toFixed(1);
+    const dx = (Math.random() * 60 - 30).toFixed(0);
+    const dy = (Math.random() * 60 - 30).toFixed(0);
+    const flyFrom = Math.random() < 0.5 ? '-20%' : '118%';
+    const flyTo = flyFrom === '-20%' ? '118%' : '-20%';
+    const dur = (isFly ? 3.5 + Math.random() * 2.5 : isBg ? 8 + Math.random() * 6 : 5 + Math.random() * 4).toFixed(2);
+    const delay = (Math.random() * 1.4).toFixed(2);
     const accent = Math.random() < 0.5 ? 'lyric-word-a' : 'lyric-word-b';
-    span.className = `lyric-word ${accent}${Math.random() < 0.3 ? ' glitch-word' : ''}`;
+    span.className = `lyric-word ${variant} ${accent}${Math.random() < 0.28 ? ' glitch-word' : ''}`;
     span.textContent = text;
-    span.style.cssText = `font-size:${size.toFixed(0)}px;top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;animation-duration:${life}s`;
+    span.style.cssText = `font-size:${size.toFixed(0)}px;top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--fly-from:${flyFrom};--fly-to:${flyTo};animation-duration:${dur}s;animation-delay:${delay}s`;
     container.appendChild(span);
-    span.addEventListener('animationend', () => span.remove());
-    while (container.children.length > 10) container.removeChild(container.firstChild); // safety cap
+    return span;
+  }
+
+  // Fades a word out on its way from the pool instead of yanking it, then removes it.
+  function evictLyricWord(el) {
+    if (!el || el.classList.contains('leaving')) return;
+    el.classList.add('leaving');
+    setTimeout(() => el.remove(), 800);
   }
 
   // Paces the ticker against real playback progress: every timeupdate, works out which lyric
-  // index *should* be showing by now (progress * total lines) and spawns forward up to it, in
+  // index *should* be showing by now (progress * total lines) and spawns forward to it, in
   // order -- approximate placement in the song, never a jump backward, never out of sequence.
-  // Capped per tick so a seek/big time jump can't dump a flood of lines at once.
+  // Keeps a rolling pool of ticker.poolSize words alive at once (crowding the screen, several
+  // fighting for attention) -- each new line pushes the oldest still-alive one out rather than
+  // just adding to a pile. Capped per tick so a seek/big time jump can't dump a flood at once.
   function tickLyricTicker(deck) {
     const item = deck.item;
     const ticker = state.lyricTicker;
@@ -292,7 +311,8 @@
     let spawned = 0;
     while (ticker.lastIndex < targetIndex && spawned < 3) {
       ticker.lastIndex += 1;
-      spawnLyricWord(field, item.lyricsLines[ticker.lastIndex]);
+      ticker.pool.push(spawnLyricWord(field, item.lyricsLines[ticker.lastIndex]));
+      if (ticker.pool.length > ticker.poolSize) evictLyricWord(ticker.pool.shift());
       spawned += 1;
     }
     ticker.lastIndex = Math.max(ticker.lastIndex, targetIndex);
@@ -571,20 +591,26 @@
     }
     if (mode.id === 'song') {
       // No per-line timestamps exist for Suno's lyrics-eng tag, so a synced single line always
-      // drifted out of time, and a one-shot random sample never changed for the whole track --
-      // per the maker's follow-up, this is a live ticker now: every real line from the track,
-      // in order, each spawned roughly where it falls in the song's own timeline (paced against
-      // playback progress in tickLyricTicker/onDeckTimeUpdate, not word-accurate), fading in,
-      // drifting, and fading back out on its own, so several overlap at once for a chaotic,
-      // disjointed feed rather than a static wall of text. Falls back to just the title for
-      // tracks with no lyrics. A per-song-type effect vocabulary (tagging different treatments
-      // to different kinds of songs) is a good next step, logged rather than built here.
+      // drifted out of time, a one-shot random sample never changed all track, and a slow
+      // 1-in-1-out ticker paced to real lyric cadence read as one line at a time -- per the
+      // maker's follow-up, this crowds the screen instead: a rolling pool of ~10-20 lines alive
+      // at once (filled immediately so it's crowded from the first frame, not built up slowly),
+      // each line still spawned in order and roughly where it falls in the song's own timeline
+      // (tickLyricTicker/onDeckTimeUpdate), but the earliest alive line gets pushed out to make
+      // room the moment a new one arrives, not left to expire on its own. Falls back to just the
+      // title for tracks with no lyrics. A per-song-type effect vocabulary (tagging different
+      // treatments to different kinds of songs) is a good next step, logged rather than built here.
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
       el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
-      state.lyricTicker = { item, lastIndex: -1 };
-      if (item && item.lyricsLines && item.lyricsLines.length) {
-        state.lyricTicker.lastIndex = 0;
-        spawnLyricWord(byId('glitch-lyric-field'), item.lyricsLines[0]);
+      const lines = (item && item.lyricsLines) || [];
+      const poolSize = 10 + Math.floor(Math.random() * 8); // 10-17, "10-20 lines" per the ask
+      const ticker = { item, lastIndex: -1, poolSize, pool: [] };
+      state.lyricTicker = ticker;
+      const field = byId('glitch-lyric-field');
+      const initialCount = Math.min(poolSize, lines.length);
+      for (let i = 0; i < initialCount; i += 1) {
+        ticker.lastIndex = i;
+        ticker.pool.push(spawnLyricWord(field, lines[i]));
       }
       return;
     }
