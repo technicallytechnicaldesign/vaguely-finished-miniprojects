@@ -44,6 +44,8 @@
       this.item = null;     // {type:'song'|'liner', title, subtitle, audio, durationSeconds, ...}
       this.cutInAt = null;  // seconds into this deck's own playback to trigger the next transition
       this.firedCutIn = false;
+      this.loadGeneration = 0;
+      this.cleanupTimers = new Set();
       // bound to the audio element's own 'timeupdate', not requestAnimationFrame: rAF gets
       // throttled hard (sometimes fully paused) in a backgrounded/hidden browser tab, but
       // 'timeupdate' keeps firing off real playback progress regardless of tab visibility.
@@ -51,10 +53,34 @@
       this.audio.addEventListener('ended', () => onEnded(this));
     }
     load(item) {
+      this.cancelCleanup();
+      this.loadGeneration += 1;
       this.item = item;
       this.cutInAt = null;
       this.firedCutIn = false;
       this.audio.src = item.audio;
+    }
+    scheduleCleanup(callback, delayMs) {
+      const generation = this.loadGeneration;
+      const timer = setTimeout(() => {
+        this.cleanupTimers.delete(timer);
+        if (this.loadGeneration !== generation) return;
+        callback();
+      }, delayMs);
+      this.cleanupTimers.add(timer);
+    }
+    cancelCleanup() {
+      this.cleanupTimers.forEach(timer => clearTimeout(timer));
+      this.cleanupTimers.clear();
+    }
+    reset() {
+      this.cancelCleanup();
+      this.loadGeneration += 1;
+      this.audio.pause();
+      this.gain.gain.value = 0;
+      this.item = null;
+      this.cutInAt = null;
+      this.firedCutIn = false;
     }
     async play() { try { await this.audio.play(); } catch (e) { /* needs a user gesture; surfaced by the caller */ } }
     fadeTo(target, ctx, seconds) {
@@ -376,7 +402,7 @@
       // see pickCutInSeconds) rather than competing at equal volume, then finishes fading out.
       toDeck.fadeTo(1, state.ctx, HOST_RISE_S);
       fromDeck.fadeTo(SONG_DUCK_LEVEL, state.ctx, SONG_DUCK_S);
-      setTimeout(() => fromDeck.fadeTo(0, state.ctx, SONG_FULL_FADE_S), SONG_DUCK_S * 1000);
+      fromDeck.scheduleCleanup(() => fromDeck.fadeTo(0, state.ctx, SONG_FULL_FADE_S), SONG_DUCK_S * 1000);
       totalFadeS = SONG_DUCK_S + SONG_FULL_FADE_S;
     } else {
       fromDeck.fadeTo(0, state.ctx, FADE_S);
@@ -385,7 +411,7 @@
     }
     // fromDeck would otherwise keep decoding/playing silently in the background for
     // whatever's left of its track until this same Deck object gets reused
-    setTimeout(() => fromDeck.audio.pause(), (totalFadeS + 0.2) * 1000);
+    fromDeck.scheduleCleanup(() => fromDeck.audio.pause(), (totalFadeS + 0.2) * 1000);
 
     const isHostLine = next.type === 'host liner' || next.type === 'host bridge' || next.type === 'street report' || next.type === 'ad block intro';
     if (isHostLine && state.station.jingle && Math.random() < (state.station.jingle.chance || 0)) {
@@ -410,7 +436,7 @@
   function selectStation(id) {
     const station = data.stations.find(item => item.id === id) || data.stations[0];
     ensureAudioGraph();
-    state.decks.forEach(d => { d.audio.pause(); d.gain.gain.value = 0; d.item = null; d.cutInAt = null; d.firedCutIn = false; });
+    state.decks.forEach(deck => deck.reset());
     Object.assign(state, {
       station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
       plan: [], pendingBlock: [], callBag: [], lastCallerRole: '', callCooldown: 0,
