@@ -19,6 +19,24 @@ const callInTestLiners = [
 window.SIGNAL_STATIONS = {
   "notice": "SNOW CRASH RADIO is live: sushiK, 20 songs, Street reports, ad blocks, and ten open-line callers now share one weighted broadcast flow.",
   "defaultStation": "snowcrash",
+  "pirateSignals": [
+    {"id": "GLS-001", "family": "glossolalia", "frequency": "07.3", "title": "Dial Static Prelude", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-001.wav", "durationSeconds": 18.30, "width": 9},
+    {"id": "CMP-001", "family": "machine", "frequency": "12.2", "title": "Carrier Detect", "source": "ROOT RELAY", "audio": "audio/pirate/CMP-001.wav", "durationSeconds": 16.94, "width": 9},
+    {"id": "GLS-002", "family": "glossolalia", "frequency": "18.8", "title": "Two Tongues", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-002.wav", "durationSeconds": 20.36, "width": 9},
+    {"id": "WYN-001", "family": "sermon", "frequency": "23.9", "title": "The Pearly Gates", "source": "REVEREND WAYNE", "audio": "audio/pirate/WYN-001.wav", "durationSeconds": 26.88, "width": 10},
+    {"id": "CMP-002", "family": "machine", "frequency": "26.6", "title": "Kernel Panic Loop", "source": "ROOT RELAY", "audio": "audio/pirate/CMP-002.wav", "durationSeconds": 23.00, "width": 9},
+    {"id": "GLS-003", "family": "glossolalia", "frequency": "31.4", "title": "Breach Warning", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-003.wav", "durationSeconds": 18.82, "width": 9},
+    {"id": "GLS-004", "family": "glossolalia", "frequency": "42.1", "title": "Congregation", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-004.wav", "durationSeconds": 14.96, "width": 9},
+    {"id": "CMP-003", "family": "machine", "frequency": "48.8", "title": "Buffer Overflow", "source": "ROOT RELAY", "audio": "audio/pirate/CMP-003.wav", "durationSeconds": 21.68, "width": 9},
+    {"id": "WYN-002", "family": "sermon", "frequency": "54.0", "title": "Babel's Warning", "source": "REVEREND WAYNE", "audio": "audio/pirate/WYN-002.wav", "durationSeconds": 30.20, "width": 10},
+    {"id": "GLS-005", "family": "glossolalia", "frequency": "57.7", "title": "Signal Eaten", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-005.wav", "durationSeconds": 22.53, "width": 9},
+    {"id": "CMP-004", "family": "machine", "frequency": "66.6", "title": "Handshake Denied", "source": "ROOT RELAY", "audio": "audio/pirate/CMP-004.wav", "durationSeconds": 18.77, "width": 9},
+    {"id": "GLS-006", "family": "glossolalia", "frequency": "71.2", "title": "Dead Air Bleed", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-006.wav", "durationSeconds": 20.61, "width": 9},
+    {"id": "WYN-003", "family": "sermon", "frequency": "78.4", "title": "Enki's Bargain", "source": "REVEREND WAYNE", "audio": "audio/pirate/WYN-003.wav", "durationSeconds": 29.63, "width": 10},
+    {"id": "CMP-005", "family": "machine", "frequency": "86.5", "title": "Root Shell", "source": "ROOT RELAY", "audio": "audio/pirate/CMP-005.wav", "durationSeconds": 22.30, "width": 9},
+    {"id": "WYN-004", "family": "sermon", "frequency": "110.7", "title": "The Raft Is Coming", "source": "REVEREND WAYNE", "audio": "audio/pirate/WYN-004.wav", "durationSeconds": 29.77, "width": 10},
+    {"id": "WYN-005", "family": "sermon", "frequency": "124.6", "title": "Speaking In Tongues", "source": "REVEREND WAYNE", "audio": "audio/pirate/WYN-005.wav", "durationSeconds": 36.21, "width": 10}
+  ],
   "stations": [
     {
       "id": "cybersprawl",

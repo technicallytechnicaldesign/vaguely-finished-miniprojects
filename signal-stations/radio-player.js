@@ -116,14 +116,90 @@
     }
   }
 
+  class StaticChannel {
+    constructor(ctx, dest) {
+      this.ctx = ctx;
+      this.gain = ctx.createGain();
+      this.filter = ctx.createBiquadFilter();
+      this.filter.type = 'bandpass';
+      this.filter.frequency.value = 2300;
+      this.filter.Q.value = 0.32;
+      this.gain.gain.value = 0;
+      const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let index = 0; index < samples.length; index += 1) {
+        const crackle = Math.random() < 0.002 ? (Math.random() * 2 - 1) * 2.8 : 0;
+        samples[index] = Math.max(-1, Math.min(1, Math.random() * 2 - 1 + crackle));
+      }
+      this.source = ctx.createBufferSource();
+      this.source.buffer = buffer;
+      this.source.loop = true;
+      this.source.connect(this.filter).connect(this.gain).connect(dest);
+      this.source.start();
+    }
+    setLevel(level, seconds = 0.08) {
+      const gain = this.gain.gain;
+      const now = this.ctx.currentTime;
+      gain.cancelScheduledValues(now);
+      gain.setValueAtTime(gain.value, now);
+      gain.linearRampToValueAtTime(level, now + seconds);
+    }
+  }
+
+  class PirateChannel {
+    constructor(ctx, dest) {
+      this.audio = new Audio();
+      this.audio.preload = 'auto';
+      this.audio.crossOrigin = 'anonymous';
+      this.source = ctx.createMediaElementSource(this.audio);
+      this.gain = ctx.createGain();
+      this.gain.gain.value = 0;
+      this.source.connect(this.gain).connect(dest);
+      this.finish = null;
+    }
+    stop(ctx) {
+      this.audio.onended = null;
+      this.audio.onerror = null;
+      this.audio.pause();
+      this.finish = null;
+      const now = ctx.currentTime;
+      this.gain.gain.cancelScheduledValues(now);
+      this.gain.gain.setValueAtTime(0, now);
+    }
+    async play(signal, ctx, onEnded) {
+      this.stop(ctx);
+      this.audio.src = signal.audio;
+      this.audio.currentTime = 0;
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        this.gain.gain.setValueAtTime(0, ctx.currentTime);
+        if (this.finish === finish) this.finish = null;
+        onEnded();
+      };
+      this.finish = finish;
+      this.audio.onended = finish;
+      this.audio.onerror = finish;
+      this.gain.gain.setValueAtTime(0, ctx.currentTime);
+      this.gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.12);
+      try {
+        await this.audio.play();
+      } catch (error) {
+        finish();
+      }
+    }
+  }
+
   const state = {
-    station: null, ctx: null, decks: null, jingle: null, master: null, analyser: null,
+    station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, master: null, analyser: null,
     activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
     callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1,
+    reception: 'locked', pirateSignal: null,
   };
 
   function onDeckTimeUpdate(deck) {
@@ -156,6 +232,8 @@
     const dest = state.master;
     state.decks = [new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded), new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded)];
     state.jingle = new JingleChannel(state.ctx, dest);
+    state.staticChannel = new StaticChannel(state.ctx, dest);
+    state.pirate = new PirateChannel(state.ctx, dest);
     startVisualizer();
   }
 
@@ -394,6 +472,7 @@
 
   function renderStation(station) {
     applyVisualProfile(station);
+    byId('reception-label').textContent = 'locked station';
     byId('frequency').textContent = station.frequency;
     byId('name').textContent = station.name;
     byId('tagline').textContent = station.tagline;
@@ -497,15 +576,137 @@
     return Math.round(Number.parseFloat(station.frequency) * 10);
   }
 
+  function pirateDialValue(signal) {
+    return Math.round(Number.parseFloat(signal.frequency) * 10);
+  }
+
   function formatDial(value) {
     return (Number(value) / 10).toFixed(1).padStart(5, '0');
   }
 
-  function nearestStation(value) {
-    return data.stations.reduce((nearest, station) => {
-      const distance = Math.abs(stationDialValue(station) - value);
-      return !nearest || distance < nearest.distance ? { station, distance } : nearest;
-    }, null).station;
+  function scannerEntries() {
+    const known = data.stations.map(station => ({ kind: 'station', item: station, value: stationDialValue(station), width: 8 }));
+    const pirate = (data.pirateSignals || []).map(signal => ({ kind: 'pirate', item: signal, value: pirateDialValue(signal), width: signal.width || 9 }));
+    return known.concat(pirate).sort((a, b) => a.value - b.value);
+  }
+
+  function nearestCarrier(value) {
+    return scannerEntries().reduce((nearest, entry) => {
+      const distance = Math.abs(entry.value - value);
+      return !nearest || distance < nearest.distance ? { entry, distance } : nearest;
+    }, null);
+  }
+
+  function setReception(mode) {
+    state.reception = mode;
+    document.documentElement.dataset.reception = mode;
+  }
+
+  function clearKnownPreset() {
+    document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', 'false'));
+  }
+
+  function quietProgramme() {
+    if (state.decks) state.decks.forEach(deck => deck.reset());
+    state.started = false;
+    state.plan = [];
+    state.pendingBlock = [];
+    renderQueue();
+  }
+
+  function renderDeadBand(value) {
+    const frequency = formatDial(value);
+    clearKnownPreset();
+    document.documentElement.dataset.broadcast = 'signal';
+    byId('frequency').textContent = frequency;
+    byId('reception-label').textContent = 'open spectrum';
+    byId('name').textContent = 'DEAD BAND';
+    byId('tagline').textContent = 'Unmapped spectrum. Something may be listening back.';
+    byId('world-label').textContent = 'multipath snow';
+    byId('world-tag').textContent = 'no stable reality';
+    byId('host').textContent = 'Origin: unresolved';
+    byId('line').textContent = '"No licensed source. Keep the dial moving."';
+    byId('notice').textContent = 'Static is live. Hidden carriers only lock inside a narrow frequency window.';
+    byId('track-count').textContent = 'No mapped programme at this frequency';
+    byId('mode-label').textContent = 'dead band / seeking';
+    byId('signal-lock').textContent = 'no lock';
+    byId('now-title').textContent = 'HISS / MULTIPATH';
+    byId('now-subtitle').textContent = `${frequency} SIG.FM / unlicensed spectrum`;
+    byId('break-note').textContent = 'Sweep slowly. Pirate carriers do not advertise themselves.';
+    byId('queue').innerHTML = '<li class="empty">Only static is queued here.</li>';
+    byId('play').disabled = true;
+    byId('play').textContent = 'No carrier';
+    byId('skip').disabled = true;
+  }
+
+  function pirateProfile(signal) {
+    const profiles = {
+      glossolalia: { world: 'talkback', accent: '#ff4eb8', secondary: '#ffea00', rgb: '255,78,184', label: 'language breach' },
+      machine: { world: 'cybersprawl', accent: '#56e5ff', secondary: '#ff665e', rgb: '86,229,255', label: 'machine handshake' },
+      sermon: { world: 'snowcrash', accent: '#ffd76b', secondary: '#ff4e50', rgb: '255,215,107', label: 'Pearly Gates relay' }
+    };
+    return profiles[signal.family] || profiles.glossolalia;
+  }
+
+  function renderPirate(signal) {
+    applyVisualProfile({ id: 'pirate', theme: 'unlicensed carrier', visualProfile: pirateProfile(signal) });
+    clearKnownPreset();
+    document.documentElement.dataset.broadcast = 'signal';
+    byId('reception-label').textContent = 'unstable carrier';
+    byId('frequency').textContent = signal.frequency;
+    byId('name').textContent = signal.source;
+    byId('tagline').textContent = 'Unlicensed transmission bleeding through the mapped band.';
+    byId('host').textContent = `Origin: ${signal.source}`;
+    byId('line').textContent = '"No callsign. No permission. Signal riding the gaps."';
+    byId('notice').textContent = `${signal.id} was not on the carrier map. It will vanish when the transmission ends.`;
+    byId('track-count').textContent = 'One intercepted burst, no scheduled repeat';
+    byId('mode-label').textContent = 'pirate breakthrough';
+    byId('signal-lock').textContent = 'unstable carrier';
+    byId('now-title').textContent = signal.title;
+    byId('now-subtitle').textContent = `${signal.id} / ${signal.family} intrusion`;
+    byId('break-note').textContent = 'Hold frequency. Signal integrity is collapsing.';
+    byId('queue').innerHTML = `<li><span>!</span><strong>${signal.id}</strong><small>signal ends without warning</small></li>`;
+    byId('play').disabled = true;
+    byId('play').textContent = 'Carrier seized';
+    byId('skip').disabled = true;
+  }
+
+  function enterDeadBand(value, options = {}) {
+    ensureAudioGraph();
+    state.ctx.resume().catch(() => {});
+    if (state.reception !== 'static') {
+      quietProgramme();
+      state.pirate.stop(state.ctx);
+      state.pirateSignal = null;
+    }
+    setReception('static');
+    state.staticChannel.setLevel(options.scanning ? 0.13 : 0.17);
+    document.documentElement.dataset.tuning = 'true';
+    byId('tuner-status').textContent = options.scanning ? 'seeking carrier' : 'no carrier';
+    renderDeadBand(value);
+  }
+
+  function playPirateSignal(signal, options = {}) {
+    if (!options.fromScan) stopScan(true);
+    ensureAudioGraph();
+    state.ctx.resume().catch(() => {});
+    quietProgramme();
+    state.pirateSignal = signal;
+    setReception('pirate');
+    state.staticChannel.setLevel(0.025, 0.16);
+    byId('tuner').value = pirateDialValue(signal);
+    byId('tuner-output').textContent = formatDial(pirateDialValue(signal));
+    byId('tuner-status').textContent = 'illegal carrier';
+    byId('tuner-note').textContent = `Intercepted ${signal.id} at ${signal.frequency}. Do not expect it to remain.`;
+    renderPirate(signal);
+    state.pirate.play(signal, state.ctx, () => {
+      if (state.pirateSignal !== signal) return;
+      state.pirateSignal = null;
+      const value = Number(byId('tuner').value);
+      enterDeadBand(value, { scanning: state.scanning });
+      byId('tuner-note').textContent = `${signal.id} collapsed back into static.`;
+      if (state.scanning) state.scanTimer = setTimeout(scanToNextCarrier, 700);
+    });
   }
 
   function setScannerUI(active, status) {
@@ -521,8 +722,9 @@
     if (state.scanTimer) clearTimeout(state.scanTimer);
     state.scanFrame = null;
     state.scanTimer = null;
-    setScannerUI(false, preserveDial ? 'manual seeking' : 'carrier locked');
-    if (!preserveDial && state.station) {
+    const status = state.reception === 'pirate' ? 'illegal carrier' : state.reception === 'static' ? 'dead band held' : 'carrier locked';
+    setScannerUI(false, preserveDial ? status : 'carrier locked');
+    if (!preserveDial && state.station && state.reception === 'locked') {
       const value = stationDialValue(state.station);
       byId('tuner').value = value;
       byId('tuner-output').textContent = formatDial(value);
@@ -531,15 +733,15 @@
 
   function scanToNextCarrier() {
     if (!state.scanning) return;
-    const ordered = data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b));
-    state.scanIndex = (state.scanIndex + 1) % ordered.length;
-    const targetStation = ordered[state.scanIndex];
+    const entries = scannerEntries();
     const from = Number(byId('tuner').value);
-    const to = stationDialValue(targetStation);
+    const target = entries.find(entry => entry.value > from + 1) || entries[0];
+    const to = target.value;
     const start = performance.now();
-    const duration = 1150;
+    const duration = 800 + Math.min(700, Math.abs(to - from) * 0.9);
     byId('tuner-status').textContent = 'seeking carrier';
-    byId('tuner-note').textContent = 'Scanning the mapped band. Known carriers lock automatically.';
+    byId('tuner-note').textContent = 'Scanning open spectrum. Static persists until any carrier catches.';
+    enterDeadBand(from, { scanning: true });
     const step = now => {
       if (!state.scanning) return;
       const progress = Math.min(1, (now - start) / duration);
@@ -552,9 +754,13 @@
         return;
       }
       state.scanFrame = null;
-      selectStation(targetStation.id, { fromScan: true });
+      if (target.kind === 'pirate') {
+        playPirateSignal(target.item, { fromScan: true });
+        return;
+      }
+      selectStation(target.item.id, { fromScan: true });
       byId('tuner-status').textContent = 'carrier found';
-      byId('tuner-note').textContent = `Locked ${targetStation.frequency} / ${targetStation.name}. Continuing scan.`;
+      byId('tuner-note').textContent = `Locked ${target.item.frequency} / ${target.item.name}. Continuing scan.`;
       state.scanTimer = setTimeout(scanToNextCarrier, 2200);
     };
     state.scanFrame = requestAnimationFrame(step);
@@ -562,12 +768,13 @@
 
   function toggleScan() {
     if (state.scanning) {
-      stopScan();
-      byId('tuner-note').textContent = 'Scan stopped on the current known carrier.';
+      const holdOpenBand = state.reception !== 'locked';
+      stopScan(holdOpenBand);
+      byId('tuner-note').textContent = holdOpenBand ? 'Scan stopped. Manual control is holding this frequency.' : 'Scan stopped on the current known carrier.';
       return;
     }
-    const ordered = data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b));
-    state.scanIndex = ordered.findIndex(station => station.id === state.station.id);
+    ensureAudioGraph();
+    state.ctx.resume().catch(() => {});
     setScannerUI(true, 'seeking carrier');
     scanToNextCarrier();
   }
@@ -577,6 +784,10 @@
     if (!options.fromScan) stopScan();
     ensureAudioGraph();
     const root = document.documentElement;
+    state.pirate.stop(state.ctx);
+    state.staticChannel.setLevel(0, 0.12);
+    state.pirateSignal = null;
+    setReception('locked');
     root.dataset.tuning = 'true';
     clearTimeout(state.tuneTimer);
     state.tuneTimer = setTimeout(() => { root.dataset.tuning = 'false'; }, 760);
@@ -588,8 +799,10 @@
     });
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
+    byId('notice').textContent = data.notice;
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('play').disabled = !trackCount;
+    byId('skip').disabled = false;
     byId('play').textContent = trackCount ? 'Start broadcast' : 'No tracks loaded';
   }
 
@@ -618,7 +831,8 @@
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
-    button.innerHTML = `<strong>Preset ${String(index + 1).padStart(2, '0')} / ${station.frequency}</strong><span>${station.name}</span>`;
+    button.setAttribute('aria-label', `Preset ${index + 1}: ${station.frequency} ${station.name}`);
+    button.title = `${station.frequency} / ${station.name}`;
     button.addEventListener('click', () => selectStation(station.id));
     list.append(button);
   });
@@ -627,14 +841,26 @@
   byId('scan').addEventListener('click', toggleScan);
   byId('tuner').addEventListener('input', event => {
     stopScan(true);
-    document.documentElement.dataset.tuning = 'true';
-    byId('tuner-output').textContent = formatDial(event.target.value);
-    byId('tuner-note').textContent = 'Manual sweep active. Release to lock the nearest known carrier.';
+    const value = Number(event.target.value);
+    byId('tuner-output').textContent = formatDial(value);
+    enterDeadBand(value);
+    byId('tuner-note').textContent = 'Manual sweep active. Release near a carrier to catch it.';
   });
   byId('tuner').addEventListener('change', event => {
-    const station = nearestStation(Number(event.target.value));
-    selectStation(station.id);
-    byId('tuner-note').textContent = `Nearest mapped carrier: ${station.frequency} / ${station.name}.`;
+    const value = Number(event.target.value);
+    const result = nearestCarrier(value);
+    if (result && result.distance <= result.entry.width) {
+      if (result.entry.kind === 'pirate') {
+        playPirateSignal(result.entry.item);
+        return;
+      }
+      selectStation(result.entry.item.id);
+      byId('tuner-note').textContent = `Mapped carrier locked: ${result.entry.item.frequency} / ${result.entry.item.name}.`;
+      return;
+    }
+    enterDeadBand(value);
+    byId('tuner-status').textContent = 'no carrier';
+    byId('tuner-note').textContent = `${formatDial(value)} is dead band. Scrub again or start auto scan.`;
   });
 
   byId('play').addEventListener('click', async () => {
