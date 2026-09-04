@@ -231,7 +231,7 @@
 
   const state = {
     station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, preview: null, master: null, analyser: null,
-    activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
+    activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
     callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
@@ -411,16 +411,35 @@
     }, 0);
   }
 
+  // Shuffle-bag pick, same shape as pickCallIn() below: every track in the station's pool
+  // plays exactly once before any repeat, rather than a flat random pick that can (and did,
+  // SIG-0632) leave a freshly-added track unheard for a long time by pure bad luck. Keyed by
+  // `audio` rather than `id` -- station.tracks in the public data has no id field, and audio
+  // path is the one property guaranteed unique even between same-titled takes (e.g. "Snow
+  // Crash" take1/take2).
   function chooseTrack() {
     const tracks = (state.station.tracks || []).filter(t => t.audio);
-    const alternatives = tracks.filter(t => t.title !== state.lastTrackTitle);
-    let pool = alternatives.length ? alternatives : tracks;
+    const byAudio = new Map(tracks.map(t => [t.audio, t]));
+    state.songBag = state.songBag.filter(audio => byAudio.has(audio));
+    if (!state.songBag.length) state.songBag = shuffle(tracks.map(t => t.audio));
+
+    let bagIndex;
     if (state.pendingRequestTags) {
-      const scored = pool.map(track => ({ track, score: trackRequestScore(track, state.pendingRequestTags) }));
+      // request-matching stays scoped to what's still left in the bag this cycle, so a call-in
+      // request can't replay something already heard since the last reshuffle -- ties broken
+      // randomly among the best-scoring candidates still in the bag.
+      const scored = state.songBag.map((audio, index) => ({ index, score: trackRequestScore(byAudio.get(audio), state.pendingRequestTags) }));
       const bestScore = Math.max(...scored.map(item => item.score));
-      if (bestScore > 0) pool = scored.filter(item => item.score === bestScore).map(item => item.track);
+      const best = bestScore > 0 ? scored.filter(item => item.score === bestScore) : scored;
+      bagIndex = best[Math.floor(Math.random() * best.length)].index;
+    } else {
+      // avoid an immediate title repeat right at a bag-wrap boundary (the reshuffle can otherwise
+      // land the same track that just finished as the very next pick)
+      bagIndex = state.songBag.findIndex(audio => byAudio.get(audio).title !== state.lastTrackTitle);
+      if (bagIndex < 0) bagIndex = 0;
     }
-    const track = pick(pool);
+    const [audio] = state.songBag.splice(bagIndex, 1);
+    const track = byAudio.get(audio);
     state.pendingRequestTags = null;
     state.lastTrackTitle = track.title;
     return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags, lyricsLines: track.lyricsLines };
@@ -1088,7 +1107,7 @@
     state.tuneTimer = setTimeout(() => { root.dataset.tuning = 'false'; }, 760);
     state.decks.forEach(deck => deck.reset());
     Object.assign(state, {
-      station, activeIndex: 0, lastTrackTitle: '', songsSinceBreak: 0, breakAfter: 0,
+      station, activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
       plan: [], pendingBlock: [], callBag: [], lastCallerRole: '', callCooldown: 0,
       breaksSinceCall: 0, lastBreakKind: '', pendingRequestTags: null, started: false
     });
