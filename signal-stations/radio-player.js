@@ -236,7 +236,7 @@
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
-    scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1,
+    scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1, seekFrame: null,
     reception: 'locked', pirateSignal: null, power: false,
   };
 
@@ -253,24 +253,9 @@
     if (byId('progress-fill')) byId('progress-fill').style.width = `${duration ? Math.min(100, current / duration * 100) : 0}%`;
   }
 
-  function updateLyricLine(deck) {
-    const item = deck.item;
-    if (!item || item.type !== 'song' || !item.lyricsLines || !item.lyricsLines.length) return;
-    const el = document.querySelector('#identity-visual .glitch-lyric');
-    if (!el) return;
-    const duration = deck.audio.duration || item.durationSeconds || 1;
-    const progress = duration ? Math.min(1, deck.audio.currentTime / duration) : 0;
-    const index = Math.min(item.lyricsLines.length - 1, Math.floor(progress * item.lyricsLines.length));
-    if (el.dataset.index !== String(index)) {
-      el.dataset.index = String(index);
-      el.textContent = item.lyricsLines[index];
-    }
-  }
-
   function onDeckTimeUpdate(deck) {
     if (state.decks[state.activeIndex] !== deck) return; // only the currently-active deck can trigger a transition
     renderProgress(deck);
-    updateLyricLine(deck);
     if (deck.item && deck.cutInAt != null && !deck.firedCutIn && deck.audio.currentTime >= deck.cutInAt) {
       deck.firedCutIn = true;
       startCrossfade(deck, 1 - state.activeIndex);
@@ -539,14 +524,27 @@
       return;
     }
     if (mode.id === 'song') {
-      const bars = Array.from({ length: 22 }, () => `<i style="--h:${(0.2 + Math.random() * 0.8).toFixed(2)}"></i>`).join('');
-      // Suno embeds real lyrics on every SNOW CRASH track (an ID3 lyrics-eng tag,
-      // extracted by extract_lyrics.py) -- shown here paced against playback progress
-      // via updateLyricLine(), not word-accurate synced (no per-line timestamps exist),
-      // just an even spread across the track's own duration. Falls back to the title
-      // for tracks/stations that don't carry lyricsLines.
-      const firstLine = item && item.lyricsLines && item.lyricsLines.length ? item.lyricsLines[0] : (item ? item.title : '');
-      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz">${bars}</div><p class="glitch-lyric" data-index="0">${firstLine}</p></div>`;
+      // No per-line timestamps exist for Suno's lyrics-eng tag, so a synced single line was
+      // always going to drift out of time with the actual vocal -- per the maker's own call,
+      // this is a style treatment now, not a reader: a full-bleed mirrored equalizer with a
+      // scattered field of ~20 real lyric lines from the track (sampled once per track, not
+      // re-picked mid-song) at varied size/rotation/opacity, some carrying the ad panel's own
+      // glitch treatment for texture. Falls back to just the title for tracks with no lyrics.
+      const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
+      const lines = item && item.lyricsLines && item.lyricsLines.length ? item.lyricsLines : (item ? [item.title] : []);
+      const sliceStart = lines.length > 20 ? Math.floor(Math.random() * (lines.length - 20)) : 0;
+      const sample = lines.slice(sliceStart, sliceStart + 20);
+      const field = sample.map((line, i) => {
+        const size = (10 + Math.random() * 20).toFixed(0);
+        const top = (Math.random() * 86).toFixed(1);
+        const left = (Math.random() * 65).toFixed(1);
+        const rot = (Math.random() * 10 - 5).toFixed(1);
+        const opacity = (0.28 + Math.random() * 0.5).toFixed(2);
+        const accent = i % 2 === 0 ? 'lyric-word-a' : 'lyric-word-b';
+        const glitch = i % 3 === 0 ? ' glitch-word' : '';
+        return `<span class="lyric-word ${accent}${glitch}" style="font-size:${size}px;top:${top}%;left:${left}%;transform:rotate(${rot}deg);opacity:${opacity}">${line}</span>`;
+      }).join('');
+      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="glitch-lyric-field">${field}</div></div>`;
       return;
     }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
@@ -888,7 +886,7 @@
     state.scanning = active;
     document.documentElement.dataset.scanning = String(active);
     byId('scan').setAttribute('aria-pressed', String(active));
-    byId('scan').textContent = active ? 'Stop scan' : 'Auto scan';
+    byId('scan').textContent = active ? 'Stop' : 'Scan';
     byId('tuner-status').textContent = status || (active ? 'seeking carrier' : 'carrier locked');
   }
 
@@ -937,6 +935,49 @@
       state.scanTimer = setTimeout(scanToNextCarrier, 2200);
     };
     state.scanFrame = requestAnimationFrame(step);
+  }
+
+  // A single-step version of the scan sweep: jump straight to the next (or previous)
+  // active carrier -- known station or pirate alike -- instead of continuously sweeping.
+  // Reuses the same eased tween and landing logic as scanToNextCarrier, just once, in
+  // either direction, and doesn't chain into another jump on arrival.
+  function seekStep(direction) {
+    stopScan(true);
+    if (state.seekFrame) { cancelAnimationFrame(state.seekFrame); state.seekFrame = null; }
+    ensureAudioGraph();
+    state.ctx.resume().catch(() => {});
+    const entries = scannerEntries();
+    if (!entries.length) return;
+    const from = Number(byId('tuner').value);
+    const target = direction > 0
+      ? entries.find(entry => entry.value > from + 1) || entries[0]
+      : [...entries].reverse().find(entry => entry.value < from - 1) || entries[entries.length - 1];
+    const to = target.value;
+    const start = performance.now();
+    const duration = 450 + Math.min(500, Math.abs(to - from) * 0.6);
+    byId('tuner-status').textContent = 'seeking carrier';
+    byId('tuner-note').textContent = direction > 0 ? 'Jumping to the next active carrier.' : 'Jumping to the previous active carrier.';
+    enterDeadBand(from, { scanning: true });
+    const step = now => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(from + (to - from) * eased);
+      setDialValue(value);
+      applyTuningAudio(value, { scanning: true });
+      if (progress < 1) {
+        state.seekFrame = requestAnimationFrame(step);
+        return;
+      }
+      state.seekFrame = null;
+      if (target.kind === 'pirate') {
+        playPirateSignal(target.item, { fromScan: true });
+        return;
+      }
+      selectStation(target.item.id, { fromScan: true });
+      byId('tuner-status').textContent = 'carrier found';
+      byId('tuner-note').textContent = `Locked ${target.item.frequency} / ${target.item.name}.`;
+    };
+    state.seekFrame = requestAnimationFrame(step);
   }
 
   function toggleScan() {
@@ -1076,6 +1117,8 @@
   });
 
   byId('power').addEventListener('click', () => { setPower(!state.power); });
+  byId('seek-back').addEventListener('click', () => seekStep(-1));
+  byId('seek-forward').addEventListener('click', () => seekStep(1));
   byId('skip').addEventListener('click', () => {
     if (!state.power || !state.started) return;
     const active = state.decks[state.activeIndex];
