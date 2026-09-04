@@ -230,7 +230,7 @@
       id: liner.id,
       type: liner.kind || 'host liner',
       title: isCallIn(liner.kind) ? callTitle : liner.kind || 'Host',
-      subtitle: liner.copy,
+      subtitle: isCallIn(liner.kind) && liner.callerRole ? `${liner.callerRole} / ${liner.copy}` : liner.copy,
       audio: liner.audio,
       durationSeconds: liner.durationSeconds,
       callerRole: liner.callerRole,
@@ -533,6 +533,7 @@
   data.stations.forEach(station => {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
+    button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
     button.innerHTML = `<strong>${station.frequency} · ${station.name}</strong><span>${station.theme}</span>`;
     button.addEventListener('click', () => selectStation(station.id));
     list.append(button);
