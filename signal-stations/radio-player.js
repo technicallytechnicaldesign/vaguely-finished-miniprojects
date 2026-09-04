@@ -255,32 +255,41 @@
 
   // One floating lyric word. Picks one of four looping animation variants -- drift (fade,
   // gentle wander, loops), fly (crosses the whole panel edge to edge), bg (huge, low-opacity,
-  // sits behind the others), pulse (holds position, breathes in and out) -- so a crowded
-  // screen of them reads as chaotic rather than one uniform effect repeated. Loops
+  // sits behind the others), pulse (holds position, breathes in and out) -- plus one of five
+  // fonts and a wide size range, so a crowded screen of them reads as loud and chaotic rather
+  // than one uniform effect repeated. "Glitch" words don't get a second animation layered on
+  // (that would fight the variant's own opacity/transform, see the fourth-round log entry) --
+  // instead they keep the same animation but play it in visible discrete jumps via
+  // `animation-timing-function: steps(...)` instead of a smooth easing curve, which reads as a
+  // stutter/flicker with zero property conflicts, on top of the RGB-split text-shadow. Loops
   // continuously once alive; it doesn't self-expire, it waits to be evicted by
   // evictLyricWord() when the rolling pool is full. Returns the element so the caller can
   // track it in the pool.
   const LYRIC_VARIANTS = ['v-drift', 'v-drift', 'v-fly', 'v-pulse', 'v-bg'];
+  const LYRIC_FONTS = ['var(--font-head)', 'var(--font-lyric-a)', 'var(--font-lyric-b)', 'var(--font-lyric-c)', 'var(--font-lyric-d)'];
   function spawnLyricWord(container, text) {
     if (!container || !text) return null;
     const span = document.createElement('span');
     const variant = LYRIC_VARIANTS[Math.floor(Math.random() * LYRIC_VARIANTS.length)];
     const isBg = variant === 'v-bg';
     const isFly = variant === 'v-fly';
-    const size = isBg ? 58 + Math.random() * 68 : 9 + Math.random() * 34;
+    const isGlitch = Math.random() < 0.38;
+    const size = isBg ? 50 + Math.random() * 100 : 8 + Math.random() * 46;
+    const font = LYRIC_FONTS[Math.floor(Math.random() * LYRIC_FONTS.length)];
     const top = Math.random() * 84;
     const left = isFly ? 0 : Math.random() * 62;
-    const rot = (Math.random() * 14 - 7).toFixed(1);
-    const dx = (Math.random() * 60 - 30).toFixed(0);
-    const dy = (Math.random() * 60 - 30).toFixed(0);
+    const rot = (Math.random() * 18 - 9).toFixed(1);
+    const dx = (Math.random() * 70 - 35).toFixed(0);
+    const dy = (Math.random() * 70 - 35).toFixed(0);
     const flyFrom = Math.random() < 0.5 ? '-20%' : '118%';
     const flyTo = flyFrom === '-20%' ? '118%' : '-20%';
     const dur = (isFly ? 3.5 + Math.random() * 2.5 : isBg ? 8 + Math.random() * 6 : 5 + Math.random() * 4).toFixed(2);
     const delay = (Math.random() * 1.4).toFixed(2);
+    const timing = isGlitch ? `steps(${4 + Math.floor(Math.random() * 6)},jump-end)` : (isFly ? 'linear' : 'ease-in-out');
     const accent = Math.random() < 0.5 ? 'lyric-word-a' : 'lyric-word-b';
-    span.className = `lyric-word ${variant} ${accent}${Math.random() < 0.28 ? ' glitch-word' : ''}`;
+    span.className = `lyric-word ${variant} ${accent}${isGlitch ? ' glitch-word' : ''}`;
     span.textContent = text;
-    span.style.cssText = `font-size:${size.toFixed(0)}px;top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--fly-from:${flyFrom};--fly-to:${flyTo};animation-duration:${dur}s;animation-delay:${delay}s`;
+    span.style.cssText = `font-size:${size.toFixed(0)}px;font-family:${font};top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--fly-from:${flyFrom};--fly-to:${flyTo};animation-duration:${dur}s;animation-delay:${delay}s;animation-timing-function:${timing}`;
     container.appendChild(span);
     return span;
   }
@@ -603,7 +612,7 @@
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
       el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
       const lines = (item && item.lyricsLines) || [];
-      const poolSize = 10 + Math.floor(Math.random() * 8); // 10-17, "10-20 lines" per the ask
+      const poolSize = 13 + Math.floor(Math.random() * 9); // 13-21, leaning toward the loud end
       const ticker = { item, lastIndex: -1, poolSize, pool: [] };
       state.lyricTicker = ticker;
       const field = byId('glitch-lyric-field');
