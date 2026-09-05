@@ -1352,6 +1352,13 @@
     list.append(button);
   });
   buildDialFace();
+  updateReadoutArch();
+  let readoutArchResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(readoutArchResizeTimer);
+    readoutArchResizeTimer = setTimeout(updateReadoutArch, 120);
+  });
+  window.addEventListener('load', updateReadoutArch); // catches any late webfont reflow
   pushSystemNotice(data.notice);
   runNetworkFeed();
 
