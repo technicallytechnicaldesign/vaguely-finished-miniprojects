@@ -1365,6 +1365,9 @@
     button.addEventListener('click', () => selectStation(station.id));
     list.append(button);
   });
+  // computed, not hand-typed -- this footer count went stale once already (read "four" after
+  // a fifth station shipped) since it used to be plain text in index.html
+  if (byId('mapped-station-count')) byId('mapped-station-count').textContent = data.stations.length;
   buildDialFace();
   updateReadoutArch();
   let readoutArchResizeTimer = null;
