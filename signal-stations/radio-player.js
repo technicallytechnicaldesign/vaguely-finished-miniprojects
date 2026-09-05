@@ -5,7 +5,7 @@
   // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
   // overlap, not an outro guess (that's for actual songs, which have real musical structure).
   const isCallIn = type => type === 'caller talk-back';
-  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro' || isCallIn(type);
+  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro' || type === 'station ID' || isCallIn(type);
   const AD_BLOCK_KINDS = new Set(['ad block intro', 'ad block outro']);
 
   // --- crossfade/timing tuning -------------------------------------------------
@@ -237,7 +237,7 @@
     station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, preview: null, master: null, analyser: null,
     activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
     callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
-    lastBreakKind: '', pendingRequestTags: null, pendingBlock: [],
+    lastBreakKind: '', pendingRequestTags: null, pendingBlock: [], itemsSinceJingle: 0,
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1, seekFrame: null,
@@ -455,6 +455,24 @@
     const pool = (state.station.interludes || []).filter(x => x.audio && !isCallIn(x.kind) && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind));
     if (!pool.length) return null;
     return toPlanItem(pick(pool));
+  }
+
+  // Standalone station-ID jingles (station.stationJingles) are deliberately outside
+  // breakRouting entirely -- the maker's ask (2026-09-05) was for one to land between songs
+  // "regardless of the other planned rotation settings," not compete for a break slot inside
+  // the host/call-in/ad-block weighting. So this is its own independent per-item coin flip,
+  // checked before any of that logic runs, with a minimum item gap so it can't fire twice in
+  // quick succession. More variants are planned (SIG note); pick() already spreads across
+  // however many stationJingles a station ends up with.
+  function maybeStationJingle() {
+    const jingles = (state.station.stationJingles || []).filter(x => x.audio);
+    if (!jingles.length) return null;
+    const minGap = state.station.stationJingleMinGap == null ? 3 : state.station.stationJingleMinGap;
+    if (state.itemsSinceJingle < minGap) return null;
+    const chance = state.station.stationJingleChance == null ? 0.12 : state.station.stationJingleChance;
+    if (Math.random() > chance) return null;
+    state.itemsSinceJingle = 0;
+    return toPlanItem(pick(jingles));
   }
 
   function toPlanItem(liner) {
@@ -687,6 +705,9 @@
   function decideNext() {
     if (!(state.station.tracks || []).some(t => t.audio)) return null;
     if (state.pendingBlock && state.pendingBlock.length) return state.pendingBlock.shift();
+    state.itemsSinceJingle += 1;
+    const jingle = maybeStationJingle();
+    if (jingle) return jingle;
     if (!state.breakAfter) state.breakAfter = rollRunLength();
     state.songsSinceBreak += 1;
     if (state.songsSinceBreak > state.breakAfter) {
@@ -759,6 +780,7 @@
     if (item.type === 'sponsored notice' || AD_BLOCK_KINDS.has(item.type)) return { id: 'ad', label: 'commercial incursion' };
     if (item.type === 'street report') return { id: 'report', label: 'field report' };
     if (item.type === 'host liner' || item.type === 'host bridge') return { id: 'host', label: 'host transmission' };
+    if (item.type === 'station ID') return { id: 'host', label: 'station identification' };
     if (item.type === 'song') return { id: 'song', label: 'music carrier' };
     return { id: 'signal', label: 'signal fragment' };
   }
@@ -855,6 +877,7 @@
       if (next.type === 'ad block outro') return 'Ad block over.';
       if (next.type === 'sponsored notice') return 'Sponsored transmission.';
       if (isCallIn(next.type)) return 'Open line to the Street.';
+      if (next.type === 'station ID') return 'Station identification.';
       if (isHostLine) return 'On the air, live.';
       return 'Song plays out, host cuts in on the tail.';
     };
@@ -923,6 +946,29 @@
       const color = (station.visualProfile && station.visualProfile.accent) || '#56e5ff';
       return `<circle class="dial-carrier" style="--dot:${color}" cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="4.5"></circle>`;
     }).join('');
+  }
+
+  // --- readout arch: a real semicircle concentric with the dial (same center 320,250,
+  // radius scaled down to 150), running to its own natural spring point (baseline y=250,
+  // same as the dial's own arc) and then straight down to wherever the identity panel's
+  // top edge actually is. That target can't be a fixed viewBox constant: the preset
+  // buttons sitting between the dial and the panel are fixed-px, not proportional to the
+  // dial's own viewBox scaling, so the right bottom-Y shifts with viewport width. Measured
+  // live off the real DOM instead, and recomputed on resize.
+  const READOUT_ARCH_R = 150;
+  function updateReadoutArch() {
+    const svg = byId('dial-svg');
+    const arch = byId('dial-readout-arch');
+    const panel = document.querySelector('.identity-panel');
+    if (!svg || !arch || !panel) return;
+    const svgRect = svg.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    if (!svgRect.width) return;
+    const scale = svgRect.width / 640; // SVG viewBox is 640 wide
+    const left = DIAL_CX - READOUT_ARCH_R;
+    const right = DIAL_CX + READOUT_ARCH_R;
+    const bottomY = Math.max(DIAL_CY + 4, (panelRect.top - svgRect.top) / scale);
+    arch.setAttribute('d', `M ${left} ${DIAL_CY} A ${READOUT_ARCH_R} ${READOUT_ARCH_R} 0 0 1 ${right} ${DIAL_CY} L ${right.toFixed(1)} ${bottomY.toFixed(1)} L ${left.toFixed(1)} ${bottomY.toFixed(1)} Z`);
   }
 
   // --- proximity tuning -----------------------------------------------------------
@@ -1228,7 +1274,7 @@
     Object.assign(state, {
       station, activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
       plan: [], pendingBlock: [], callBag: [], lastCallerRole: '', callCooldown: 0,
-      breaksSinceCall: 0, lastBreakKind: '', pendingRequestTags: null, started: false
+      breaksSinceCall: 0, lastBreakKind: '', pendingRequestTags: null, itemsSinceJingle: 0, started: false
     });
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
