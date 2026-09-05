@@ -916,9 +916,19 @@
     needle.setAttribute('transform', `rotate(${(90 - angleForValue(value)).toFixed(2)} ${DIAL_CX} ${DIAL_CY})`);
   }
 
+  // Two places write the frequency readout (the locked-value setDialValue path, and the
+  // manual tuner's own 'input' listener below) -- both need to land in both the <output>
+  // (a11y link for the <input for="tuner">) and its visible curved-SVG counterpart, so
+  // this is the one place that does both instead of duplicating it at each call site.
+  function setReadoutNumber(value) {
+    const formatted = formatDial(value);
+    byId('tuner-output').textContent = formatted;
+    if (byId('dial-number-svg-text')) byId('dial-number-svg-text').textContent = formatted;
+  }
+
   function setDialValue(value) {
     byId('tuner').value = value;
-    byId('tuner-output').textContent = formatDial(value);
+    setReadoutNumber(value);
     updateDialNeedle(value);
   }
 
@@ -969,16 +979,10 @@
     const right = DIAL_CX + READOUT_ARCH_R;
     const bottomY = Math.max(DIAL_CY + 4, (panelRect.top - svgRect.top) / scale);
     arch.setAttribute('d', `M ${left} ${DIAL_CY} A ${READOUT_ARCH_R} ${READOUT_ARCH_R} 0 0 1 ${right} ${DIAL_CY} L ${right.toFixed(1)} ${bottomY.toFixed(1)} L ${left.toFixed(1)} ${bottomY.toFixed(1)} Z`);
-    // Tie the readout text size to the SAME measured scale as the arch itself, instead of
-    // a separate vw-based clamp -- the arch's width follows the dial-stage's capped,
-    // non-linear width (min(100%,960px), and 0-padding below 780px), which is not what vw
-    // tracks, so a vw clamp drifts out of sync and the number/unit overflow the arch at
-    // some widths (seen on mobile: '1' and 'MHz' spilling past the border). 66.7px and
-    // 10.7px are the base sizes at scale 1 (matching the old clamp's ~100px/16px ceiling
-    // at the ~1.5 scale a full-width desktop dial renders at).
-    const root = document.documentElement;
-    root.style.setProperty('--readout-number-size', `${Math.min(100, Math.max(24, scale * 66.7)).toFixed(1)}px`);
-    root.style.setProperty('--readout-unit-size', `${Math.min(16, Math.max(9, scale * 10.7)).toFixed(1)}px`);
+    // The readout number/unit used to need a matching JS-computed font size here (they
+    // were HTML, sized in vw units that drift out of sync with the arch's own viewBox-
+    // based scaling). Now that they're curved SVG text living in the same viewBox as the
+    // arch, they scale by the same viewBox-to-pixel ratio automatically -- nothing to do.
   }
 
   // --- proximity tuning -----------------------------------------------------------
@@ -1376,7 +1380,7 @@
   byId('tuner').addEventListener('input', event => {
     stopScan(true);
     const value = Number(event.target.value);
-    byId('tuner-output').textContent = formatDial(value);
+    setReadoutNumber(value);
     updateDialNeedle(value);
     enterDeadBand(value);
     previewMappedStation(value);
