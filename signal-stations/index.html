@@ -59,7 +59,6 @@
     .dial-control .dc-label{position:relative;z-index:1;pointer-events:none}
     .dial-control .dc-ring{position:absolute;inset:-6px;z-index:0;border-radius:50%;border:1px dashed var(--grid);pointer-events:none;transition:border-color .3s ease,border-style .3s ease}
     .dial-control .dc-sweep{position:absolute;inset:0;z-index:0;border-radius:50%;opacity:0;pointer-events:none;background:conic-gradient(from 0deg,rgba(var(--station-rgb),.6),transparent 24%);transition:opacity .2s ease}
-    .dial-control:active{transform:translateY(-50%) scale(.94)}
     .power[data-on="true"]{animation:control-pulse 2.6s ease-in-out infinite}
     .power[data-on="true"] .dc-ring{border-style:solid;border-color:rgba(var(--station-rgb),.65);animation:dc-spin 7s linear infinite}
     .scan[aria-pressed="true"]{animation:control-pulse 1.3s ease-in-out infinite}
@@ -78,6 +77,21 @@
     .dial-readout{top:74%;background:none;border:0;box-shadow:none;backdrop-filter:none;clip-path:none;padding:0}
     .dial-readout:after{content:none}
     .dial-readout-arch{fill:rgba(6,8,10,.88);stroke:rgba(var(--station-rgb),.16);stroke-width:1.5;filter:drop-shadow(0 0 20px rgba(var(--station-rgb),.45)) drop-shadow(0 0 40px rgba(var(--station-rgb),.28))}
+    /* Number/unit size is set by updateReadoutArch() (radio-player.js) from the arch's
+       actual measured width, not raw vw units -- vw and the arch's own viewBox-based
+       width follow different scaling laws (the arch tracks the dial's capped, non-linear
+       width; vw doesn't), so a fixed vw clamp drifts out of sync and the text overflows
+       the arch at some widths (seen on mobile: '1' and 'MHz' spilling past the border). */
+    .dial-number{font-size:var(--readout-number-size,clamp(52px,10vw,100px))}
+    .dial-unit{font-size:var(--readout-unit-size,16px)}
+    /* --- mobile-scroll layer fix: .dial-control mixes backdrop-filter with a continuous
+       animation (control-pulse/dc-spin) and no compositor-layer hint -- a known trigger
+       for Android Chrome to evict the layer on scroll and leave it unpainted until forced
+       to repaint. Forcing its own stable layer should stop that; not reproducible in this
+       desktop-Chromium pane, so unverified until confirmed on a real phone. --- */
+    .dial-control{transform:translateY(-50%) translateZ(0);will-change:transform;backface-visibility:hidden}
+    .dial-control:active{transform:translateY(-50%) translateZ(0) scale(.94)}
+    .dial-control .dc-ring,.dial-control .dc-sweep{will-change:transform}
   </style>
 </head>
 <body>
@@ -90,6 +104,6 @@
     <footer class="footer"><p>Unlicensed spectrum / four mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=20260905-netfeed"></script>
-  <script src="radio-player.js?v=20260905-vapor-hud-5"></script>
+  <script src="radio-player.js?v=20260905-vapor-hud-6"></script>
 </body>
 </html>
