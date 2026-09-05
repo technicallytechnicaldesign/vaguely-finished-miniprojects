@@ -20,7 +20,11 @@
   const SONG_DUCK_LEVEL = 0.18;   // background level the song bleeds under the host at
   const SONG_FULL_FADE_S = 1.8;   // after the duck, how long until the song is fully silent
   const FADE_S = 2.2;             // symmetric crossfade duration for entering a song (liner/song -> song)
-  const LINER_OVERLAP_S = 1.6;    // how much of a liner's tail overlaps whatever comes next
+  // Kept short on purpose (was 1.6s -- SIG feedback 2026-09-05: the host was getting
+  // drowned out because the incoming song/ad had already climbed most of the way to full
+  // volume before the host actually finished the sentence). This still overlaps enough to
+  // avoid a hard silence, but the host's tail is essentially clear before anything rises.
+  const LINER_OVERLAP_S = 0.5;    // how much of a liner's tail overlaps whatever comes next
   const CALL_POST_GAP_MS = 300;   // let the mixed disconnect land before the requested song starts
 
   function pickCutInSeconds(track) {
@@ -476,6 +480,103 @@
     return shuffled;
   }
 
+  // --- network notice console ---------------------------------------------------
+  // The "Network notice" panel reads as a live channel log: a rolling loop of scripted
+  // scenes (data.networkFeed -- listener chat, simulated scrape/telemetry output, and the
+  // station's own security-daemon interruptions) plus real functional notices (station
+  // lock, dead band, pirate carrier) pushed in as distinct [SIGNAL] lines. Chat and exec/
+  // daemon lines both build up character-by-character (a chat line just reads fast, since
+  // real clients don't type letter by letter); [SIGNAL] lines land instantly since they
+  // carry actual state and shouldn't get stuck behind a typing crawl. Placeholder content
+  // in stations.data.js is intentionally Snow-Crash-heavy for now -- flagged to workshop
+  // further once the shape of the thing is agreed on.
+  const CONSOLE_MAX_LINES = 40;
+  const CONSOLE_TYPE_MS = 16;        // per-character delay for exec/daemon lines
+  const CONSOLE_CHAT_MS = 4;         // per-character delay for listener chat lines
+  const CONSOLE_LINE_GAP_MS = 550;   // default pause after a line finishes, before the next
+  const CONSOLE_SCENE_GAP_MS = 3200; // pause between scenes
+
+  function consoleLog() { return byId('notice-log'); }
+
+  function scrollConsole() {
+    const body = consoleLog();
+    if (body) body.scrollTop = body.scrollHeight;
+  }
+
+  function appendConsoleLine(role) {
+    const body = consoleLog();
+    if (!body) return null;
+    const el = document.createElement('div');
+    el.className = `console-line ${role}`;
+    body.appendChild(el);
+    while (body.children.length > CONSOLE_MAX_LINES) body.removeChild(body.firstChild);
+    return el;
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function typeInto(el, text, perCharMs) {
+    const cursor = document.createElement('span');
+    cursor.className = 'console-cursor';
+    el.appendChild(cursor);
+    for (let index = 0; index < text.length; index += 1) {
+      cursor.insertAdjacentText('beforebegin', text[index]);
+      scrollConsole();
+      if (perCharMs) await wait(perCharMs);
+    }
+    cursor.remove();
+  }
+
+  function flashConsole() {
+    const el = byId('notice');
+    if (!el) return;
+    el.classList.remove('alert');
+    void el.offsetWidth; // restart the CSS animation on repeated daemon lines
+    el.classList.add('alert');
+  }
+
+  // Real station/tuning state -- always lands immediately, ahead of or alongside whatever
+  // the scripted feed is mid-typing, so functional info is never stuck behind a crawl.
+  function pushSystemNotice(text) {
+    const el = appendConsoleLine('signal');
+    if (!el) return;
+    el.textContent = text;
+    scrollConsole();
+  }
+
+  async function playFeedLine(line) {
+    const el = appendConsoleLine(line.role);
+    if (!el) return;
+    if (line.who) {
+      const who = document.createElement('span');
+      who.className = 'who';
+      who.textContent = `[${line.who}]: `;
+      el.appendChild(who);
+    }
+    await typeInto(el, line.text, line.role === 'listener' ? CONSOLE_CHAT_MS : CONSOLE_TYPE_MS);
+    if (line.role === 'daemon') flashConsole();
+    scrollConsole();
+  }
+
+  async function runNetworkFeed() {
+    const scenes = (data.networkFeed || []).filter(scene => scene && scene.length);
+    if (!scenes.length) return;
+    let order = shuffle(scenes);
+    let cursor = 0;
+    for (;;) {
+      if (cursor >= order.length) { order = shuffle(scenes); cursor = 0; }
+      const scene = order[cursor];
+      cursor += 1;
+      for (const line of scene) {
+        await playFeedLine(line);
+        await wait(line.holdMs || CONSOLE_LINE_GAP_MS);
+      }
+      await wait(CONSOLE_SCENE_GAP_MS);
+    }
+  }
+
   function availableCallIns() {
     const configured = state.station.breakRouting && state.station.breakRouting.callRotations;
     const allowedRotations = new Set(configured || ['live', 'audition']);
@@ -918,7 +1019,7 @@
     byId('world-label').textContent = 'multipath snow';
     byId('host').textContent = 'Origin: unresolved';
     byId('line').textContent = '"No licensed source. Keep the dial moving."';
-    byId('notice').textContent = 'Static is live. Hidden carriers only lock inside a narrow frequency window.';
+    pushSystemNotice('Static is live. Hidden carriers only lock inside a narrow frequency window.');
     byId('track-count').textContent = 'No mapped programme at this frequency';
     byId('mode-label').textContent = 'dead band / seeking';
     byId('signal-lock').textContent = 'no lock';
@@ -948,7 +1049,7 @@
     byId('dial-station').textContent = signal.source;
     byId('host').textContent = `Origin: ${signal.source}`;
     byId('line').textContent = '"No callsign. No permission. Signal riding the gaps."';
-    byId('notice').textContent = `${signal.id} was not on the carrier map. It will vanish when the transmission ends.`;
+    pushSystemNotice(`${signal.id} was not on the carrier map. It will vanish when the transmission ends.`);
     byId('track-count').textContent = 'One intercepted burst, no scheduled repeat';
     byId('mode-label').textContent = 'pirate breakthrough';
     byId('signal-lock').textContent = 'unstable carrier';
@@ -1003,7 +1104,7 @@
     state.scanning = active;
     document.documentElement.dataset.scanning = String(active);
     byId('scan').setAttribute('aria-pressed', String(active));
-    byId('scan').textContent = active ? 'Stop' : 'Scan';
+    byId('scan-label').textContent = active ? 'Stop' : 'Scan';
     byId('tuner-status').textContent = status || (active ? 'seeking carrier' : 'carrier locked');
   }
 
@@ -1131,7 +1232,7 @@
     });
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
-    byId('notice').textContent = data.notice;
+    pushSystemNotice(data.notice);
     byId('skip').disabled = false;
     if (state.power) startBroadcast();
   }
@@ -1164,7 +1265,7 @@
     document.documentElement.dataset.power = on ? 'on' : 'off';
     byId('power').dataset.on = String(on);
     byId('power').setAttribute('aria-pressed', String(on));
-    byId('power').textContent = on ? 'ON AIR' : 'OFF AIR';
+    byId('power-label').textContent = on ? 'ON AIR' : 'OFF AIR';
     if (!on) {
       stopScan();
       if (state.staticChannel) state.staticChannel.setLevel(0, 0.1);
@@ -1205,7 +1306,8 @@
     list.append(button);
   });
   buildDialFace();
-  byId('notice').textContent = data.notice;
+  pushSystemNotice(data.notice);
+  runNetworkFeed();
 
   byId('scan').addEventListener('click', toggleScan);
   byId('tuner').addEventListener('input', event => {

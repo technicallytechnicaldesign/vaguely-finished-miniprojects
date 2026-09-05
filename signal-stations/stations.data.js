@@ -18,6 +18,39 @@ const callInTestLiners = [
 
 window.SIGNAL_STATIONS = {
   "notice": "SNOW CRASH RADIO is live: sushiK, 20 songs, Street reports, ad blocks, and ten open-line callers now share one weighted broadcast flow.",
+  "networkFeed": [
+    [
+      { "role": "listener", "who": "RAFTER88927", "text": "Raaaaaaaaaven" },
+      { "role": "listener", "who": "GARGOYLE1337", "text": "RECORDING ONLINE" },
+      { "role": "exec", "text": "gargoyle.capture --target=SIGNAL_RADIO --mode=full_scrape", "holdMs": 700 },
+      { "role": "exec", "text": "uplinking gogglecam feed to the Library... 43%", "holdMs": 500 },
+      { "role": "exec", "text": "uplinking gogglecam feed to the Library... 91%", "holdMs": 900 },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "!!!!!!!!! AUTOMATED REMINDER: FULL-CHANNEL SCRAPING IS IN VIOLATION OF THIS CHANNEL'S DATA PROTOCOLS !!!!!!!!!", "holdMs": 2600 }
+    ],
+    [
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "THIS TRANSMISSION IS PROTECTED UNDER UNLICENSED SPECTRUM PROTOCOL 7. DO NOT FEED THE FRANCHISE.", "holdMs": 1800 },
+      { "role": "listener", "who": "HIRO_P", "text": "anyone else's avatar katana glitching on this carrier" },
+      { "role": "listener", "who": "YT_URSULA", "text": "mine keeps drawing Reason by itself again lol" },
+      { "role": "exec", "text": "nam-shub.filter --payload=incoming --scan=linguistic_virus", "holdMs": 500 },
+      { "role": "exec", "text": "scan complete: 0 infected packets", "holdMs": 1200 }
+    ],
+    [
+      { "role": "listener", "who": "DELIVERATOR_23", "text": "29:58 and counting, Uncle Enzo is watching" },
+      { "role": "listener", "who": "BURBCLAVE_9", "text": "can the host play something that isn't getting repossessed by CIC" },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "REMINDER: ALL SONG REQUESTS ROUTE THROUGH THE LIBRARIAN. DIRECT UPLINKS WILL BE SEVERED.", "holdMs": 2200 }
+    ],
+    [
+      { "role": "listener", "who": "L33T_ENKI", "text": "the kourier just clipped a burbclave gate doing like 120" },
+      { "role": "exec", "text": "street.telemetry --lane=skateboard --unit=kourier07", "holdMs": 500 },
+      { "role": "exec", "text": "harpoon_lock: TRUE", "holdMs": 1000 },
+      { "role": "listener", "who": "RAFTER88927", "text": "someone tell dispatch he still owes me a smiley" }
+    ],
+    [
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "THIS CHANNEL DOES NOT STORE, INDEX, OR RESELL LISTENER VOICE DATA. GARGOYLES ARE NOT US.", "holdMs": 2000 },
+      { "role": "listener", "who": "GARGOYLE1337", "text": "worth a shot" },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "SECOND WARNING, GARGOYLE1337. ONE MORE AND YOUR UPLINK GETS NULL-ROUTED.", "holdMs": 2400 }
+    ]
+  ],
   "defaultStation": "snowcrash",
   "pirateSignals": [
     {"id": "GLS-001", "family": "glossolalia", "frequency": "07.3", "title": "Dial Static Prelude", "source": "UNKNOWN TONGUE", "audio": "audio/pirate/GLS-001.wav", "durationSeconds": 18.30, "width": 9},
