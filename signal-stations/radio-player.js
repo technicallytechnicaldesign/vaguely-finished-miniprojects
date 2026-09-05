@@ -1230,8 +1230,11 @@
       return;
     }
     enterDeadBand(value);
-    byId('tuner-status').textContent = 'no carrier';
-    byId('tuner-note').textContent = `${formatDial(value)} is dead band. Scrub again or start auto scan.`;
+    const preview = previewMappedStation(value);
+    byId('tuner-status').textContent = preview ? 'mapped carrier nearby' : 'no carrier';
+    byId('tuner-note').textContent = preview
+      ? `${preview.name} is bleeding through. Fine-tune the dial to lock it.`
+      : `${formatDial(value)} is dead band. Scrub again or start auto scan.`;
   });
 
   byId('power').addEventListener('click', () => { setPower(!state.power); });
