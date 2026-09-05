@@ -491,10 +491,10 @@
   // in stations.data.js is intentionally Snow-Crash-heavy for now -- flagged to workshop
   // further once the shape of the thing is agreed on.
   const CONSOLE_MAX_LINES = 40;
-  const CONSOLE_TYPE_MS = 16;        // per-character delay for exec/daemon lines
-  const CONSOLE_CHAT_MS = 4;         // per-character delay for listener chat lines
-  const CONSOLE_LINE_GAP_MS = 550;   // default pause after a line finishes, before the next
-  const CONSOLE_SCENE_GAP_MS = 3200; // pause between scenes
+  const CONSOLE_TYPE_MS = 30;        // per-character delay for exec/daemon lines
+  const CONSOLE_CHAT_MS = 10;        // per-character delay for listener chat lines
+  const CONSOLE_LINE_GAP_MS = 900;   // default pause after a line finishes, before the next
+  const CONSOLE_SCENE_GAP_MS = 4200; // pause between scenes
 
   function consoleLog() { return byId('notice-log'); }
 
