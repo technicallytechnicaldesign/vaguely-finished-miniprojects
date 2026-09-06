@@ -518,14 +518,15 @@
 
   // --- network notice console ---------------------------------------------------
   // The "Network notice" panel reads as a live channel log: a rolling loop of scripted
-  // scenes (data.networkFeed -- listener chat, simulated scrape/telemetry output, and the
-  // station's own security-daemon interruptions) plus real functional notices (station
-  // lock, dead band, pirate carrier) pushed in as distinct [SIGNAL] lines. Chat and exec/
-  // daemon lines both build up character-by-character (a chat line just reads fast, since
-  // real clients don't type letter by letter); [SIGNAL] lines land instantly since they
-  // carry actual state and shouldn't get stuck behind a typing crawl. Placeholder content
-  // in stations.data.js is intentionally Snow-Crash-heavy for now -- flagged to workshop
-  // further once the shape of the thing is agreed on.
+  // scenes (station.networkFeed, falling back to the shared data.networkFeed default for
+  // a station without its own -- see stationNetworkFeed() -- listener chat, simulated
+  // scrape/telemetry output, and the station's own daemon interruptions) plus real
+  // functional notices (station lock, dead band, pirate carrier) pushed in as distinct
+  // [SIGNAL] lines. Chat and exec/daemon lines both build up character-by-character (a chat
+  // line just reads fast, since real clients don't type letter by letter); [SIGNAL] lines
+  // land instantly since they carry actual state and shouldn't get stuck behind a typing
+  // crawl. The shared default in stations.data.js is Snow-Crash-flavored (its original
+  // home before this went per-station); CRUSTACEAN STATION got its own feed 2026-09-06.
   const CONSOLE_MAX_LINES = 40;
   const CONSOLE_TYPE_MS = 30;        // per-character delay for exec/daemon lines
   const CONSOLE_CHAT_MS = 10;        // per-character delay for listener chat lines
@@ -596,12 +597,29 @@
     scrollConsole();
   }
 
+  // Per-station feed pool, added 2026-09-06 (was one fixed Snow-Crash-flavored pool for
+  // every station regardless of tuning): a station's own `networkFeed` wins when present,
+  // falling back to the shared `data.networkFeed` default for stations without one yet.
+  function stationNetworkFeed(station) {
+    const feed = (station && station.networkFeed) || data.networkFeed || [];
+    return feed.filter(scene => scene && scene.length);
+  }
+
   async function runNetworkFeed() {
-    const scenes = (data.networkFeed || []).filter(scene => scene && scene.length);
-    if (!scenes.length) return;
-    let order = shuffle(scenes);
+    let feedStationId = null;
+    let scenes = [];
+    let order = [];
     let cursor = 0;
     for (;;) {
+      // re-check at every scene boundary (not mid-scene) so switching stations swaps the
+      // feed's content promptly without cutting a scene off halfway through
+      if (!state.station || state.station.id !== feedStationId) {
+        feedStationId = state.station ? state.station.id : null;
+        scenes = stationNetworkFeed(state.station);
+        order = shuffle(scenes);
+        cursor = 0;
+      }
+      if (!scenes.length) { await wait(CONSOLE_SCENE_GAP_MS); continue; }
       if (cursor >= order.length) { order = shuffle(scenes); cursor = 0; }
       const scene = order[cursor];
       cursor += 1;
@@ -1543,4 +1561,5 @@
   }
 
   selectStation(data.defaultStation || data.stations[0].id);
+  window.__SIG_DEBUG__ = { state, selectStation, stationNetworkFeed };
 })();

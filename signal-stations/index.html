@@ -129,12 +129,13 @@
     .cru-lobster i:nth-child(3){left:-4px;transform:rotate(-24deg)}.cru-lobster i:nth-child(4){right:-4px;transform:scaleX(-1) rotate(-24deg)}
     .cru-lobster i:nth-child(5){left:11px;right:11px;top:62px;height:1px;background:var(--station-secondary);box-shadow:0 12px var(--station-secondary),0 24px var(--station-secondary)}
     .cru-citation{position:absolute;left:8%;bottom:8%;padding-left:9px;border-left:1px solid var(--station-accent);color:rgba(var(--station-rgb),.58);font:300 8px/1.55 var(--font-cru-mono);letter-spacing:.12em;animation:cru-citation 16s ease-in-out infinite}
-    .host-channel{grid-template-columns:minmax(0,1fr) 136px;min-height:168px}
+    .host-channel{grid-template-columns:minmax(0,1fr) 136px;min-height:168px;overflow:visible}
     .host-avatar{width:128px;height:148px;isolation:isolate}
-    .host-portrait-frame{display:none;position:absolute;z-index:1;inset:0 8px 0 0;overflow:hidden;border:1px solid rgba(var(--station-rgb),.44);background:radial-gradient(circle at 50% 32%,rgba(var(--station-rgb),.2),rgba(2,5,6,.75) 70%);clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+    .host-portrait-frame{display:none;position:absolute;z-index:1;inset:0 8px 0 0;overflow:visible}
+    .host-portrait-frame:before{content:"";position:absolute;z-index:0;inset:0;border:1px solid rgba(var(--station-rgb),.44);background:radial-gradient(circle at 50% 32%,rgba(var(--station-rgb),.2),rgba(2,5,6,.75) 70%);clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
     .host-avatar.has-portrait .host-portrait-frame{display:block}
-    .host-portrait{width:100%;height:100%;object-fit:cover;object-position:center 8%;filter:saturate(.88) contrast(1.08);transform:scale(1.03);animation:host-portrait-breathe 11s ease-in-out infinite}
-    .host-portrait-frame:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(var(--station-rgb),.08) 3px 4px),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.12) 48%,transparent 54%);mix-blend-mode:screen;animation:host-portrait-scan 8s linear infinite}
+    .host-portrait{position:absolute;z-index:2;left:0;bottom:0;width:100%;height:calc(100% + 28px);object-fit:contain;object-position:center bottom;filter:saturate(.9) contrast(1.12);transform-origin:center bottom;animation:host-portrait-breathe 11s ease-in-out infinite}
+    .host-portrait-frame:after{content:"";position:absolute;z-index:3;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(var(--station-rgb),.08) 3px 4px),linear-gradient(112deg,transparent 0 42%,rgba(255,255,255,.12) 48%,transparent 54%);mix-blend-mode:screen;clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);animation:host-portrait-scan 8s linear infinite}
     .host-avatar.has-portrait .host-head{display:none}
     .host-avatar.has-portrait .host-orbit{z-index:2;left:-4px;top:43px;width:128px;height:58px;opacity:.55}
     .host-avatar.has-portrait .host-cube{z-index:3}
@@ -148,7 +149,7 @@
     @keyframes cru-book-float{0%,100%{transform:rotateX(58deg) rotateZ(-7deg) translate3d(0,0,0)}50%{transform:rotateX(63deg) rotateZ(-2deg) translate3d(-12px,-7px,16px)}}
     @keyframes cru-lobster-drift{0%,100%{transform:translate3d(0,0,0) rotate(-3deg);opacity:.42}50%{transform:translate3d(8px,-9px,18px) rotate(4deg);opacity:.78}}
     @keyframes cru-citation{0%,100%{opacity:.34;transform:translateY(0)}50%{opacity:.72;transform:translateY(-5px)}}
-    @keyframes host-portrait-breathe{0%,100%{transform:scale(1.03) translateY(0)}50%{transform:scale(1.07) translateY(-2px)}}
+    @keyframes host-portrait-breathe{0%,100%{transform:scale(1.03) translateY(-20px)}50%{transform:scale(1.07) translateY(-23px)}}
     @keyframes host-portrait-scan{0%{background-position:0 0,-180px 0}100%{background-position:0 0,240px 0}}
     @keyframes host-thought-in{from{opacity:0;transform:translateY(5px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
     @media(max-width:500px){.host-channel{grid-template-columns:minmax(0,1fr) 112px;min-height:148px}.host-avatar{width:108px;height:128px;transform:none}.host-avatar.has-portrait .host-orbit{width:108px;top:37px}.cru-brain{left:4%;transform:scale(.8);transform-origin:left top}.cru-book{right:2%;transform:scale(.76) rotateX(58deg) rotateZ(-7deg)}.cru-lobster{left:46%;transform:scale(.8)}.cru-citation{display:block;left:4%;font-size:6px}}
@@ -163,7 +164,7 @@
     <section class="panel transport" aria-label="Broadcast transport"><span class="transport-label">SIG / live control</span><button class="skip" id="skip" type="button" aria-label="Skip signal">›</button><span class="transport-label">Music / host / caller / report / ad</span></section>
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
-  <script src="stations.data.js?v=20260906-krill-glitch"></script>
+  <script src="stations.data.js?v=20260906-hostset"></script>
   <script src="radio-player.js?v=20260906-crustacean-visuals"></script>
 </body>
 </html>
