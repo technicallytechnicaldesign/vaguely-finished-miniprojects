@@ -303,7 +303,7 @@ window.SIGNAL_STATIONS = {
           "frequency": "27.1",
           "tagline": "Economic theology for a species that already lost the argument.",
           "host": "Dr. Aldous Krill",
-          "hostPortrait": "assets/hosts/dr-aldous-krill-v1.png",
+          "hostPortrait": "assets/hosts/dr-aldous-krill-v2.png",
           "hostQuotes": [
                 "The market didn't wait for consensus. It rarely does.",
                 "Intelligence doesn't have to know that it's intelligent.",
