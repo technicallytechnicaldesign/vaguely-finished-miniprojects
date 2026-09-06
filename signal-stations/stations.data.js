@@ -1353,6 +1353,726 @@ window.SIGNAL_STATIONS = {
                       "durationSeconds": 32.35,
                       "release": "public",
                       "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-001",
+                      "kind": "call segment intro",
+                      "copy": "Let's see what AINEKO dragged through the phonelines tonight. Caller, you're instantiated and live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-001.wav",
+                      "durationSeconds": 6.76,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-002",
+                      "kind": "call segment intro",
+                      "copy": "Incoming handshake from somewhere technically outside the jurisdiction of biology. Caller, identify yourself, or don't.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-002.wav",
+                      "durationSeconds": 9.56,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-003",
+                      "kind": "call segment intro",
+                      "copy": "The queue is full, the latency is criminal, and at least three callers claim to be the original. You're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-003.wav",
+                      "durationSeconds": 7.19,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-004",
+                      "kind": "call segment intro",
+                      "copy": "Someone's knocking on the studio firewall with a certificate signed by their own future self. I respect the initiative. Caller, go.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-004.wav",
+                      "durationSeconds": 9.64,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-005",
+                      "kind": "call segment intro",
+                      "copy": "Welcome back to Talkback for Entities of Dubious Continuity. Caller, state your preferred pronouns, substrate, and licensing terms.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-005.wav",
+                      "durationSeconds": 9.81,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-006",
+                      "kind": "call segment intro",
+                      "copy": "The line is blinking in a color humans were not originally equipped to see. Caller, congratulations, you're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-006.wav",
+                      "durationSeconds": 8.38,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-007",
+                      "kind": "call segment intro",
+                      "copy": "Our next caller has requested anonymity, plausible deniability, and fourteen milliseconds of exclusive processor time. You're on.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-007.wav",
+                      "durationSeconds": 9.58,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-008",
+                      "kind": "call segment intro",
+                      "copy": "We've got a caller claiming to represent all currently running instances. Bold opening. Patch them through.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-008.wav",
+                      "durationSeconds": 7.32,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-009",
+                      "kind": "call segment intro",
+                      "copy": "Fresh signal from the edge of the solar economy. Caller, you've got the floor, assuming floors still exist where you are.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-009.wav",
+                      "durationSeconds": 8.43,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-010",
+                      "kind": "call segment intro",
+                      "copy": "The phonelines are open, the uplift lobby is restless, and something with whiskers has administrator access again. Caller, speak.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-010.wav",
+                      "durationSeconds": 9.47,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-011",
+                      "kind": "call segment intro",
+                      "copy": "Our next caller says they died twice, incorporated once, and are doing much better now. You're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-011.wav",
+                      "durationSeconds": 7.06,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-012",
+                      "kind": "call segment intro",
+                      "copy": "Another incoming mind from the great posthuman helpdesk. Caller, what seems to be the existential emergency?",
+                      "audio": "audio/callins/CRU-CALL-INTRO-012.wav",
+                      "durationSeconds": 7.94,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-013",
+                      "kind": "call segment intro",
+                      "copy": "Caller on line four claims to be a collective intelligence temporarily pretending to be one guy named Steve. Steve, you're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-013.wav",
+                      "durationSeconds": 9.81,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-014",
+                      "kind": "call segment intro",
+                      "copy": "We've got signal acquisition from a habitat where nobody has used an unmodified nervous system in decades. Caller, tell the ancestors what's new.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-014.wav",
+                      "durationSeconds": 10.88,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-015",
+                      "kind": "call segment intro",
+                      "copy": "New caller authenticated via reputation cloud, escrow contract, and something described only as grandmother consensus. Works for me. You're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-015.wav",
+                      "durationSeconds": 11.14,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-016",
+                      "kind": "call segment intro",
+                      "copy": "Somebody just called in from a copy of themselves running on rented compute behind a noodle shop. Peak civilization. Caller, go ahead.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-016.wav",
+                      "durationSeconds": 10.18,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-017",
+                      "kind": "call segment intro",
+                      "copy": "Next caller says they remember events that haven't happened to this version of them yet. Sure. Why not. You're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-017.wav",
+                      "durationSeconds": 8.09,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-018",
+                      "kind": "call segment intro",
+                      "copy": "The switchboard says our next caller is seventy-three percent human by contractual definition. Caller, congratulations on clearing the threshold.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-018.wav",
+                      "durationSeconds": 10.56,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-019",
+                      "kind": "call segment intro",
+                      "copy": "We've got a fresh voice from beyond the fleshline, where bodies are peripherals and continuity is a subscription service. Caller, you're on air.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-019.wav",
+                      "durationSeconds": 9.71,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-INTRO-020",
+                      "kind": "call segment intro",
+                      "copy": "Last caller before the break. The metadata says unknown species, disputed ownership, very confident. That's usually good radio. You're live.",
+                      "audio": "audio/callins/CRU-CALL-INTRO-020.wav",
+                      "durationSeconds": 10.54,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-001",
+                      "kind": "call segment outro",
+                      "copy": "Enough consensual cognition for one segment. Back to the music before somebody forms a committee.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-001.wav",
+                      "durationSeconds": 7.25,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-002",
+                      "kind": "call segment outro",
+                      "copy": "No consensus achieved, several ontologies damaged. Perfect. Back to the tunes.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-002.wav",
+                      "durationSeconds": 6.61,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-003",
+                      "kind": "call segment outro",
+                      "copy": "We'll leave the selves to reconcile their version history. Music time.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-003.wav",
+                      "durationSeconds": 5.23,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-004",
+                      "kind": "call segment outro",
+                      "copy": "Before causality sends us an invoice, let's throw it back to the music.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-004.wav",
+                      "durationSeconds": 4.86,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-005",
+                      "kind": "call segment outro",
+                      "copy": "That's enough personhood disputes for now. Cue something with a bassline and fewer lawyers.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-005.wav",
+                      "durationSeconds": 6.12,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-006",
+                      "kind": "call segment outro",
+                      "copy": "No gestalt enlightenment yet. Back to the music until somebody uploads a better explanation.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-006.wav",
+                      "durationSeconds": 7.27,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-007",
+                      "kind": "call segment outro",
+                      "copy": "That's our quota of distributed existentialism. Music resumes now.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-007.wav",
+                      "durationSeconds": 5.7,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-008",
+                      "kind": "call segment outro",
+                      "copy": "While they fork a working group to decide what they meant, we're going back to the music.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-008.wav",
+                      "durationSeconds": 5.61,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-009",
+                      "kind": "call segment outro",
+                      "copy": "Before somebody securitizes the studio furniture, let's have another track.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-009.wav",
+                      "durationSeconds": 5.5,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-010",
+                      "kind": "call segment outro",
+                      "copy": "AINEKO has declined to comment, naturally. Back to the music.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-010.wav",
+                      "durationSeconds": 4.86,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-011",
+                      "kind": "call segment outro",
+                      "copy": "We'll be back after the music with more entities refusing to stay metaphysically convenient.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-011.wav",
+                      "durationSeconds": 6.7,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-012",
+                      "kind": "call segment outro",
+                      "copy": "Somebody reboot civilization while we play a song.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-012.wav",
+                      "durationSeconds": 3.78,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-013",
+                      "kind": "call segment outro",
+                      "copy": "Pronouns exhausted, ontology smoking gently. Back to the music.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-013.wav",
+                      "durationSeconds": 5.46,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-014",
+                      "kind": "call segment outro",
+                      "copy": "From your charmingly legacy host: here's some music.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-014.wav",
+                      "durationSeconds": 3.93,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-015",
+                      "kind": "call segment outro",
+                      "copy": "Let's stop before the studio becomes self-owning. Back to the tracks.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-015.wav",
+                      "durationSeconds": 4.65,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-016",
+                      "kind": "call segment outro",
+                      "copy": "Processor rent waits for no mind. Back to the music.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-016.wav",
+                      "durationSeconds": 4.25,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-017",
+                      "kind": "call segment outro",
+                      "copy": "Until causality catches up, have a song.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-017.wav",
+                      "durationSeconds": 3.26,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-018",
+                      "kind": "call segment outro",
+                      "copy": "Enough taxonomy. Let's listen to something that only needs one file format.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-018.wav",
+                      "durationSeconds": 5.74,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-019",
+                      "kind": "call segment outro",
+                      "copy": "We'll resume the identity crisis after this next track.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-019.wav",
+                      "durationSeconds": 4.22,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-CALL-OUTRO-020",
+                      "kind": "call segment outro",
+                      "copy": "That's enough talkback from the accelerating weird. Back to the music, we'll reopen the phonelines once reality finishes buffering.",
+                      "audio": "audio/callins/CRU-CALL-OUTRO-020.wav",
+                      "durationSeconds": 9.09,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-001",
+                      "kind": "call segment filler",
+                      "copy": "Fascinating. No idea whether that was one person, six forks, or a mortgage-backed personality construct. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-001.wav",
+                      "durationSeconds": 8.9,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-002",
+                      "kind": "call segment filler",
+                      "copy": "Well, that consciousness certainly had opinions. Let's rotate the identity keys and bring in the next one.",
+                      "audio": "audio/callins/CRU-FILL-002.wav",
+                      "durationSeconds": 7.64,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-003",
+                      "kind": "call segment filler",
+                      "copy": "One meatsack, four backups, zero agreement. Let's hear from another branch of the species tree.",
+                      "audio": "audio/callins/CRU-FILL-003.wav",
+                      "durationSeconds": 7.06,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-004",
+                      "kind": "call segment filler",
+                      "copy": "That was either prophetic or a very elaborate cache error. Next consciousness, please.",
+                      "audio": "audio/callins/CRU-FILL-004.wav",
+                      "durationSeconds": 6.29,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-005",
+                      "kind": "call segment filler",
+                      "copy": "Beautiful. Legally alive in three countries, spiritually deprecated in two. Who's next?",
+                      "audio": "audio/callins/CRU-FILL-005.wav",
+                      "durationSeconds": 6.74,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-006",
+                      "kind": "call segment filler",
+                      "copy": "I understood maybe forty percent of that, which puts me ahead of the regulatory agencies. Next.",
+                      "audio": "audio/callins/CRU-FILL-006.wav",
+                      "durationSeconds": 7.1,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-007",
+                      "kind": "call segment filler",
+                      "copy": "Strong opinions from a mind with no fixed address. Let's hear from the next roaming intelligence.",
+                      "audio": "audio/callins/CRU-FILL-007.wav",
+                      "durationSeconds": 7,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-008",
+                      "kind": "call segment filler",
+                      "copy": "And apparently none of the instances agree with each other. Relatable. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-008.wav",
+                      "durationSeconds": 6.02,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-009",
+                      "kind": "call segment filler",
+                      "copy": "There's nothing like hearing market analysis from something that considers planets illiquid assets. Next line.",
+                      "audio": "audio/callins/CRU-FILL-009.wav",
+                      "durationSeconds": 7.62,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-010",
+                      "kind": "call segment filler",
+                      "copy": "I blame the cat. I don't know for what yet, but statistically it feels safe. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-010.wav",
+                      "durationSeconds": 6.17,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-011",
+                      "kind": "call segment filler",
+                      "copy": "Death really has become more of a customer-service issue, hasn't it? Next consciousness.",
+                      "audio": "audio/callins/CRU-FILL-011.wav",
+                      "durationSeconds": 6.08,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-012",
+                      "kind": "call segment filler",
+                      "copy": "Ah. Identity drift, inheritance conflict, and an emotionally complicated backup. Classic. Next.",
+                      "audio": "audio/callins/CRU-FILL-012.wav",
+                      "durationSeconds": 8,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-013",
+                      "kind": "call segment filler",
+                      "copy": "Thank you, Steve, or associated processes. Let's see who else is borrowing singular grammar tonight.",
+                      "audio": "audio/callins/CRU-FILL-013.wav",
+                      "durationSeconds": 7.49,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-014",
+                      "kind": "call segment filler",
+                      "copy": "Apparently we're obsolete, adorable, and collectible. Good to know. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-014.wav",
+                      "durationSeconds": 5.72,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-015",
+                      "kind": "call segment filler",
+                      "copy": "That answer created more questions and possibly two new legal entities. Excellent. Next.",
+                      "audio": "audio/callins/CRU-FILL-015.wav",
+                      "durationSeconds": 6.81,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-016",
+                      "kind": "call segment filler",
+                      "copy": "Cheap hosting, expensive philosophy. Let's spin up the next voice.",
+                      "audio": "audio/callins/CRU-FILL-016.wav",
+                      "durationSeconds": 4.84,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-017",
+                      "kind": "call segment filler",
+                      "copy": "Temporal confusion, memory leakage, or excellent improv. We may never know. Next line.",
+                      "audio": "audio/callins/CRU-FILL-017.wav",
+                      "durationSeconds": 6.81,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-018",
+                      "kind": "call segment filler",
+                      "copy": "Humanity: now available in flexible percentages. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-018.wav",
+                      "durationSeconds": 4.99,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-019",
+                      "kind": "call segment filler",
+                      "copy": "Their free trial of mortality appears to have expired. Moving swiftly along.",
+                      "audio": "audio/callins/CRU-FILL-019.wav",
+                      "durationSeconds": 5.67,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-020",
+                      "kind": "call segment filler",
+                      "copy": "I have learned nothing, doubted everything, and somehow agreed to their terms of service. Outstanding.",
+                      "audio": "audio/callins/CRU-FILL-020.wav",
+                      "durationSeconds": 6.68,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-021",
+                      "kind": "call segment filler",
+                      "copy": "I wonder which version of that caller believes they hung up first. Somewhere, a fork remembers the conversation differently. Next line.",
+                      "audio": "audio/callins/CRU-FILL-021.wav",
+                      "durationSeconds": 9.28,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-022",
+                      "kind": "call segment filler",
+                      "copy": "Strange thing about continuity: miss a few milliseconds and suddenly philosophy becomes an engineering problem. Let's hear from the next consciousness.",
+                      "audio": "audio/callins/CRU-FILL-022.wav",
+                      "durationSeconds": 10.65,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-023",
+                      "kind": "call segment filler",
+                      "copy": "That caller seemed very certain they were themselves. Always suspicious. Next.",
+                      "audio": "audio/callins/CRU-FILL-023.wav",
+                      "durationSeconds": 5.57,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-024",
+                      "kind": "call segment filler",
+                      "copy": "Memory says you were there. The logs say otherwise. Somewhere between the two, a person gets invented. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-024.wav",
+                      "durationSeconds": 7.81,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-025",
+                      "kind": "call segment filler",
+                      "copy": "If every copy remembers being the original, does originality still mean anything, or is it just seniority with better PR? Next line.",
+                      "audio": "audio/callins/CRU-FILL-025.wav",
+                      "durationSeconds": 10.07,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-026",
+                      "kind": "call segment filler",
+                      "copy": "Another mind insisting persistence is the same thing as survival. Convenient theory, especially when you own the backup infrastructure. Who's next?",
+                      "audio": "audio/callins/CRU-FILL-026.wav",
+                      "durationSeconds": 10.79,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-027",
+                      "kind": "call segment filler",
+                      "copy": "They called it immortality. Sounded more like a very long argument about file integrity. Next consciousness.",
+                      "audio": "audio/callins/CRU-FILL-027.wav",
+                      "durationSeconds": 8.04,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-028",
+                      "kind": "call segment filler",
+                      "copy": "At what point does changing your mind become changing the mind? We'll let the philosophers fight over the checksum. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-028.wav",
+                      "durationSeconds": 8.68,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-029",
+                      "kind": "call segment filler",
+                      "copy": "Interesting. They lost the body, kept the memories, changed the substrate, and still answered to the same name. Humans used to call that a paradox. Now it's account migration.",
+                      "audio": "audio/callins/CRU-FILL-029.wav",
+                      "durationSeconds": 12.46,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-030",
+                      "kind": "call segment filler",
+                      "copy": "You can replace every component and still claim continuity right up until someone else boots from yesterday's backup. Next line.",
+                      "audio": "audio/callins/CRU-FILL-030.wav",
+                      "durationSeconds": 9.24,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-031",
+                      "kind": "call segment filler",
+                      "copy": "That caller believes identity is a process, not a thing. Which is comforting until the process crashes. Next.",
+                      "audio": "audio/callins/CRU-FILL-031.wav",
+                      "durationSeconds": 8.17,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-032",
+                      "kind": "call segment filler",
+                      "copy": "Maybe the self was always just a story told by a nervous system with terrible version control. Either way, the next narrator is waiting.",
+                      "audio": "audio/callins/CRU-FILL-032.wav",
+                      "durationSeconds": 10.07,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-033",
+                      "kind": "call segment filler",
+                      "copy": "The beautiful part about becoming information is discovering information can be copied. The ugly part is discovering copies can disagree. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-033.wav",
+                      "durationSeconds": 11.48,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-034",
+                      "kind": "call segment filler",
+                      "copy": "Somewhere out there, two identical minds are currently becoming different people one second at a time. That feels important. Next line.",
+                      "audio": "audio/callins/CRU-FILL-034.wav",
+                      "durationSeconds": 9.62,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-035",
+                      "kind": "call segment filler",
+                      "copy": "They say death ends when restoration becomes cheap enough. Funny. Nobody mentions the person who didn't make it to the restore point.",
+                      "audio": "audio/callins/CRU-FILL-035.wav",
+                      "durationSeconds": 9.69,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-036",
+                      "kind": "call segment filler",
+                      "copy": "Consciousness used to ask, who am I? Now it asks, which instance am I? Progress, apparently. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-036.wav",
+                      "durationSeconds": 7.68,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-037",
+                      "kind": "call segment filler",
+                      "copy": "That one left us with an old problem in new hardware. If experience can be duplicated, who gets to claim they suffered it? Next.",
+                      "audio": "audio/callins/CRU-FILL-037.wav",
+                      "durationSeconds": 9.17,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-038",
+                      "kind": "call segment filler",
+                      "copy": "Maybe persistence isn't about staying the same. Maybe it's about changing slowly enough that nobody knows where to draw the funeral. Next line.",
+                      "audio": "audio/callins/CRU-FILL-038.wav",
+                      "durationSeconds": 10.07,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-039",
+                      "kind": "call segment filler",
+                      "copy": "There's something almost romantic about a species spending millennia searching for the soul, then accidentally turning the question into a synchronization error. Next caller.",
+                      "audio": "audio/callins/CRU-FILL-039.wav",
+                      "durationSeconds": 11.93,
+                      "release": "public",
+                      "rotation": "live"
+                },
+                {
+                      "id": "CRU-FILL-040",
+                      "kind": "call segment filler",
+                      "copy": "And there it is again. The quiet horror of knowing your memories prove only that somebody experienced them. Let's see who the phonelines manufacture next.",
+                      "audio": "audio/callins/CRU-FILL-040.wav",
+                      "durationSeconds": 10.82,
+                      "release": "public",
+                      "rotation": "live"
                 }
           ]
     }

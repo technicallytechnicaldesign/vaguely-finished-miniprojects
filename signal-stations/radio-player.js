@@ -5,8 +5,10 @@
   // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
   // overlap, not an outro guess (that's for actual songs, which have real musical structure).
   const isCallIn = type => type === 'caller talk-back';
-  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro' || type === 'station ID' || isCallIn(type);
+  const isCallSegment = type => type === 'call segment intro' || type === 'call segment outro' || type === 'call segment filler';
+  const isSpokenKind = type => type === 'host liner' || type === 'host bridge' || type === 'sponsored notice' || type === 'street report' || type === 'ad block intro' || type === 'ad block outro' || type === 'station ID' || isCallIn(type) || isCallSegment(type);
   const AD_BLOCK_KINDS = new Set(['ad block intro', 'ad block outro']);
+  const CALL_SEGMENT_KINDS = new Set(['call segment intro', 'call segment outro', 'call segment filler']);
 
   // --- crossfade/timing tuning -------------------------------------------------
   // Songs always play out, essentially to their real end -- no more cutting in over the
@@ -345,9 +347,13 @@
   }
 
   function onDeckEnded(deck) {
-    if (state.decks[state.activeIndex] !== deck || !deck.item || !isCallIn(deck.item.type)) return;
+    // mirrors armCutIn's null-cutInAt items (caller clips and call segment intro/filler/
+    // outro): those never fire the early-crossfade check in onDeckTimeUpdate, so this is
+    // the only place their transition gets triggered at all -- without it, a call block
+    // would play its intro and then just go dead instead of advancing to the first caller.
+    if (state.decks[state.activeIndex] !== deck || !deck.item || !(isCallIn(deck.item.type) || isCallSegment(deck.item.type))) return;
     setTimeout(() => {
-      if (state.decks[state.activeIndex] === deck && deck.item && isCallIn(deck.item.type)) {
+      if (state.decks[state.activeIndex] === deck && deck.item && (isCallIn(deck.item.type) || isCallSegment(deck.item.type))) {
         startCrossfade(deck, 1 - state.activeIndex);
       }
     }, CALL_POST_GAP_MS);
@@ -452,7 +458,10 @@
   function pickLiner() {
     // ad kinds are never drawn here: sponsored notice only plays inside a block (see
     // buildAdBlock), and ad block intro/outro are block bookends, not general rotation.
-    const pool = (state.station.interludes || []).filter(x => x.audio && !isCallIn(x.kind) && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind));
+    // call segment intro/outro/filler are likewise block-only bookends/bridges (see
+    // buildCallBlock) -- drawing one standalone would play a filler with no caller either
+    // side of it, or an outro with no call that just happened.
+    const pool = (state.station.interludes || []).filter(x => x.audio && !isCallIn(x.kind) && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind) && !isCallSegment(x.kind));
     if (!pool.length) return null;
     return toPlanItem(pick(pool));
   }
@@ -616,6 +625,36 @@
     return toPlanItem(call);
   }
 
+  // Assembles a full call segment as one contiguous run -- buildAdBlock()'s shape, applied
+  // to the crustacean-style pooled intro/callers/filler/outro content (SIG-1080): a random
+  // intro, 4-5 distinct callers (no repeats within the run, capped by pool size), a random
+  // no-repeat filler bridging each consecutive caller pair, and a random outro. Falls back
+  // to null (plain per-clip pickCallIn) if a station doesn't have all three segment pools or
+  // fewer than 2 callers -- so every other station's call-ins are untouched by this.
+  function buildCallBlock() {
+    const pool = (state.station.interludes || []).filter(x => x.audio);
+    const intros = pool.filter(x => x.kind === 'call segment intro');
+    const outros = pool.filter(x => x.kind === 'call segment outro');
+    const fillers = pool.filter(x => x.kind === 'call segment filler');
+    const calls = availableCallIns();
+    if (!intros.length || !outros.length || !fillers.length || calls.length < 2) return null;
+    const callCount = Math.min(calls.length, 4 + Math.floor(Math.random() * 2)); // 4-5, capped by pool size
+    const chosenCalls = shuffle(calls).slice(0, callCount);
+    const shuffledFillers = shuffle(fillers);
+    // pull the chosen callers out of the rotation bag so a plain pickCallIn() right after
+    // this block can't immediately repeat one of them
+    const chosenIds = new Set(chosenCalls.map(call => call.id));
+    state.callBag = state.callBag.filter(id => !chosenIds.has(id));
+    state.lastCallerRole = chosenCalls[chosenCalls.length - 1].callerRole || '';
+    const items = [pick(intros)];
+    chosenCalls.forEach((call, index) => {
+      items.push(call);
+      if (index < chosenCalls.length - 1) items.push(shuffledFillers[index % shuffledFillers.length]);
+    });
+    items.push(pick(outros));
+    return items.map(toPlanItem);
+  }
+
   function pickWeightedKind(options) {
     const viable = options.filter(option => option.available && option.weight > 0);
     if (!viable.length) return null;
@@ -649,7 +688,7 @@
     const weights = routing.weights || { host: 0.8, callIn: 0, adBlock: 0.2 };
     const calls = availableCallIns();
     const interludes = (state.station.interludes || []).filter(item => item.audio);
-    const hostAvailable = interludes.some(item => !isCallIn(item.kind) && item.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(item.kind));
+    const hostAvailable = interludes.some(item => !isCallIn(item.kind) && item.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(item.kind) && !isCallSegment(item.kind));
     const adAvailable = interludes.some(item => item.kind === 'ad block intro')
       && interludes.some(item => item.kind === 'ad block outro')
       && interludes.filter(item => item.kind === 'sponsored notice').length >= 2;
@@ -664,6 +703,14 @@
     ]);
 
     if (kind === 'call-in') {
+      const block = buildCallBlock();
+      if (block && block.length) {
+        state.pendingBlock = block.slice(1);
+        state.callCooldown = routing.callCooldownBreaks == null ? 2 : routing.callCooldownBreaks;
+        state.breaksSinceCall = 0;
+        state.lastBreakKind = 'call-in';
+        return block[0];
+      }
       const call = pickCallIn();
       if (call) {
         state.callCooldown = routing.callCooldownBreaks == null ? 2 : routing.callCooldownBreaks;
@@ -776,7 +823,7 @@
 
   function broadcastMode(item) {
     if (!item) return { id: 'idle', label: 'carrier idle' };
-    if (isCallIn(item.type)) return { id: 'call', label: 'open line / caller' };
+    if (isCallIn(item.type) || isCallSegment(item.type)) return { id: 'call', label: 'open line / caller' };
     if (item.type === 'sponsored notice' || AD_BLOCK_KINDS.has(item.type)) return { id: 'ad', label: 'commercial incursion' };
     if (item.type === 'street report') return { id: 'report', label: 'field report' };
     if (item.type === 'host liner' || item.type === 'host bridge') return { id: 'host', label: 'host transmission' };
@@ -828,7 +875,9 @@
 
   // --- the actual crossfade sequencer ------------------------------------------
   function armCutIn(deck) {
-    if (deck.item && isCallIn(deck.item.type)) {
+    if (deck.item && (isCallIn(deck.item.type) || isCallSegment(deck.item.type))) {
+      // same as a caller clip: play the intro/filler/outro out in full, no early cut-in --
+      // a filler getting trimmed before the next caller starts would clip the bridge line.
       deck.cutInAt = null;
       return;
     }
@@ -876,7 +925,7 @@
       if (next.type === 'ad block intro') return 'Ad block starting.';
       if (next.type === 'ad block outro') return 'Ad block over.';
       if (next.type === 'sponsored notice') return 'Sponsored transmission.';
-      if (isCallIn(next.type)) return 'Open line to the Street.';
+      if (isCallIn(next.type) || isCallSegment(next.type)) return 'Open line to the Street.';
       if (next.type === 'station ID') return 'Station identification.';
       if (isHostLine) return 'On the air, live.';
       return 'Song plays out, host cuts in on the tail.';
@@ -1310,7 +1359,7 @@
     deck.gain.gain.setValueAtTime(1, state.ctx.currentTime);
     state.activeIndex = 0;
     state.started = true;
-    const showStatus = () => renderNow(deck, isCallIn(first.type) ? 'Open line to the Street.' : isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
+    const showStatus = () => renderNow(deck, (isCallIn(first.type) || isCallSegment(first.type)) ? 'Open line to the Street.' : isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
     deck.audio.onloadedmetadata = () => { armCutIn(deck); showStatus(); };
     if (deck.audio.readyState >= 1) armCutIn(deck);
     showStatus();
