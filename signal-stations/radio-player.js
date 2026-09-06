@@ -244,6 +244,7 @@
     started: false, visualizerStarted: false, tuneTimer: null,
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1, seekFrame: null,
     reception: 'locked', pirateSignal: null, power: false, lyricTicker: null,
+    hostQuoteTimer: null, hostQuoteIndex: 0, hostFocus: null, hostKey: '',
   };
 
   function formatClock(seconds) {
@@ -276,29 +277,34 @@
     'var(--font-head)', 'var(--font-lyric-a)', 'var(--font-lyric-b)', 'var(--font-lyric-c)', 'var(--font-lyric-d)',
     'var(--font-lyric-e)', 'var(--font-lyric-f)', 'var(--font-lyric-g)', 'var(--font-lyric-h)', 'var(--font-lyric-i)', 'var(--font-lyric-j)'
   ];
+  const CRUSTACEAN_LYRIC_VARIANTS = ['v-cru-drift', 'v-cru-drift', 'v-cru-fade', 'v-cru-depth'];
+  const CRUSTACEAN_LYRIC_FONTS = ['var(--font-cru-serif)', 'var(--font-cru-mono)', 'var(--font-cru-book)'];
   function spawnLyricWord(container, text) {
     if (!container || !text) return null;
     const span = document.createElement('span');
-    const variant = LYRIC_VARIANTS[Math.floor(Math.random() * LYRIC_VARIANTS.length)];
+    const isCrustacean = state.station && state.station.id === 'crustacean';
+    const variants = isCrustacean ? CRUSTACEAN_LYRIC_VARIANTS : LYRIC_VARIANTS;
+    const fonts = isCrustacean ? CRUSTACEAN_LYRIC_FONTS : LYRIC_FONTS;
+    const variant = variants[Math.floor(Math.random() * variants.length)];
     const isBg = variant === 'v-bg';
     const isFly = variant === 'v-fly';
-    const isGlitch = Math.random() < 0.38;
-    const size = isBg ? 50 + Math.random() * 100 : 8 + Math.random() * 46;
-    const font = LYRIC_FONTS[Math.floor(Math.random() * LYRIC_FONTS.length)];
-    const top = Math.random() * 84;
-    const left = isFly ? 0 : Math.random() * 62;
-    const rot = (Math.random() * 18 - 9).toFixed(1);
-    const dx = (Math.random() * 70 - 35).toFixed(0);
-    const dy = (Math.random() * 70 - 35).toFixed(0);
+    const isGlitch = !isCrustacean && Math.random() < 0.38;
+    const size = isCrustacean ? 11 + Math.random() * 24 : isBg ? 50 + Math.random() * 100 : 8 + Math.random() * 46;
+    const font = fonts[Math.floor(Math.random() * fonts.length)];
+    const top = Math.random() * (isCrustacean ? 88 : 84);
+    const left = isFly ? 0 : Math.random() * (isCrustacean ? 72 : 62);
+    const rot = (Math.random() * (isCrustacean ? 4 : 18) - (isCrustacean ? 2 : 9)).toFixed(1);
+    const dx = (Math.random() * (isCrustacean ? 30 : 70) - (isCrustacean ? 15 : 35)).toFixed(0);
+    const dy = (Math.random() * (isCrustacean ? 24 : 70) - (isCrustacean ? 12 : 35)).toFixed(0);
     const flyFrom = Math.random() < 0.5 ? '-20%' : '118%';
     const flyTo = flyFrom === '-20%' ? '118%' : '-20%';
-    const dur = (isFly ? 3.5 + Math.random() * 2.5 : isBg ? 8 + Math.random() * 6 : 5 + Math.random() * 4).toFixed(2);
-    const delay = (Math.random() * 1.4).toFixed(2);
+    const dur = (isCrustacean ? 14 + Math.random() * 12 : isFly ? 3.5 + Math.random() * 2.5 : isBg ? 8 + Math.random() * 6 : 5 + Math.random() * 4).toFixed(2);
+    const delay = (Math.random() * (isCrustacean ? 4 : 1.4)).toFixed(2);
     const timing = isGlitch ? `steps(${4 + Math.floor(Math.random() * 6)},jump-end)` : (isFly ? 'linear' : 'ease-in-out');
     const accent = Math.random() < 0.5 ? 'lyric-word-a' : 'lyric-word-b';
     span.className = `lyric-word ${variant} ${accent}${isGlitch ? ' glitch-word' : ''}`;
     span.textContent = text;
-    span.style.cssText = `font-size:${size.toFixed(0)}px;font-family:${font};top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--fly-from:${flyFrom};--fly-to:${flyTo};animation-duration:${dur}s;animation-delay:${delay}s;animation-timing-function:${timing}`;
+    span.style.cssText = `font-size:${size.toFixed(0)}px;font-family:${font};top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;--rot:${rot}deg;--dx:${dx}px;--dy:${dy}px;--fly-from:${flyFrom};--fly-to:${flyTo};--alpha:${(isCrustacean ? 0.2 + Math.random() * 0.48 : 1).toFixed(2)};--depth:${(Math.random() * 18 - 9).toFixed(0)}px;animation-duration:${dur}s;animation-delay:${delay}s;animation-timing-function:${timing}`;
     container.appendChild(span);
     return span;
   }
@@ -494,7 +500,10 @@
       audio: liner.audio,
       durationSeconds: liner.durationSeconds,
       callerRole: liner.callerRole,
-      requestTags: liner.requestTags
+      requestTags: liner.requestTags,
+      hostName: liner.hostName,
+      hostPortrait: liner.hostPortrait,
+      hostQuotes: liner.hostQuotes
     };
   }
 
@@ -778,6 +787,57 @@
     if (byId('world-label')) byId('world-label').textContent = profile.label || station.theme;
   }
 
+  function hostProfileFor(item) {
+    const station = state.station || {};
+    const name = (item && item.hostName) || station.host || 'Unresolved host';
+    const portrait = (item && item.hostPortrait) || station.hostPortrait || '';
+    const quotes = (item && item.hostQuotes) || station.hostQuotes || [station.sampleLine || 'Signal acquired.'];
+    return { name, portrait, quotes: quotes.filter(Boolean) };
+  }
+
+  function renderHost(item, options = {}) {
+    state.hostFocus = item || null;
+    const profile = hostProfileFor(item);
+    const key = `${profile.name}|${profile.portrait}`;
+    if (key !== state.hostKey) {
+      state.hostKey = key;
+      state.hostQuoteIndex = 0;
+    }
+    if (options.advance && profile.quotes.length) state.hostQuoteIndex = (state.hostQuoteIndex + 1) % profile.quotes.length;
+    byId('host').textContent = `Host: ${profile.name}`;
+    const line = byId('line');
+    line.classList.remove('thought-shift');
+    line.textContent = `"${profile.quotes[state.hostQuoteIndex % Math.max(1, profile.quotes.length)] || ''}"`;
+    if (options.advance) requestAnimationFrame(() => line.classList.add('thought-shift'));
+    const avatar = byId('host-avatar');
+    const image = byId('host-portrait');
+    if (avatar && image) {
+      avatar.classList.toggle('has-portrait', Boolean(profile.portrait));
+      image.onerror = () => avatar.classList.remove('has-portrait');
+      if (profile.portrait) image.src = profile.portrait;
+      else image.removeAttribute('src');
+      image.alt = profile.portrait ? `Portrait of ${profile.name}` : '';
+    }
+    if (byId('host-id')) byId('host-id').textContent = profile.name.toUpperCase().replace(/[^A-Z0-9]+/g, '_');
+  }
+
+  function startHostThoughtFeed() {
+    clearInterval(state.hostQuoteTimer);
+    state.hostQuoteTimer = setInterval(() => renderHost(state.hostFocus, { advance: true }), 9000);
+  }
+
+  function stopHostThoughtFeed() {
+    clearInterval(state.hostQuoteTimer);
+    state.hostQuoteTimer = null;
+  }
+
+  function clearHostPortrait() {
+    const avatar = byId('host-avatar');
+    const image = byId('host-portrait');
+    if (avatar) avatar.classList.remove('has-portrait');
+    if (image) { image.removeAttribute('src'); image.alt = ''; }
+  }
+
   // The identity panel's left column: a mode-reactive glitch visual with spoken-head,
   // ad-marquee, and lyric treatments. Song visuals combine the real rolling lyric pool
   // with deliberately placeholder programmer-art objects until track tags can select them.
@@ -800,9 +860,13 @@
       // title for tracks with no lyrics. A per-song-type effect vocabulary (tagging different
       // treatments to different kinds of songs) is a good next step, logged rather than built here.
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
-      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div><div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div><div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
+      const isCrustacean = state.station && state.station.id === 'crustacean';
+      const art = isCrustacean
+        ? '<div class="lyric-art lyric-art-crustacean" aria-hidden="true"><div class="cru-brain"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="cru-book"><i></i><i></i><i></i></div><div class="cru-lobster"><i></i><i></i><i></i><i></i><i></i></div><div class="cru-citation">SPECIMEN 27.1<br>MEMORY / MARKETS<br>PLATE IV</div></div>'
+        : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
+      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
       const lines = (item && item.lyricsLines) || [];
-      const poolSize = 13 + Math.floor(Math.random() * 9); // 13-21, leaning toward the loud end
+      const poolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : 13 + Math.floor(Math.random() * 9);
       const ticker = { item, lastIndex: -1, poolSize, pool: [] };
       state.lyricTicker = ticker;
       const field = byId('glitch-lyric-field');
@@ -837,8 +901,10 @@
     applyVisualProfile(station);
     byId('reception-label').textContent = 'locked station';
     byId('dial-station').textContent = station.name;
-    byId('host').textContent = `Host: ${station.host}`;
-    byId('line').textContent = `"${station.sampleLine}"`;
+    state.hostFocus = null;
+    state.hostKey = '';
+    renderHost(null);
+    startHostThoughtFeed();
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
     document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
@@ -850,6 +916,7 @@
     const mode = broadcastMode(item);
     document.documentElement.dataset.broadcast = mode.id;
     renderIdentityVisual(mode, item);
+    renderHost(item);
     if (byId('mode-label')) byId('mode-label').textContent = mode.label;
     if (byId('signal-lock')) byId('signal-lock').textContent = state.started ? 'signal locked' : 'receiver ready';
     byId('now-title').textContent = item ? item.title : 'Off air';
@@ -1120,6 +1187,8 @@
 
   function renderDeadBand(value) {
     const frequency = formatDial(value);
+    stopHostThoughtFeed();
+    clearHostPortrait();
     delete document.documentElement.dataset.previewStation;
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
@@ -1150,6 +1219,8 @@
   }
 
   function renderPirate(signal) {
+    stopHostThoughtFeed();
+    clearHostPortrait();
     delete document.documentElement.dataset.previewStation;
     applyVisualProfile({ id: 'pirate', theme: 'unlicensed carrier', visualProfile: pirateProfile(signal) });
     clearKnownPreset();

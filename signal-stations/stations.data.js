@@ -303,6 +303,15 @@ window.SIGNAL_STATIONS = {
           "frequency": "27.1",
           "tagline": "Economic theology for a species that already lost the argument.",
           "host": "Dr. Aldous Krill",
+          "hostPortrait": "assets/hosts/dr-aldous-krill-v1.png",
+          "hostQuotes": [
+                "The market didn't wait for consensus. It rarely does.",
+                "Intelligence doesn't have to know that it's intelligent.",
+                "Personhood comes with feelings. Legal personhood comes with assets.",
+                "Consciousness isn't necessarily the scarce commodity. Compute is.",
+                "Abundance never destroys economics. It merely changes the battlefield.",
+                "A quieter event. No thunderbolt. Just a pricing correction."
+          ],
           "theme": "Post-singularity economics / dry academic broadcast",
           "sampleLine": "The market didn't wait for consensus. It rarely does.",
           "runLength": {
