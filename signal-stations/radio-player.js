@@ -1561,5 +1561,4 @@
   }
 
   selectStation(data.defaultStation || data.stations[0].id);
-  window.__SIG_DEBUG__ = { state, selectStation, stationNetworkFeed };
 })();
