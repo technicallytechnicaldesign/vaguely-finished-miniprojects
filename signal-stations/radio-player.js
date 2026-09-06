@@ -492,11 +492,21 @@
 
   function toPlanItem(liner) {
     const callTitle = liner.callerName ? `Open line: ${liner.callerName}` : 'Open line';
+    // A liner carrying its own `title` is a titled piece (a long-form host segment, not a short
+    // one-off bridge line) -- treat it like a song: real title, short subtitle, and NEVER surface
+    // `copy` in the UI. Before this, any liner with no explicit title fell back to `copy` as its
+    // subtitle, which was harmless for a one-sentence bridge line but dumped an entire multi-minute
+    // monologue into the tagline (and the on-deck queue preview) for CRUSTACEAN's host segments --
+    // reported live 2026-09-06 as overtaking the screen. `copy` still travels with the item for any
+    // future non-display use (e.g. a transcript feature), it's just never read for display again.
+    const hasOwnTitle = !isCallIn(liner.kind) && liner.title;
     return {
       id: liner.id,
       type: liner.kind || 'host liner',
-      title: isCallIn(liner.kind) ? callTitle : liner.kind || 'Host',
-      subtitle: isCallIn(liner.kind) && liner.callerRole ? `${liner.callerRole} / ${liner.copy}` : liner.copy,
+      title: isCallIn(liner.kind) ? callTitle : (liner.title || liner.kind || 'Host'),
+      subtitle: isCallIn(liner.kind) && liner.callerRole
+        ? `${liner.callerRole} / ${liner.copy}`
+        : hasOwnTitle ? (liner.hostName || 'Live segment') : liner.copy,
       audio: liner.audio,
       durationSeconds: liner.durationSeconds,
       callerRole: liner.callerRole,
