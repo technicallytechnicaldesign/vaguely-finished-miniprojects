@@ -934,9 +934,12 @@
       // treatments to different kinds of songs) is a good next step, logged rather than built here.
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
       const isCrustacean = state.station && state.station.id === 'crustacean';
+      const isSnowCrash = state.station && state.station.id === 'snowcrash';
       const art = isCrustacean
         ? '<div class="lyric-art lyric-art-crustacean" aria-hidden="true"><div class="cru-object cru-brain"><img src="assets/objects/crustacean-brain-v1.png" alt=""></div><div class="cru-object cru-book"><img src="assets/objects/crustacean-book-v1.png" alt=""></div><div class="cru-object cru-lobster"><img src="assets/objects/crustacean-lobster-v1.png" alt=""></div><div class="cru-citation">SPECIMEN 27.1<br>MEMORY / MARKETS<br>PLATE IV</div></div>'
-        : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
+        : isSnowCrash
+          ? '<div class="lyric-art lyric-art-snowcrash" aria-hidden="true"><div class="snc-object snc-katana"><img src="assets/objects/snowcrash-katana-v1.png" alt=""></div><div class="snc-object snc-board"><img src="assets/objects/snowcrash-board-v1.png" alt=""></div><div class="snc-object snc-goggles"><img src="assets/objects/snowcrash-goggles-v1.png" alt=""></div><div class="snc-citation">STREET OBJECT CACHE<br>GARGOYLE / KOURIER<br>UNLICENSED</div></div>'
+          : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
       el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
       const lines = (item && item.lyricsLines) || [];
       const poolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : 13 + Math.floor(Math.random() * 9);

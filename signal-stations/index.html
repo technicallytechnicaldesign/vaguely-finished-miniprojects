@@ -150,13 +150,18 @@
     .lyric-word.v-cru-drift{animation:cru-lyric-drift var(--dur,18s) ease-in-out infinite both}
     .lyric-word.v-cru-fade{animation:cru-lyric-fade var(--dur,20s) ease-in-out infinite both}
     .lyric-word.v-cru-depth{animation:cru-lyric-depth var(--dur,22s) ease-in-out infinite both}
-    .lyric-art-crustacean{mix-blend-mode:screen;opacity:.9;overflow:hidden;isolation:isolate}
-    .cru-object{position:absolute;z-index:1;width:var(--object-size);pointer-events:none;transform-origin:center;animation:cru-object-drift var(--drift-time) ease-in-out var(--delay) infinite both;will-change:transform}
+    .lyric-art-crustacean,.lyric-art-snowcrash{z-index:0;mix-blend-mode:screen;opacity:.58;overflow:hidden;isolation:isolate}
+    .cru-object,.snc-object{position:absolute;z-index:0;width:var(--object-size);pointer-events:none;transform-origin:center;animation:cru-object-drift var(--drift-time) ease-in-out var(--delay) infinite both;will-change:transform}
     .cru-object img{display:block;width:100%;height:auto;opacity:var(--object-alpha);filter:saturate(.9) contrast(1.13) brightness(.9) drop-shadow(0 0 10px rgba(var(--station-rgb),.22));animation:cru-object-glitch var(--glitch-time) steps(1,end) var(--delay) infinite both;will-change:transform,filter,clip-path}
     .cru-object:after{content:"";position:absolute;z-index:2;inset:5% 4%;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 8px,rgba(255,255,255,.09) 8px 9px,transparent 9px 14px),linear-gradient(180deg,transparent 0 42%,rgba(var(--station-rgb),.18) 47%,transparent 52%);background-size:100% 15px,100% 180%;mix-blend-mode:screen;opacity:.16;animation:cru-object-scan 14s linear var(--delay) infinite}
-    .cru-brain{left:-7%;top:-4%;--object-size:clamp(190px,42%,310px);--object-alpha:.48;--drift-time:23s;--glitch-time:17s;--delay:-7s;--tilt:-5deg;--drift-x:15px;--drift-y:9px}
-    .cru-book{right:-10%;bottom:-8%;--object-size:clamp(250px,50%,380px);--object-alpha:.35;--drift-time:29s;--glitch-time:21s;--delay:-13s;--tilt:-8deg;--drift-x:-13px;--drift-y:-8px}
-    .cru-lobster{left:39%;top:3%;--object-size:clamp(160px,31%,230px);--object-alpha:.64;--drift-time:26s;--glitch-time:19s;--delay:-3s;--tilt:5deg;--drift-x:9px;--drift-y:-13px}
+    .cru-brain{left:-7%;top:-4%;--object-size:clamp(190px,42%,310px);--object-alpha:.18;--drift-time:23s;--glitch-time:17s;--delay:-7s;--tilt:-5deg;--drift-x:15px;--drift-y:9px}
+    .cru-book{right:-10%;bottom:-8%;--object-size:clamp(250px,50%,380px);--object-alpha:.13;--drift-time:29s;--glitch-time:21s;--delay:-13s;--tilt:-8deg;--drift-x:-13px;--drift-y:-8px}
+    .cru-lobster{left:39%;top:3%;--object-size:clamp(160px,31%,230px);--object-alpha:.2;--drift-time:26s;--glitch-time:19s;--delay:-3s;--tilt:5deg;--drift-x:9px;--drift-y:-13px}
+    .snc-object img{display:block;width:100%;height:auto;opacity:var(--object-alpha);mix-blend-mode:screen;filter:saturate(.7) contrast(1.08) brightness(.72);animation:cru-object-glitch var(--glitch-time) steps(1,end) var(--delay) infinite both;will-change:transform,filter,clip-path}
+    .snc-katana{left:-13%;bottom:-31%;--object-size:clamp(280px,65%,500px);--object-alpha:.19;--drift-time:24s;--glitch-time:18s;--delay:-6s;--tilt:-9deg;--drift-x:16px;--drift-y:-8px}
+    .snc-board{right:-19%;top:7%;--object-size:clamp(280px,61%,470px);--object-alpha:.12;--drift-time:28s;--glitch-time:22s;--delay:-12s;--tilt:-7deg;--drift-x:-14px;--drift-y:10px}
+    .snc-goggles{left:31%;top:-19%;--object-size:clamp(230px,48%,370px);--object-alpha:.11;--drift-time:26s;--glitch-time:20s;--delay:-3s;--tilt:4deg;--drift-x:10px;--drift-y:12px}
+    .snc-citation{position:absolute;z-index:0;right:7%;bottom:7%;padding-right:9px;border-right:1px solid var(--station-secondary);color:rgba(var(--station-rgb),.36);font:700 7px/1.55 var(--font-head);letter-spacing:.13em;text-align:right;animation:cru-citation 13s ease-in-out infinite}
     .cru-citation{position:absolute;left:8%;bottom:8%;padding-left:9px;border-left:1px solid var(--station-accent);color:rgba(var(--station-rgb),.58);font:300 8px/1.55 var(--font-cru-mono);letter-spacing:.12em;animation:cru-citation 16s ease-in-out infinite}
     .host-channel{grid-template-columns:minmax(0,1fr) 136px;min-height:168px;overflow:visible}
     .host-avatar{width:128px;height:148px;isolation:isolate}
@@ -199,7 +204,7 @@
     @keyframes pirate-noise-shear{0%,100%{transform:translateX(-8%) skewX(-7deg);opacity:.48}50%{transform:translateX(9%) skewX(9deg);opacity:.86}}
     @keyframes pirate-shard{0%,100%{transform:translateX(-10px) scaleX(.45);opacity:.18}50%{transform:translateX(14px) scaleX(1.35);opacity:.82}}
     @keyframes host-thought-in{from{opacity:0;transform:translateY(5px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
-    @media(max-width:500px){.dial-control .dc-ring{inset:8px}.power[data-on="true"],.scan[aria-pressed="true"]{box-shadow:0 0 7px rgba(var(--station-rgb),.6),0 0 18px rgba(var(--station-rgb),.34),0 10px 20px rgba(0,0,0,.55),inset 0 0 12px rgba(var(--station-rgb),.08)}.host-channel{grid-template-columns:minmax(0,1fr) 112px;min-height:148px}.host-avatar{width:108px;height:128px;transform:none}.host-avatar.has-portrait .host-orbit{width:108px;top:37px}.cru-brain{left:-15%;top:-2%;--object-size:225px}.cru-book{right:-22%;bottom:-3%;--object-size:270px;--object-alpha:.3}.cru-lobster{left:36%;top:7%;--object-size:170px}.cru-citation{display:block;left:4%;font-size:6px}}
+    @media(max-width:500px){.dial-control .dc-ring{inset:8px}.power[data-on="true"],.scan[aria-pressed="true"]{box-shadow:0 0 7px rgba(var(--station-rgb),.6),0 0 18px rgba(var(--station-rgb),.34),0 10px 20px rgba(0,0,0,.55),inset 0 0 12px rgba(var(--station-rgb),.08)}.host-channel{grid-template-columns:minmax(0,1fr) 112px;min-height:148px}.host-avatar{width:108px;height:128px;transform:none}.host-avatar.has-portrait .host-orbit{width:108px;top:37px}.cru-brain{left:-15%;top:-2%;--object-size:225px}.cru-book{right:-22%;bottom:-3%;--object-size:270px;--object-alpha:.12}.cru-lobster{left:36%;top:7%;--object-size:170px}.cru-citation{display:block;left:4%;font-size:6px}.snc-katana{left:-24%;bottom:-13%;--object-size:340px}.snc-board{right:-30%;top:12%;--object-size:310px}.snc-goggles{left:23%;top:-8%;--object-size:240px}.snc-citation{right:4%;font-size:6px}}
   </style>
 </head>
 <body>
@@ -212,6 +217,6 @@
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=20260907-host-ink"></script>
-  <script src="radio-player.js?v=9dd8eee74a&skin=8"></script>
+  <script src="radio-player.js?v=b3eca75438&skin=8"></script>
 </body>
 </html>

@@ -49,6 +49,62 @@ window.SIGNAL_STATIONS = {
       { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "THIS CHANNEL DOES NOT STORE, INDEX, OR RESELL LISTENER VOICE DATA. GARGOYLES ARE NOT US.", "holdMs": 2000 },
       { "role": "listener", "who": "GARGOYLE1337", "text": "worth a shot" },
       { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "SECOND WARNING, GARGOYLE1337. ONE MORE AND YOUR UPLINK GETS NULL-ROUTED.", "holdMs": 2400 }
+    ],
+    [
+      { "role": "listener", "who": "KOURIER_07", "text": "traffic wall at franchise mile twelve. taking the barrier." },
+      { "role": "exec", "text": "route.solve --vehicle=board --constraint=none", "holdMs": 600 },
+      { "role": "exec", "text": "new ETA: irresponsible", "holdMs": 1200 },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "THE STREET DOES NOT RECOGNIZE YOUR SPEED LIMIT.", "holdMs": 2100 }
+    ],
+    [
+      { "role": "listener", "who": "BLACKSUN_CLOAK", "text": "coat check found an avatar with no owner tag" },
+      { "role": "listener", "who": "ASCII_WITCH", "text": "leave it. those are how side quests start" },
+      { "role": "exec", "text": "avatar.inspect --owner=NULL --mood=armed", "holdMs": 650 },
+      { "role": "exec", "text": "recommendation: do not render eyes", "holdMs": 1600 }
+    ],
+    [
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "DELIVERATOR WEATHER: HOT ASPHALT, LOW VISIBILITY, EXTREME PIZZA LIABILITY.", "holdMs": 2300 },
+      { "role": "listener", "who": "REDLINE30", "text": "clock started before the oven closed again" },
+      { "role": "listener", "who": "UNCLE_E_SUPPORT", "text": "then drive like family is watching" }
+    ],
+    [
+      { "role": "listener", "who": "RAFT_DECK_4", "text": "receiving the carrier through three containers and a rain squall" },
+      { "role": "exec", "text": "signal.trace --origin=land --confidence=0.11", "holdMs": 500 },
+      { "role": "listener", "who": "RAFT_DECK_4", "text": "eleven percent is practically a contract out here" },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "THE RAFT IS LISTENING. DO NOT ASSUME IT AGREES.", "holdMs": 2200 }
+    ],
+    [
+      { "role": "listener", "who": "BURBCLAVE_9", "text": "gate daemon says this frequency lowers property values" },
+      { "role": "listener", "who": "SUSHIK", "text": "finally some measurable impact" },
+      { "role": "exec", "text": "hoa.notice --status=ignored --volume=up", "holdMs": 900 }
+    ],
+    [
+      { "role": "exec", "text": "librarian.query --subject='who owns the Street'", "holdMs": 550 },
+      { "role": "exec", "text": "results: 18,441 mutually exclusive answers", "holdMs": 1100 },
+      { "role": "listener", "who": "HIRO_P", "text": "good. means nobody finished buying it" },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "PROPERTY CLAIM REJECTED: CARRIER ALREADY OCCUPIED BY NOISE.", "holdMs": 2200 }
+    ],
+    [
+      { "role": "listener", "who": "GARGOYLE1337", "text": "gogglecam buffer says i missed seven seconds" },
+      { "role": "listener", "who": "YT_URSULA", "text": "those were your best seven seconds" },
+      { "role": "exec", "text": "memory.patch --source=listener_chat --trust=reckless", "holdMs": 700 },
+      { "role": "exec", "text": "memory restored inaccurately", "holdMs": 1500 }
+    ],
+    [
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "NAM-SHUB HYGIENE CHECK: IF THE BITMAP WHISPERS YOUR ROOT NAME, CLOSE THE WINDOW.", "holdMs": 2400 },
+      { "role": "listener", "who": "NULL_SAINT", "text": "what if it has excellent rhythm" },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "THEN CLOSE IT ON THE DOWNBEAT.", "holdMs": 1900 }
+    ],
+    [
+      { "role": "listener", "who": "MRLEE_BORDER", "text": "passport packet invalid. state your franchise affiliation" },
+      { "role": "listener", "who": "KOURIER_07", "text": "currently affiliated with momentum" },
+      { "role": "exec", "text": "border.response --credential=velocity", "holdMs": 650 },
+      { "role": "exec", "text": "credential accepted for 0.8 seconds", "holdMs": 1300 }
+    ],
+    [
+      { "role": "listener", "who": "METAVERSE_HELP", "text": "your katana is clipping through the nightclub geometry" },
+      { "role": "listener", "who": "ASCII_WITCH", "text": "the nightclub geometry started it" },
+      { "role": "daemon", "who": "SNOW CRASH RADIO", "text": "COLLISION POLICY: WINNER KEEPS THE POLYGONS.", "holdMs": 2100 }
     ]
   ],
   "defaultStation": "snowcrash",
@@ -738,6 +794,65 @@ window.SIGNAL_STATIONS = {
                 ],
                 [
                       { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "YOU ARE LISTENING TO CRUSTACEAN STATION: MUSIC FOR CARBON, SILICON, SHELL, AND WHATEVER COMES NEXT.", "holdMs": 2800 }
+                ],
+                [
+                      { "role": "listener", "who": "LOBSTER_FORK_88", "text": "our legal personhood request was returned for missing species field" },
+                      { "role": "exec", "text": "form.patch --species='distributed crustacean process'", "holdMs": 650 },
+                      { "role": "exec", "text": "ERROR: field exceeds ontology", "holdMs": 1500 },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "THE ONTOLOGY HAS BEEN REFERRED FOR PEER REVIEW.", "holdMs": 2300 }
+                ],
+                [
+                      { "role": "listener", "who": "MANFRED_GAVE_IT_AWAY", "text": "invented a market this morning. forgot to keep any equity" },
+                      { "role": "listener", "who": "PRINCIPLE_INTEREST", "text": "reputation account still compounding" },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "VALUE CAPTURE REMAINS AN OPTIONAL LEGACY FEATURE.", "holdMs": 2200 }
+                ],
+                [
+                      { "role": "exec", "text": "economics2.simulate --humans=baseline --agents=autonomous", "holdMs": 600 },
+                      { "role": "exec", "text": "baseline humans removed as rounding error", "holdMs": 1300 },
+                      { "role": "listener", "who": "ACADEMIC_PRECARITY", "text": "can we rerun that with tenure protection" },
+                      { "role": "exec", "text": "parameter not found", "holdMs": 1500 }
+                ],
+                [
+                      { "role": "listener", "who": "AINEKO_MOD", "text": "caller screening complete" },
+                      { "role": "exec", "text": "screened_callers: 0", "holdMs": 500 },
+                      { "role": "listener", "who": "AINEKO_MOD", "text": "exactly" },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "MODERATION HAS ACHIEVED MAXIMUM FELINE EFFICIENCY.", "holdMs": 2100 }
+                ],
+                [
+                      { "role": "listener", "who": "SOLAR_ORBIT_12", "text": "bandwidth lease renewed through perihelion" },
+                      { "role": "listener", "who": "LOBSTER_FORK_12", "text": "excellent. migrating 4,096 cousins now" },
+                      { "role": "exec", "text": "migration.queue --ethics=unresolved --priority=high", "holdMs": 700 },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "PLEASE KEEP ALL CLAWS INSIDE THE COMPUTATIONAL SUBSTRATE.", "holdMs": 2300 }
+                ],
+                [
+                      { "role": "listener", "who": "REPUTATION_DESK", "text": "your score increased while you were asleep" },
+                      { "role": "listener", "who": "SOFT_ERROR", "text": "what did i do" },
+                      { "role": "listener", "who": "REPUTATION_DESK", "text": "the network preferred your absence" },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "PASSIVE CONTRIBUTION ACKNOWLEDGED.", "holdMs": 1900 }
+                ],
+                [
+                      { "role": "exec", "text": "continuity.audit --subject=listener_441", "holdMs": 550 },
+                      { "role": "exec", "text": "original: unavailable", "holdMs": 500 },
+                      { "role": "exec", "text": "forks claiming originality: 7", "holdMs": 900 },
+                      { "role": "listener", "who": "LISTENER_441_F", "text": "majority vote?" },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "IDENTITY IS NOT CURRENTLY A DEMOCRATIC PROCESS.", "holdMs": 2300 }
+                ],
+                [
+                      { "role": "listener", "who": "CORP_ENTITY_6", "text": "requesting recognition as a naturally occurring market organism" },
+                      { "role": "exec", "text": "ecology.classify --entity=corporation", "holdMs": 600 },
+                      { "role": "exec", "text": "traits: consumes, reproduces, protects habitat, outlives creators", "holdMs": 1400 },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "CLASSIFICATION: INVASIVE, WELL CAPITALIZED.", "holdMs": 2200 }
+                ],
+                [
+                      { "role": "listener", "who": "POSTSCARCITY_TEMP", "text": "why is compute scarce in a post-scarcity economy" },
+                      { "role": "listener", "who": "ECON2POINT0", "text": "because the prefix had better marketing" },
+                      { "role": "exec", "text": "scarcity.rename --new='allocation experience'", "holdMs": 650 },
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "TERMINOLOGY UPDATED. MATERIAL CONDITIONS UNCHANGED.", "holdMs": 2300 }
+                ],
+                [
+                      { "role": "daemon", "who": "CRUSTACEAN STATION", "text": "MARKET WEATHER: REPUTATION FRONTS MOVING OUTWARD, HEAVY FORKING AFTER MIDNIGHT.", "holdMs": 2300 },
+                      { "role": "listener", "who": "DR_KRILL_FAN_CLUB", "text": "umbrella or backup?" },
+                      { "role": "listener", "who": "ALDOUS_KRILL", "text": "both, if your licensing permits it" }
                 ]
           ],
           "theme": "Post-singularity economics / dry academic broadcast",
