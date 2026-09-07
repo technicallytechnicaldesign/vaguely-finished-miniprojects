@@ -245,6 +245,7 @@
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1, seekFrame: null,
     reception: 'locked', pirateSignal: null, power: false, lyricTicker: null,
     hostQuoteTimer: null, hostQuoteIndex: 0, hostFocus: null, hostKey: '',
+    consoleMuted: false, consoleGeneration: 0,
   };
 
   function formatClock(seconds) {
@@ -545,6 +546,19 @@
 
   function consoleLog() { return byId('notice-log'); }
 
+  function setConsoleSearching(searching) {
+    state.consoleMuted = searching;
+    state.consoleGeneration += 1;
+    const body = consoleLog();
+    if (!body) return;
+    body.replaceChildren();
+    byId('notice').classList.remove('alert');
+    if (searching) {
+      const el = appendConsoleLine('signal');
+      if (el) el.textContent = 'searching for signal...';
+    }
+  }
+
   function scrollConsole() {
     const body = consoleLog();
     if (body) body.scrollTop = body.scrollHeight;
@@ -564,16 +578,21 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async function typeInto(el, text, perCharMs) {
+  async function typeInto(el, text, perCharMs, generation) {
     const cursor = document.createElement('span');
     cursor.className = 'console-cursor';
     el.appendChild(cursor);
     for (let index = 0; index < text.length; index += 1) {
+      if (state.consoleMuted || state.consoleGeneration !== generation || !el.isConnected) {
+        cursor.remove();
+        return false;
+      }
       cursor.insertAdjacentText('beforebegin', text[index]);
       scrollConsole();
       if (perCharMs) await wait(perCharMs);
     }
     cursor.remove();
+    return true;
   }
 
   function flashConsole() {
@@ -587,6 +606,7 @@
   // Real station/tuning state -- always lands immediately, ahead of or alongside whatever
   // the scripted feed is mid-typing, so functional info is never stuck behind a crawl.
   function pushSystemNotice(text) {
+    if (state.consoleMuted) return;
     const el = appendConsoleLine('signal');
     if (!el) return;
     el.textContent = text;
@@ -594,6 +614,8 @@
   }
 
   async function playFeedLine(line) {
+    if (state.consoleMuted) return;
+    const generation = state.consoleGeneration;
     const el = appendConsoleLine(line.role);
     if (!el) return;
     if (line.who) {
@@ -602,7 +624,8 @@
       who.textContent = `[${line.who}]: `;
       el.appendChild(who);
     }
-    await typeInto(el, line.text, line.role === 'listener' ? CONSOLE_CHAT_MS : CONSOLE_TYPE_MS);
+    const completed = await typeInto(el, line.text, line.role === 'listener' ? CONSOLE_CHAT_MS : CONSOLE_TYPE_MS, generation);
+    if (!completed) return;
     if (line.role === 'daemon') flashConsole();
     scrollConsole();
   }
@@ -621,6 +644,7 @@
     let order = [];
     let cursor = 0;
     for (;;) {
+      if (state.consoleMuted) { await wait(300); continue; }
       // re-check at every scene boundary (not mid-scene) so switching stations swaps the
       // feed's content promptly without cutting a scene off halfway through
       if (!state.station || state.station.id !== feedStationId) {
@@ -634,6 +658,7 @@
       const scene = order[cursor];
       cursor += 1;
       for (const line of scene) {
+        if (state.consoleMuted) break;
         await playFeedLine(line);
         await wait(line.holdMs || CONSOLE_LINE_GAP_MS);
       }
@@ -958,6 +983,7 @@
 
   function renderStation(station) {
     delete document.documentElement.dataset.previewStation;
+    setConsoleSearching(false);
     applyVisualProfile(station);
     byId('reception-label').textContent = 'locked station';
     byId('dial-station').textContent = station.name;
@@ -1266,7 +1292,7 @@
     const avatar = byId('host-avatar');
     if (avatar) avatar.classList.add('unresolved-avatar');
     if (byId('host-id')) byId('host-id').textContent = 'NO_SOURCE';
-    pushSystemNotice('Static is live. Hidden carriers only lock inside a narrow frequency window.');
+    setConsoleSearching(true);
     byId('track-count').textContent = 'No mapped programme at this frequency';
     byId('mode-label').textContent = 'dead band / seeking';
     byId('signal-lock').textContent = 'no lock';
@@ -1313,7 +1339,7 @@
     byId('dial-station').textContent = signal.source;
     byId('host').textContent = `Origin: ${signal.source}`;
     byId('line').textContent = '"No callsign. No permission. Signal riding the gaps."';
-    pushSystemNotice(`${signal.id} was not on the carrier map. It will vanish when the transmission ends.`);
+    setConsoleSearching(true);
     byId('track-count').textContent = 'One intercepted burst, no scheduled repeat';
     byId('mode-label').textContent = 'pirate breakthrough';
     byId('signal-lock').textContent = 'unstable carrier';

@@ -182,7 +182,7 @@
     .host-avatar.has-portrait .host-cube{z-index:3}
     .host-avatar.has-portrait .host-id{z-index:3;right:0;padding:3px;background:rgba(0,0,0,.62)}
     .host-avatar.pirate-avatar .host-portrait-frame:before{border-color:rgba(var(--station-rgb),.2);background:repeating-linear-gradient(0deg,rgba(0,0,0,.82) 0 4px,rgba(var(--station-rgb),.08) 4px 5px,transparent 5px 8px),rgba(2,3,4,.86)}
-    .host-avatar.pirate-avatar .host-portrait{height:calc(100% + 36px);opacity:.1;filter:saturate(.3) contrast(1.72) brightness(.48) blur(.6px) drop-shadow(3px 0 0 var(--station-secondary)) drop-shadow(-3px 0 0 rgba(var(--station-rgb),.45));animation:pirate-avatar-break 1.35s steps(2,end) infinite}
+    .host-avatar.pirate-avatar .host-portrait{height:calc(100% + 36px);opacity:.2;filter:saturate(.3) contrast(1.72) brightness(.48) blur(.6px) drop-shadow(3px 0 0 var(--station-secondary)) drop-shadow(-3px 0 0 rgba(var(--station-rgb),.45));animation:pirate-avatar-break 1.35s steps(2,end) infinite}
     .host-avatar.pirate-avatar .host-portrait-frame:after{background:repeating-linear-gradient(0deg,rgba(0,0,0,.72) 0 3px,transparent 3px 5px,rgba(255,255,255,.12) 5px 6px,transparent 6px 9px),repeating-linear-gradient(90deg,transparent 0 13%,rgba(var(--station-rgb),.22) 13% 18%,rgba(0,0,0,.84) 18% 29%,transparent 29% 47%);mix-blend-mode:normal;opacity:.88;animation:pirate-avatar-scan .22s steps(2) infinite}
     .host-avatar.pirate-avatar .host-orbit{opacity:.25;border-style:dotted;animation-duration:1.7s}
     .host-avatar.pirate-avatar .host-cube{animation-duration:.78s}
@@ -204,7 +204,7 @@
     @keyframes cru-citation{0%,100%{opacity:.34;transform:translateY(0)}50%{opacity:.72;transform:translateY(-5px)}}
     @keyframes host-portrait-breathe{0%,100%{transform:scale(1.03)}50%{transform:scale(1.06)}}
     @keyframes host-portrait-scan{0%{background-position:0 0,-180px 0}100%{background-position:0 0,240px 0}}
-    @keyframes pirate-avatar-break{0%,64%,100%{transform:translate(0) scale(1.06);clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:.07}66%{transform:translate(-7px,1px) scale(1.1);clip-path:polygon(0 0,100% 0,100% 27%,8% 33%,8% 48%,100% 44%,100% 100%,0 100%);opacity:.34}70%{transform:translate(6px,-2px) scale(1.04);clip-path:polygon(0 0,100% 0,100% 18%,0 23%,0 66%,94% 72%,94% 100%,0 100%);opacity:.12}76%{transform:translate(-2px,0) scale(1.09);clip-path:inset(19% 0 28% 0);opacity:.42}82%{transform:translate(4px,2px) scale(1.05);clip-path:inset(52% 0 8% 0);opacity:.18}}
+    @keyframes pirate-avatar-break{0%,64%,100%{transform:translate(0) scale(1.06);clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:.17}66%{transform:translate(-7px,1px) scale(1.1);clip-path:polygon(0 0,100% 0,100% 27%,8% 33%,8% 48%,100% 44%,100% 100%,0 100%);opacity:.44}70%{transform:translate(6px,-2px) scale(1.04);clip-path:polygon(0 0,100% 0,100% 18%,0 23%,0 66%,94% 72%,94% 100%,0 100%);opacity:.22}76%{transform:translate(-2px,0) scale(1.09);clip-path:inset(19% 0 28% 0);opacity:.52}82%{transform:translate(4px,2px) scale(1.05);clip-path:inset(52% 0 8% 0);opacity:.28}}
     @keyframes pirate-avatar-scan{0%{background-position:0 0,-90px 0;transform:translateX(-3px)}50%{background-position:0 5px,60px 0;transform:translateX(4px)}100%{background-position:0 11px,180px 0;transform:translateX(-1px)}}
     @keyframes pirate-static-jump{0%{transform:translate(-2%,-1%) scale(1.03);background-position:0 0,0 0}50%{transform:translate(2%,1%) scale(1.06);background-position:7px -4px,-9px 0}100%{transform:translate(-1%,2%) scale(1.04);background-position:-5px 3px,13px 0}}
     @keyframes pirate-static-roll{to{transform:translateY(26%)}}
@@ -224,6 +224,6 @@
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=20260907-host-ink"></script>
-  <script src="radio-player.js?v=30e91c8d9b&skin=6"></script>
+  <script src="radio-player.js?v=edb04b2a09&skin=7"></script>
 </body>
 </html>
