@@ -69,7 +69,7 @@
     @keyframes dc-spin{to{transform:rotate(360deg)}}
     @keyframes control-pulse{0%,100%{box-shadow:0 0 8px rgba(var(--station-rgb),.7),0 0 30px rgba(var(--station-rgb),.55)}50%{box-shadow:0 0 10px rgba(var(--station-rgb),.9),0 0 44px rgba(var(--station-rgb),.78)}}
     @keyframes control-breathe{0%,100%{transform:scale(.96);opacity:.45}50%{transform:scale(1.04);opacity:1}}
-    @keyframes control-glitch{0%,100%{transform:translate(0,-8px) scaleX(.72);opacity:.25}42%{transform:translate(0,7px) scaleX(.82);opacity:.48}46%{transform:translate(-5px,10px) scaleX(1);opacity:.9}50%{transform:translate(4px,13px) scaleX(.55);opacity:.62}68%{transform:translate(0,18px) scaleX(.9);opacity:.72}}
+    @keyframes control-glitch{0%,100%{transform:translate3d(0,-15px,0) scaleX(.58);opacity:.2}24%{transform:translate3d(0,-3px,0) scaleX(.84);opacity:.56}45%{transform:translate3d(-5px,11px,0) scaleX(1.05);opacity:.94}49%{transform:translate3d(5px,15px,0) scaleX(.48);opacity:.64}72%{transform:translate3d(0,28px,0) scaleX(.92);opacity:.78}88%{transform:translate3d(0,36px,0) scaleX(.66);opacity:.34}}
     /* Dormant controls are neutral hardware; station color and movement only appear live. */
     .dial-control{border:1px solid rgba(177,187,197,.28);border-radius:50%;color:#7f8993;background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.055),transparent 28%),linear-gradient(145deg,rgba(23,27,32,.58),rgba(5,6,7,.48) 72%);box-shadow:0 12px 28px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,255,255,.025),inset 0 -10px 18px rgba(0,0,0,.32);clip-path:none;filter:grayscale(1)}
     .dial-control:before{content:"";position:absolute;inset:7px;z-index:1;border:1px solid rgba(177,187,197,.12);border-radius:50%;pointer-events:none}
@@ -78,10 +78,10 @@
     .dial-control:hover{border-color:rgba(220,226,232,.48);color:#b7c0c8;filter:grayscale(1) brightness(1.08)}
     .dial-control .dc-ring{inset:-7px;border:1px dashed rgba(177,187,197,.2);border-radius:50%}
     .dial-control .dc-sweep{border-radius:50%;background:conic-gradient(from 0deg,rgba(var(--station-rgb),.82),transparent 24%,color-mix(in srgb,var(--station-secondary) 58%,transparent) 58%,transparent 72%)}
-    .power[data-on="true"],.scan[aria-pressed="true"]{color:#fff;border-color:var(--station-accent);background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.12),transparent 26%),linear-gradient(145deg,rgba(var(--station-rgb),.16),rgba(5,6,7,.42) 76%);filter:none;box-shadow:0 0 8px rgba(var(--station-rgb),.72),0 0 30px rgba(var(--station-rgb),.55),0 12px 28px rgba(0,0,0,.72),inset 0 0 18px rgba(var(--station-rgb),.14)}
+    .power[data-on="true"],.scan[aria-pressed="true"]{color:#fff;border-color:var(--station-accent);background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.07),transparent 27%),linear-gradient(145deg,rgba(var(--station-rgb),.09),rgba(5,6,7,.2) 78%);filter:none;box-shadow:0 0 8px rgba(var(--station-rgb),.72),0 0 30px rgba(var(--station-rgb),.55),0 12px 28px rgba(0,0,0,.58),inset 0 0 14px rgba(var(--station-rgb),.08)}
     .power[data-on="true"] .dc-label,.scan[aria-pressed="true"] .dc-label{text-shadow:0 0 8px var(--station-accent),1px 0 var(--station-secondary)}
     .power[data-on="true"]:before,.scan[aria-pressed="true"]:before{border-color:rgba(var(--station-rgb),.48);animation:control-breathe 1.8s ease-in-out infinite}
-    .power[data-on="true"]:after,.scan[aria-pressed="true"]:after{content:"";display:block;position:absolute;left:-5px;right:-5px;top:29%;z-index:3;height:2px;background:var(--station-secondary);box-shadow:0 13px 0 var(--station-accent),0 27px 0 color-mix(in srgb,var(--station-secondary) 72%,transparent);transform-origin:center;animation:control-glitch 2.8s steps(2,end) infinite;pointer-events:none}
+    .power[data-on="true"]:after,.scan[aria-pressed="true"]:after{content:"";display:block;position:absolute;left:-5px;right:-5px;top:18%;z-index:3;height:2px;background:var(--station-secondary);box-shadow:0 9px 0 color-mix(in srgb,var(--station-accent) 78%,transparent),0 18px 0 color-mix(in srgb,var(--station-secondary) 48%,transparent);transform-origin:center;will-change:transform;animation:control-glitch 2.35s steps(1,end) infinite;pointer-events:none}
     .scan[aria-pressed="true"]:after{animation-duration:1.65s;animation-direction:alternate-reverse}
     .power[data-on="true"] .dc-ring,.scan[aria-pressed="true"] .dc-ring{border-radius:38%;clip-path:polygon(10% 0,90% 0,100% 10%,100% 90%,90% 100%,10% 100%,0 90%,0 10%)}
     /* --- notice console fills its telemetry column (fixed, not content-grown --
@@ -178,12 +178,13 @@
     .host-avatar.pirate-avatar .host-portrait-frame:after{background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.13) 2px 3px,transparent 3px 8px),linear-gradient(90deg,transparent 0 18%,rgba(var(--station-rgb),.34) 18% 23%,transparent 23% 61%,rgba(255,255,255,.13) 61% 63%,transparent 63%);mix-blend-mode:screen;animation:pirate-avatar-scan .34s steps(3) infinite}
     .host-avatar.pirate-avatar .host-orbit{opacity:.25;border-style:dotted;animation-duration:1.7s}
     .host-avatar.pirate-avatar .host-cube{animation-duration:.78s}
+    .host-avatar.unresolved-avatar .host-portrait-frame,.host-avatar.unresolved-avatar .host-head,.host-avatar.unresolved-avatar .host-orbit,.host-avatar.unresolved-avatar .host-cube,.host-avatar.unresolved-avatar .host-id{display:none}
     .pirate-static{position:absolute;inset:0;overflow:hidden;background:#020303;isolation:isolate}
-    .pirate-static:before{content:"";position:absolute;inset:-12%;z-index:1;background:repeating-radial-gradient(ellipse at 31% 43%,rgba(255,255,255,.72) 0 1px,rgba(0,0,0,.84) 1px 3px,transparent 3px 6px),repeating-linear-gradient(93deg,rgba(var(--station-rgb),.28) 0 1px,transparent 1px 5px);background-size:8px 7px,17px 100%;mix-blend-mode:screen;animation:pirate-static-jump .08s steps(2) infinite}
-    .pirate-static:after{content:"";position:absolute;inset:-30% 0;z-index:2;background:repeating-linear-gradient(0deg,transparent 0 7%,rgba(255,255,255,.24) 7% 7.7%,transparent 7.7% 16%,rgba(var(--station-rgb),.3) 16% 18%,transparent 18% 29%);mix-blend-mode:screen;animation:pirate-static-roll .48s steps(5) infinite}
-    .pirate-noise{position:absolute;inset:0;z-index:3;background:linear-gradient(112deg,transparent 0 28%,rgba(var(--station-rgb),.2) 29% 32%,transparent 33% 58%,rgba(255,255,255,.13) 59% 60%,transparent 61%);animation:pirate-noise-shear .19s steps(3) infinite}
+    .pirate-static:before{content:"";position:absolute;inset:-16%;z-index:1;background:repeating-conic-gradient(from 13deg at 31% 43%,rgba(255,255,255,.82) 0 1deg,rgba(0,0,0,.92) 1deg 3deg,transparent 3deg 6deg),repeating-radial-gradient(circle at 67% 29%,rgba(var(--station-rgb),.55) 0 1px,transparent 1px 4px);background-size:11px 9px,7px 6px;mix-blend-mode:screen;opacity:.86;animation:pirate-static-jump .065s steps(2) infinite}
+    .pirate-static:after{content:"";position:absolute;inset:-34% 0;z-index:2;background:repeating-linear-gradient(0deg,transparent 0 4%,rgba(255,255,255,.34) 4% 4.8%,transparent 4.8% 10%,rgba(var(--station-rgb),.5) 10% 13%,transparent 13% 21%);mix-blend-mode:screen;animation:pirate-static-roll .36s steps(6) infinite}
+    .pirate-noise{position:absolute;inset:0;z-index:3;background:linear-gradient(112deg,transparent 0 19%,rgba(var(--station-rgb),.4) 20% 27%,transparent 28% 51%,rgba(255,255,255,.24) 52% 55%,transparent 56%),repeating-linear-gradient(90deg,transparent 0 8%,rgba(255,255,255,.12) 8% 9%,transparent 9% 17%);animation:pirate-noise-shear .14s steps(3) infinite}
     .pirate-burst{position:absolute;inset:0;z-index:4;overflow:hidden;mix-blend-mode:screen}
-    .pirate-burst i{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);background:var(--station-accent);box-shadow:9px 0 0 var(--station-secondary),-6px 0 0 rgba(255,255,255,.2);opacity:.62;animation:pirate-shard .62s steps(2) var(--delay) infinite}
+    .pirate-burst i{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);background:var(--station-accent);box-shadow:9px 0 0 var(--station-secondary),-6px 0 0 rgba(255,255,255,.34);opacity:.78;animation:pirate-shard .48s steps(2) var(--delay) infinite}
     .host-line span,.host-line #line{display:inline-block}
     #line.thought-shift{animation:host-thought-in .65s ease both}
     @keyframes cru-lyric-drift{0%,100%{opacity:calc(var(--alpha) * .35);transform:translate3d(0,0,var(--depth)) rotate(var(--rot))}45%,65%{opacity:var(--alpha);transform:translate3d(var(--dx),var(--dy),calc(var(--depth) + 8px)) rotate(var(--rot))}}
@@ -215,6 +216,6 @@
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=20260907-host-ink"></script>
-  <script src="radio-player.js?v=93574d273b"></script>
+  <script src="radio-player.js?v=afc97f4485&skin=4"></script>
 </body>
 </html>

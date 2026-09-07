@@ -840,7 +840,7 @@
     const avatar = byId('host-avatar');
     const image = byId('host-portrait');
     if (avatar && image) {
-      avatar.classList.remove('pirate-avatar');
+      avatar.classList.remove('pirate-avatar', 'unresolved-avatar');
       avatar.classList.toggle('has-portrait', Boolean(profile.portrait));
       image.onerror = () => avatar.classList.remove('has-portrait');
       if (profile.portrait) image.src = profile.portrait;
@@ -863,7 +863,7 @@
   function clearHostPortrait() {
     const avatar = byId('host-avatar');
     const image = byId('host-portrait');
-    if (avatar) avatar.classList.remove('has-portrait', 'pirate-avatar');
+    if (avatar) avatar.classList.remove('has-portrait', 'pirate-avatar', 'unresolved-avatar');
     if (image) { image.removeAttribute('src'); image.alt = ''; }
   }
 
@@ -907,8 +907,8 @@
       return;
     }
     state.lyricTicker = null;
-    if (mode.id === 'pirate') {
-      const shards = Array.from({ length: 32 }, (_, index) => {
+    if (mode.id === 'pirate' || mode.id === 'static') {
+      const shards = Array.from({ length: 72 }, (_, index) => {
         const x = (index * 37) % 96;
         const y = (index * 23) % 94;
         const width = 4 + ((index * 11) % 29);
@@ -916,7 +916,7 @@
         const delay = -((index % 9) * 0.13).toFixed(2);
         return `<i style="--x:${x}%;--y:${y}%;--w:${width}%;--h:${height}px;--delay:${delay}s"></i>`;
       }).join('');
-      el.innerHTML = `<div class="pirate-static pirate-static-${(item && item.family) || 'unknown'}"><div class="pirate-noise"></div><div class="pirate-burst">${shards}</div></div>`;
+      el.innerHTML = `<div class="pirate-static pirate-static-${(item && item.family) || 'deadband'}"><div class="pirate-noise"></div><div class="pirate-burst">${shards}</div></div>`;
       return;
     }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
@@ -1029,6 +1029,7 @@
     }
 
     state.activeIndex = toIndex;
+    const renderGeneration = toDeck.loadGeneration;
     const statusLabel = () => {
       if (next.type === 'ad block intro') return 'Ad block starting.';
       if (next.type === 'ad block outro') return 'Ad block over.';
@@ -1038,7 +1039,10 @@
       if (isHostLine) return 'On the air, live.';
       return 'Song plays out, host cuts in on the tail.';
     };
-    const showStatus = () => renderNow(toDeck, statusLabel());
+    const showStatus = () => {
+      if (state.reception !== 'locked' || toDeck.loadGeneration !== renderGeneration || toDeck.item !== next) return;
+      renderNow(toDeck, statusLabel());
+    };
     toDeck.audio.onloadedmetadata = () => { armCutIn(toDeck); showStatus(); };
     if (toDeck.audio.readyState >= 1) armCutIn(toDeck);
     showStatus(); // cheap immediate label; onloadedmetadata upgrades it once duration/outro are known
@@ -1231,6 +1235,7 @@
     stopHostThoughtFeed();
     clearHostPortrait();
     delete document.documentElement.dataset.previewStation;
+    applyVisualProfile({ id: 'deadband', theme: 'multipath snow', visualProfile: { world: 'deadband', accent: '#7b8078', secondary: '#555d62', rgb: '123,128,120', label: 'multipath snow' } });
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
     byId('reception-label').textContent = 'open spectrum';
@@ -1238,6 +1243,9 @@
     byId('world-label').textContent = 'multipath snow';
     byId('host').textContent = 'Origin: unresolved';
     byId('line').textContent = '"No licensed source. Keep the dial moving."';
+    const avatar = byId('host-avatar');
+    if (avatar) avatar.classList.add('unresolved-avatar');
+    if (byId('host-id')) byId('host-id').textContent = 'NO_SOURCE';
     pushSystemNotice('Static is live. Hidden carriers only lock inside a narrow frequency window.');
     byId('track-count').textContent = 'No mapped programme at this frequency';
     byId('mode-label').textContent = 'dead band / seeking';
@@ -1247,14 +1255,14 @@
     byId('break-note').textContent = 'Sweep slowly. Pirate carriers do not advertise themselves.';
     byId('queue').innerHTML = '<li class="empty">Only static is queued here.</li>';
     byId('skip').disabled = true;
-    renderIdentityVisual({ id: 'signal' }, null);
+    renderIdentityVisual({ id: 'static' }, { family: 'deadband' });
   }
 
   function pirateProfile(signal) {
     const profiles = {
-      glossolalia: { world: 'talkback', accent: '#918a63', secondary: '#5f654f', rgb: '145,138,99', label: 'language breach', avatar: 'assets/hosts/pirate-glossolalia-v1.png', avatarName: 'UNKNOWN TONGUE' },
-      machine: { world: 'cybersprawl', accent: '#66758a', secondary: '#455260', rgb: '102,117,138', label: 'machine handshake', avatar: 'assets/hosts/pirate-machine-v1.png', avatarName: 'ROOT RELAY' },
-      sermon: { world: 'snowcrash', accent: '#8d5f55', secondary: '#66534b', rgb: '141,95,85', label: 'Pearly Gates relay', avatar: 'assets/hosts/pirate-sermon-v1.png', avatarName: 'REVEREND WAYNE' }
+      glossolalia: { world: 'talkback', accent: '#918a63', secondary: '#5f654f', rgb: '145,138,99', label: 'language breach', avatar: 'assets/hosts/pirate-glossolalia-v1.png?v=2', avatarName: 'UNKNOWN TONGUE' },
+      machine: { world: 'cybersprawl', accent: '#66758a', secondary: '#455260', rgb: '102,117,138', label: 'machine handshake', avatar: 'assets/hosts/pirate-machine-v1.png?v=2', avatarName: 'ROOT RELAY' },
+      sermon: { world: 'snowcrash', accent: '#8d5f55', secondary: '#66534b', rgb: '141,95,85', label: 'Pearly Gates relay', avatar: 'assets/hosts/pirate-sermon-v1.png?v=2', avatarName: 'REVEREND WAYNE' }
     };
     return profiles[signal.family] || profiles.glossolalia;
   }
@@ -1263,6 +1271,7 @@
     const avatar = byId('host-avatar');
     const image = byId('host-portrait');
     if (!avatar || !image) return;
+    avatar.classList.remove('unresolved-avatar');
     avatar.classList.add('has-portrait', 'pirate-avatar');
     image.onerror = () => avatar.classList.remove('has-portrait');
     image.src = profile.avatar;
@@ -1278,7 +1287,7 @@
     applyVisualProfile({ id: 'pirate', theme: 'unlicensed carrier', visualProfile: profile });
     renderPirateAvatar(profile);
     clearKnownPreset();
-    document.documentElement.dataset.broadcast = 'signal';
+    document.documentElement.dataset.broadcast = 'pirate';
     byId('reception-label').textContent = 'unstable carrier';
     byId('dial-station').textContent = signal.source;
     byId('host').textContent = `Origin: ${signal.source}`;
@@ -1480,11 +1489,16 @@
     if (!first) return;
     const deck = state.decks[0];
     deck.load(first);
+    const renderGeneration = deck.loadGeneration;
     await deck.play();
+    if (state.reception !== 'locked' || deck.loadGeneration !== renderGeneration || deck.item !== first) return;
     deck.gain.gain.setValueAtTime(1, state.ctx.currentTime);
     state.activeIndex = 0;
     state.started = true;
-    const showStatus = () => renderNow(deck, (isCallIn(first.type) || isCallSegment(first.type)) ? 'Open line to the Street.' : isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
+    const showStatus = () => {
+      if (state.reception !== 'locked' || deck.loadGeneration !== renderGeneration || deck.item !== first) return;
+      renderNow(deck, (isCallIn(first.type) || isCallSegment(first.type)) ? 'Open line to the Street.' : isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
+    };
     deck.audio.onloadedmetadata = () => { armCutIn(deck); showStatus(); };
     if (deck.audio.readyState >= 1) armCutIn(deck);
     showStatus();
