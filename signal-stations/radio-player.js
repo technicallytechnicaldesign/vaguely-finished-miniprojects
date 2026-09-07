@@ -840,6 +840,7 @@
     const avatar = byId('host-avatar');
     const image = byId('host-portrait');
     if (avatar && image) {
+      avatar.classList.remove('pirate-avatar');
       avatar.classList.toggle('has-portrait', Boolean(profile.portrait));
       image.onerror = () => avatar.classList.remove('has-portrait');
       if (profile.portrait) image.src = profile.portrait;
@@ -862,7 +863,7 @@
   function clearHostPortrait() {
     const avatar = byId('host-avatar');
     const image = byId('host-portrait');
-    if (avatar) avatar.classList.remove('has-portrait');
+    if (avatar) avatar.classList.remove('has-portrait', 'pirate-avatar');
     if (image) { image.removeAttribute('src'); image.alt = ''; }
   }
 
@@ -906,6 +907,18 @@
       return;
     }
     state.lyricTicker = null;
+    if (mode.id === 'pirate') {
+      const shards = Array.from({ length: 32 }, (_, index) => {
+        const x = (index * 37) % 96;
+        const y = (index * 23) % 94;
+        const width = 4 + ((index * 11) % 29);
+        const height = 1 + (index % 4);
+        const delay = -((index % 9) * 0.13).toFixed(2);
+        return `<i style="--x:${x}%;--y:${y}%;--w:${width}%;--h:${height}px;--delay:${delay}s"></i>`;
+      }).join('');
+      el.innerHTML = `<div class="pirate-static pirate-static-${(item && item.family) || 'unknown'}"><div class="pirate-noise"></div><div class="pirate-burst">${shards}</div></div>`;
+      return;
+    }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
       el.innerHTML = `<div class="glitch-host"><div class="glitch-head"></div><span class="glitch-tag">${mode.label}</span></div>`;
       return;
@@ -1239,18 +1252,31 @@
 
   function pirateProfile(signal) {
     const profiles = {
-      glossolalia: { world: 'talkback', accent: '#ff4eb8', secondary: '#ffea00', rgb: '255,78,184', label: 'language breach' },
-      machine: { world: 'cybersprawl', accent: '#56e5ff', secondary: '#ff665e', rgb: '86,229,255', label: 'machine handshake' },
-      sermon: { world: 'snowcrash', accent: '#ffd76b', secondary: '#ff4e50', rgb: '255,215,107', label: 'Pearly Gates relay' }
+      glossolalia: { world: 'talkback', accent: '#918a63', secondary: '#5f654f', rgb: '145,138,99', label: 'language breach', avatar: 'assets/hosts/pirate-glossolalia-v1.png', avatarName: 'UNKNOWN TONGUE' },
+      machine: { world: 'cybersprawl', accent: '#66758a', secondary: '#455260', rgb: '102,117,138', label: 'machine handshake', avatar: 'assets/hosts/pirate-machine-v1.png', avatarName: 'ROOT RELAY' },
+      sermon: { world: 'snowcrash', accent: '#8d5f55', secondary: '#66534b', rgb: '141,95,85', label: 'Pearly Gates relay', avatar: 'assets/hosts/pirate-sermon-v1.png', avatarName: 'REVEREND WAYNE' }
     };
     return profiles[signal.family] || profiles.glossolalia;
+  }
+
+  function renderPirateAvatar(profile) {
+    const avatar = byId('host-avatar');
+    const image = byId('host-portrait');
+    if (!avatar || !image) return;
+    avatar.classList.add('has-portrait', 'pirate-avatar');
+    image.onerror = () => avatar.classList.remove('has-portrait');
+    image.src = profile.avatar;
+    image.alt = `Distorted intercepted portrait of ${profile.avatarName}`;
+    if (byId('host-id')) byId('host-id').textContent = profile.avatarName.replace(/[^A-Z0-9]+/g, '_');
   }
 
   function renderPirate(signal) {
     stopHostThoughtFeed();
     clearHostPortrait();
     delete document.documentElement.dataset.previewStation;
-    applyVisualProfile({ id: 'pirate', theme: 'unlicensed carrier', visualProfile: pirateProfile(signal) });
+    const profile = pirateProfile(signal);
+    applyVisualProfile({ id: 'pirate', theme: 'unlicensed carrier', visualProfile: profile });
+    renderPirateAvatar(profile);
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
     byId('reception-label').textContent = 'unstable carrier';
@@ -1266,7 +1292,7 @@
     byId('break-note').textContent = 'Hold frequency. Signal integrity is collapsing.';
     byId('queue').innerHTML = `<li><span>!</span><strong>${signal.id}</strong><small>signal ends without warning</small></li>`;
     byId('skip').disabled = true;
-    renderIdentityVisual({ id: 'host', label: 'intercepted signal' }, null);
+    renderIdentityVisual({ id: 'pirate', label: 'intercepted signal' }, signal);
   }
 
   function enterDeadBand(value, options = {}) {
