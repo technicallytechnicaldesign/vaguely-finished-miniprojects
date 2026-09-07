@@ -73,7 +73,7 @@ window.SIGNAL_STATIONS = {
   "stations": [
     {
       "id": "cybersprawl",
-      "visualProfile": {"world": "cybersprawl", "accent": "#56e5ff", "secondary": "#ff4eb8", "rgb": "86,229,255", "label": "rain transit grid"},
+      "visualProfile": {"world": "cybersprawl", "accent": "#00f5ff", "secondary": "#ff2fa3", "rgb": "0,245,255", "label": "rain transit grid"},
       "name": "CYBERSPRAWL FM",
       "frequency": "94.9",
       "tagline": "Night transit for the wired city.",
@@ -94,7 +94,7 @@ window.SIGNAL_STATIONS = {
     },
     {
       "id": "afterhuman",
-      "visualProfile": {"world": "afterhuman", "accent": "#c6ff65", "secondary": "#a36cff", "rgb": "198,255,101", "label": "memory lattice"},
+      "visualProfile": {"world": "afterhuman", "accent": "#b8ff00", "secondary": "#8d63ff", "rgb": "184,255,0", "label": "memory lattice"},
       "name": "AFTERHUMAN RADIO",
       "frequency": "101.3",
       "tagline": "Signals for bodies still becoming.",
@@ -164,7 +164,7 @@ window.SIGNAL_STATIONS = {
     },
     {
       "id": "snowcrash",
-      "visualProfile": {"world": "snowcrash", "accent": "#ffea00", "secondary": "#ff2f92", "rgb": "255,234,0", "label": "Street rush protocol"},
+      "visualProfile": {"world": "snowcrash", "accent": "#ffe600", "secondary": "#ff2fa3", "rgb": "255,230,0", "label": "Street rush protocol"},
       "name": "SNOW CRASH RADIO",
       "frequency": "133.7",
       "tagline": "Riot gear optional. Bandwidth is not.",
@@ -281,7 +281,7 @@ window.SIGNAL_STATIONS = {
     },
     {
       "id": "afterhuman-loopback",
-      "visualProfile": {"world": "talkback", "accent": "#55ffcc", "secondary": "#ff665e", "rgb": "85,255,204", "label": "voice diagnostic chamber"},
+      "visualProfile": {"world": "talkback", "accent": "#00f5ff", "secondary": "#ff2fa3", "rgb": "0,245,255", "label": "voice diagnostic chamber"},
       "name": "AFTERHUMAN TALKBACK",
       "frequency": "00.1",
       "tagline": "The Street is calling. Nobody checked the line.",
@@ -298,9 +298,9 @@ window.SIGNAL_STATIONS = {
           "id": "crustacean",
           "visualProfile": {
                 "world": "crustacean",
-                "accent": "#e8a33d",
-                "secondary": "#3ea8a0",
-                "rgb": "232,163,61",
+                "accent": "#00f5ff",
+                "secondary": "#ff2fa3",
+                "rgb": "0,245,255",
                 "label": "the late economics desk"
           },
           "name": "CRUSTACEAN STATION",
