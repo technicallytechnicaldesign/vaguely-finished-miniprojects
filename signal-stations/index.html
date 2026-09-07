@@ -84,6 +84,14 @@
     .power[data-on="true"]:after,.scan[aria-pressed="true"]:after{content:"";display:block;position:absolute;left:-5px;right:-5px;top:18%;z-index:3;height:2px;background:var(--station-secondary);box-shadow:0 9px 0 color-mix(in srgb,var(--station-accent) 78%,transparent),0 18px 0 color-mix(in srgb,var(--station-secondary) 48%,transparent);transform-origin:center;will-change:transform;animation:control-glitch 2.35s steps(1,end) infinite;pointer-events:none}
     .scan[aria-pressed="true"]:after{animation-duration:1.65s;animation-direction:alternate-reverse}
     .power[data-on="true"] .dc-ring,.scan[aria-pressed="true"] .dc-ring{border-radius:38%;clip-path:polygon(10% 0,90% 0,100% 10%,100% 90%,90% 100%,10% 100%,0 90%,0 10%)}
+    /* Open spectrum is noisy in the programme display, not in the receiver hardware. */
+    [data-reception="static"]{--audio-low:0!important;--audio-mid:0!important;--audio-high:0!important}
+    [data-reception="static"] .reality .static-field,[data-reception="static"] .frequency-tear{opacity:0!important;animation:none!important}
+    [data-reception="static"] .power[data-on="true"],[data-reception="static"] .scan[aria-pressed="true"]{animation:none;box-shadow:0 0 10px rgba(var(--station-rgb),.28),0 12px 28px rgba(0,0,0,.58),inset 0 0 12px rgba(var(--station-rgb),.06)}
+    [data-reception="static"] .power[data-on="true"]:before,[data-reception="static"] .scan[aria-pressed="true"]:before,[data-reception="static"] .power[data-on="true"] .dc-ring,[data-reception="static"] .scan[aria-pressed="true"] .dc-ring,[data-reception="static"] .scan[aria-pressed="true"] .dc-sweep{animation:none}
+    [data-reception="static"] .power[data-on="true"]:after,[data-reception="static"] .scan[aria-pressed="true"]:after{display:none}
+    [data-reception="static"] .scan[aria-pressed="true"] .dc-sweep{opacity:0}
+    [data-reception="static"] .dial-track,[data-reception="static"] .dial-station,[data-reception="static"] .dial-needle,[data-reception="static"] .dial-number-svg,[data-reception="static"] .dial-unit-svg{filter:none}
     /* --- notice console fills its telemetry column (fixed, not content-grown --
        it must not balloon the whole row taller as scripted lines accumulate) --- */
     .notice-section{padding:0!important;overflow:hidden}
@@ -216,6 +224,6 @@
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=20260907-host-ink"></script>
-  <script src="radio-player.js?v=afc97f4485&skin=4"></script>
+  <script src="radio-player.js?v=30e91c8d9b&skin=5"></script>
 </body>
 </html>

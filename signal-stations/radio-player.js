@@ -815,6 +815,25 @@
     if (byId('world-label')) byId('world-label').textContent = profile.label || station.theme;
   }
 
+  function updateExternalMetadata(item, contextName = '') {
+    const stationName = contextName || (state.station && state.station.name) || 'SIGNAL RADIO';
+    if (!item) {
+      document.title = `${stationName} | SIGNAL RADIO`;
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.playbackState = state.power ? 'paused' : 'none';
+      }
+      return;
+    }
+    const title = item.title || 'Untitled transmission';
+    const artist = item.subtitle || item.source || stationName;
+    document.title = `${title} / ${artist} | ${stationName}`;
+    if ('mediaSession' in navigator && 'MediaMetadata' in window) {
+      navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album: stationName });
+      navigator.mediaSession.playbackState = state.power ? 'playing' : 'paused';
+    }
+  }
+
   function hostProfileFor(item) {
     const station = state.station || {};
     const name = (item && item.hostName) || station.host || 'Unresolved host';
@@ -963,6 +982,7 @@
     byId('now-title').textContent = item ? item.title : 'Off air';
     byId('now-subtitle').textContent = item ? item.subtitle : 'Choose a station with cleared tracks.';
     byId('break-note').textContent = item ? cutInLabel || '' : 'Crossfades in live -- press play to start the broadcast.';
+    updateExternalMetadata(item);
     renderProgress(deck);
   }
 
@@ -1255,6 +1275,7 @@
     byId('break-note').textContent = 'Sweep slowly. Pirate carriers do not advertise themselves.';
     byId('queue').innerHTML = '<li class="empty">Only static is queued here.</li>';
     byId('skip').disabled = true;
+    updateExternalMetadata(null, 'Open spectrum');
     renderIdentityVisual({ id: 'static' }, { family: 'deadband' });
   }
 
@@ -1301,6 +1322,7 @@
     byId('break-note').textContent = 'Hold frequency. Signal integrity is collapsing.';
     byId('queue').innerHTML = `<li><span>!</span><strong>${signal.id}</strong><small>signal ends without warning</small></li>`;
     byId('skip').disabled = true;
+    updateExternalMetadata({ title: signal.title, subtitle: signal.source }, 'Unlicensed spectrum');
     renderIdentityVisual({ id: 'pirate', label: 'intercepted signal' }, signal);
   }
 
