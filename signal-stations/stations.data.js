@@ -73,7 +73,7 @@ window.SIGNAL_STATIONS = {
   "stations": [
     {
       "id": "cybersprawl",
-      "visualProfile": {"world": "cybersprawl", "accent": "#00f5ff", "secondary": "#ff2fa3", "rgb": "0,245,255", "label": "rain transit grid"},
+      "visualProfile": {"world": "cybersprawl", "accent": "#ff8a1f", "secondary": "#00f5ff", "rgb": "255,138,31", "label": "rain transit grid"},
       "name": "CYBERSPRAWL FM",
       "frequency": "94.9",
       "tagline": "Night transit for the wired city.",
@@ -94,7 +94,7 @@ window.SIGNAL_STATIONS = {
     },
     {
       "id": "afterhuman",
-      "visualProfile": {"world": "afterhuman", "accent": "#b8ff00", "secondary": "#8d63ff", "rgb": "184,255,0", "label": "memory lattice"},
+      "visualProfile": {"world": "afterhuman", "accent": "#8d63ff", "secondary": "#b8ff00", "rgb": "141,99,255", "label": "memory lattice"},
       "name": "AFTERHUMAN RADIO",
       "frequency": "101.3",
       "tagline": "Signals for bodies still becoming.",
@@ -281,7 +281,7 @@ window.SIGNAL_STATIONS = {
     },
     {
       "id": "afterhuman-loopback",
-      "visualProfile": {"world": "talkback", "accent": "#00f5ff", "secondary": "#ff2fa3", "rgb": "0,245,255", "label": "voice diagnostic chamber"},
+      "visualProfile": {"world": "talkback", "accent": "#ff2fa3", "secondary": "#00f5ff", "rgb": "255,47,163", "label": "voice diagnostic chamber"},
       "name": "AFTERHUMAN TALKBACK",
       "frequency": "00.1",
       "tagline": "The Street is calling. Nobody checked the line.",

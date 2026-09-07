@@ -68,15 +68,18 @@
     .scan[aria-pressed="true"] .dc-sweep{opacity:.6;animation:dc-spin 1.4s linear infinite}
     @keyframes dc-spin{to{transform:rotate(360deg)}}
     @keyframes control-pulse{0%,100%{box-shadow:0 0 8px rgba(var(--station-rgb),.7),0 0 30px rgba(var(--station-rgb),.55)}50%{box-shadow:0 0 10px rgba(var(--station-rgb),.9),0 0 44px rgba(var(--station-rgb),.78)}}
-    /* Three-ink controls echo the cyan, magenta and signal-yellow host portraits. */
-    .dial-control{border:1px solid var(--host-cyan);border-radius:0;color:#fff;background:repeating-linear-gradient(102deg,rgba(0,245,255,.11) 0 2px,transparent 2px 8px),rgba(2,4,8,.82);box-shadow:3px 0 0 -1px var(--host-magenta),-3px 0 0 -1px var(--host-cyan),0 12px 28px rgba(0,0,0,.7);clip-path:polygon(17% 0,83% 0,100% 17%,100% 83%,83% 100%,17% 100%,0 83%,0 17%)}
-    .dial-control:before{content:"";position:absolute;inset:7px;z-index:1;border:1px solid var(--host-magenta);clip-path:inherit;opacity:.72;pointer-events:none}
-    .dial-control:after{content:"";position:absolute;left:-5px;right:-5px;top:34%;z-index:2;height:2px;background:linear-gradient(90deg,var(--host-cyan) 0 31%,transparent 31% 39%,var(--host-magenta) 39% 70%,transparent 70% 77%,var(--host-yellow) 77%);box-shadow:0 13px 0 rgba(0,245,255,.38);transform:skewY(-7deg);opacity:.8;pointer-events:none}
-    .dial-control .dc-label{z-index:4;text-shadow:2px 0 var(--host-magenta),-2px 0 var(--host-cyan),0 0 9px var(--host-yellow)}
-    .dial-control:hover{border-color:var(--host-yellow);filter:saturate(1.2) brightness(1.12)}
-    .dial-control .dc-ring{inset:-7px;border:1px solid transparent;border-top-color:var(--host-yellow);border-right-color:var(--host-magenta);border-bottom-color:var(--host-cyan);border-radius:0;clip-path:inherit}
-    .dial-control .dc-sweep{border-radius:0;clip-path:inherit;background:conic-gradient(from 0deg,rgba(0,245,255,.72),transparent 22%,rgba(255,47,163,.55) 49%,transparent 68%,rgba(255,230,0,.62))}
-    .power[data-on="true"],.scan[aria-pressed="true"]{color:#fff;border-color:var(--host-yellow);background:repeating-linear-gradient(102deg,rgba(255,47,163,.22) 0 2px,transparent 2px 7px),linear-gradient(145deg,rgba(0,245,255,.22),rgba(3,4,8,.92) 62%);box-shadow:3px 0 0 -1px var(--host-magenta),-3px 0 0 -1px var(--host-cyan),0 0 18px rgba(var(--station-rgb),.58),0 12px 28px rgba(0,0,0,.72)}
+    @keyframes control-breathe{0%,100%{transform:scale(.96);opacity:.45}50%{transform:scale(1.04);opacity:1}}
+    /* Dormant controls are neutral hardware; station color and movement only appear live. */
+    .dial-control{border:1px solid rgba(177,187,197,.28);border-radius:50%;color:#7f8993;background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.08),transparent 28%),linear-gradient(145deg,#171b20,#050607 72%);box-shadow:0 12px 28px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,255,255,.025),inset 0 -10px 18px rgba(0,0,0,.46);clip-path:none;filter:grayscale(1)}
+    .dial-control:before{content:"";position:absolute;inset:7px;z-index:1;border:1px solid rgba(177,187,197,.12);border-radius:50%;pointer-events:none}
+    .dial-control:after{display:none}
+    .dial-control .dc-label{z-index:4;text-shadow:none;transition:color .25s ease,text-shadow .25s ease}
+    .dial-control:hover{border-color:rgba(220,226,232,.48);color:#b7c0c8;filter:grayscale(1) brightness(1.08)}
+    .dial-control .dc-ring{inset:-7px;border:1px dashed rgba(177,187,197,.2);border-radius:50%}
+    .dial-control .dc-sweep{border-radius:50%;background:conic-gradient(from 0deg,rgba(var(--station-rgb),.82),transparent 24%,color-mix(in srgb,var(--station-secondary) 58%,transparent) 58%,transparent 72%)}
+    .power[data-on="true"],.scan[aria-pressed="true"]{color:#fff;border-color:var(--station-accent);background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.2),transparent 26%),linear-gradient(145deg,color-mix(in srgb,var(--station-accent) 42%,#090b0d),#050607 76%);filter:none;box-shadow:0 0 8px rgba(var(--station-rgb),.72),0 0 30px rgba(var(--station-rgb),.55),0 12px 28px rgba(0,0,0,.72),inset 0 0 18px rgba(var(--station-rgb),.22)}
+    .power[data-on="true"] .dc-label,.scan[aria-pressed="true"] .dc-label{text-shadow:0 0 8px var(--station-accent),1px 0 var(--station-secondary)}
+    .power[data-on="true"]:before,.scan[aria-pressed="true"]:before{border-color:rgba(var(--station-rgb),.48);animation:control-breathe 1.8s ease-in-out infinite}
     /* --- notice console fills its telemetry column (fixed, not content-grown --
        it must not balloon the whole row taller as scripted lines accumulate) --- */
     .notice-section{padding:0!important;overflow:hidden}
@@ -104,18 +107,17 @@
     .dial-readout-num-path,.dial-readout-unit-path{fill:none}
     .dial-number-svg{fill:var(--ink);font:700 44px var(--font-head);letter-spacing:-.01em;filter:drop-shadow(0 0 calc(2px + 4px * var(--audio-high)) rgba(var(--station-rgb),.45))}
     .dial-unit-svg{fill:var(--station-accent);font:700 18px var(--font-head);letter-spacing:.1em}
-    .dial-track{stroke:var(--host-cyan);filter:drop-shadow(2px 0 var(--host-magenta)) drop-shadow(-2px 0 rgba(255,230,0,.55))}
-    #dial-ticks .dial-tick:nth-of-type(3n+1){stroke:var(--host-cyan)}
-    #dial-ticks .dial-tick:nth-of-type(3n+2){stroke:var(--host-magenta)}
-    #dial-ticks .dial-tick:nth-of-type(3n){stroke:var(--host-yellow)}
+    .dial-track{stroke:var(--station-accent);stroke-width:1;stroke-opacity:.035;filter:drop-shadow(0 0 8px var(--station-accent)) drop-shadow(0 0 22px var(--station-accent))}
+    #dial-ticks .dial-tick:nth-of-type(odd){stroke:var(--station-accent)}
+    #dial-ticks .dial-tick:nth-of-type(even){stroke:var(--station-secondary)}
     #dial-ticks .dial-tick.major{stroke-width:3;opacity:1}
-    .dial-station{filter:drop-shadow(2px 0 var(--host-magenta)) drop-shadow(-2px 0 var(--host-cyan))}
-    .dial-needle{filter:drop-shadow(2px 0 var(--host-magenta)) drop-shadow(-2px 0 var(--host-cyan)) drop-shadow(0 0 calc(3px + 9px * var(--audio-high)) var(--station-accent))}
-    .dial-readout-arch{stroke:var(--host-magenta);filter:drop-shadow(2px 0 var(--host-cyan)) drop-shadow(-2px 0 rgba(255,230,0,.5)) drop-shadow(0 0 26px rgba(var(--station-rgb),.42))}
-    .dial-number-svg{fill:#fff;filter:drop-shadow(2px 0 var(--host-magenta)) drop-shadow(-2px 0 var(--host-cyan)) drop-shadow(0 0 calc(2px + 4px * var(--audio-high)) rgba(var(--station-rgb),.48))}
-    .dial-unit-svg{fill:var(--host-yellow);filter:drop-shadow(1px 0 var(--host-magenta)) drop-shadow(-1px 0 var(--host-cyan))}
-    .station{box-shadow:2px 0 0 -1px var(--host-magenta),-2px 0 0 -1px var(--host-cyan),0 12px 28px rgba(0,0,0,.58)}
-    .station:after{background:linear-gradient(90deg,var(--host-cyan) 0 33%,var(--host-magenta) 33% 66%,var(--host-yellow) 66%);opacity:.9}
+    .dial-station{filter:drop-shadow(0 0 8px var(--station-accent))}
+    .dial-needle{stroke:var(--station-accent);stroke-width:3;opacity:.2;filter:blur(4px) drop-shadow(0 0 calc(10px + 14px * var(--audio-high)) var(--station-accent)) drop-shadow(0 0 24px var(--station-accent))}
+    .dial-readout-arch{stroke:rgba(var(--station-rgb),.08);filter:drop-shadow(0 0 18px rgba(var(--station-rgb),.52)) drop-shadow(0 0 34px rgba(var(--station-rgb),.25))}
+    .dial-number-svg{fill:#fff;filter:drop-shadow(0 0 calc(2px + 6px * var(--audio-high)) rgba(var(--station-rgb),.54))}
+    .dial-unit-svg{fill:var(--station-accent);filter:drop-shadow(0 0 7px var(--station-accent))}
+    .station{box-shadow:0 12px 28px rgba(0,0,0,.58)}
+    .station:after{background:var(--button-accent);opacity:.9}
     /* --- mobile-scroll layer fix: .dial-control mixes backdrop-filter with a continuous
        animation (control-pulse/dc-spin) and no compositor-layer hint -- a known trigger
        for Android Chrome to evict the layer on scroll and leave it unpainted until forced
