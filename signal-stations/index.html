@@ -59,7 +59,7 @@
     /* --- power / scan controls --- */
     .dial-control{overflow:visible}
     .dial-control .dc-label{position:relative;z-index:1;pointer-events:none}
-    .dial-control .dc-ring{position:absolute;inset:-6px;z-index:0;border-radius:50%;border:1px dashed var(--grid);pointer-events:none;transition:border-color .3s ease,border-style .3s ease}
+    .dial-control .dc-ring{position:absolute;inset:-2px;z-index:0;border-radius:50%;border:1px dashed var(--grid);pointer-events:none;transition:border-color .3s ease,border-style .3s ease}
     .dial-control .dc-sweep{position:absolute;inset:0;z-index:0;border-radius:50%;opacity:0;pointer-events:none;background:conic-gradient(from 0deg,rgba(var(--station-rgb),.6),transparent 24%);transition:opacity .2s ease}
     .power[data-on="true"]{animation:control-pulse 2.6s ease-in-out infinite}
     .power[data-on="true"] .dc-ring{border-style:solid;border-color:rgba(var(--station-rgb),.65);animation:dc-spin 7s linear infinite}
@@ -69,29 +69,29 @@
     @keyframes dc-spin{to{transform:rotate(360deg)}}
     @keyframes control-pulse{0%,100%{box-shadow:0 0 8px rgba(var(--station-rgb),.7),0 0 30px rgba(var(--station-rgb),.55)}50%{box-shadow:0 0 10px rgba(var(--station-rgb),.9),0 0 44px rgba(var(--station-rgb),.78)}}
     @keyframes control-breathe{0%,100%{transform:scale(.96);opacity:.45}50%{transform:scale(1.04);opacity:1}}
-    @keyframes control-glitch{0%,100%{transform:translate3d(0,-15px,0) scaleX(.58);opacity:.2}24%{transform:translate3d(0,-3px,0) scaleX(.84);opacity:.56}45%{transform:translate3d(-5px,11px,0) scaleX(1.05);opacity:.94}49%{transform:translate3d(5px,15px,0) scaleX(.48);opacity:.64}72%{transform:translate3d(0,28px,0) scaleX(.92);opacity:.78}88%{transform:translate3d(0,36px,0) scaleX(.66);opacity:.34}}
+    @keyframes control-glitch{0%,100%{background-position:0 -42px,0 -18px;clip-path:circle(48% at 50% 50%);opacity:.12;transform:translateX(0)}22%{background-position:0 -24px,0 -2px;opacity:.3}43%{background-position:0 2px,0 19px;clip-path:polygon(0 0,100% 0,100% 38%,0 43%,0 65%,100% 60%,100% 100%,0 100%);opacity:.46;transform:translateX(-2px)}47%{background-position:0 8px,0 25px;clip-path:polygon(0 0,100% 0,100% 30%,0 34%,0 74%,100% 68%,100% 100%,0 100%);opacity:.18;transform:translateX(2px)}72%{background-position:0 31px,0 48px;clip-path:circle(48% at 50% 50%);opacity:.38}88%{background-position:0 46px,0 63px;opacity:.2;transform:translateX(0)}}
     /* Dormant controls are neutral hardware; station color and movement only appear live. */
     .dial-control{border:1px solid rgba(177,187,197,.28);border-radius:50%;color:#7f8993;background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.055),transparent 28%),linear-gradient(145deg,rgba(23,27,32,.58),rgba(5,6,7,.48) 72%);box-shadow:0 12px 28px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,255,255,.025),inset 0 -10px 18px rgba(0,0,0,.32);clip-path:none;filter:grayscale(1)}
     .dial-control:before{content:"";position:absolute;inset:7px;z-index:1;border:1px solid rgba(177,187,197,.12);border-radius:50%;pointer-events:none}
     .dial-control:after{display:none}
     .dial-control .dc-label{z-index:4;text-shadow:none;transition:color .25s ease,text-shadow .25s ease}
     .dial-control:hover{border-color:rgba(220,226,232,.48);color:#b7c0c8;filter:grayscale(1) brightness(1.08)}
-    .dial-control .dc-ring{inset:-7px;border:1px dashed rgba(177,187,197,.2);border-radius:50%}
+    .dial-control .dc-ring{inset:-2px;border:1px dashed rgba(177,187,197,.2);border-radius:50%}
     .dial-control .dc-sweep{border-radius:50%;background:conic-gradient(from 0deg,rgba(var(--station-rgb),.82),transparent 24%,color-mix(in srgb,var(--station-secondary) 58%,transparent) 58%,transparent 72%)}
     .power[data-on="true"],.scan[aria-pressed="true"]{color:#fff;border-color:var(--station-accent);background:radial-gradient(circle at 36% 31%,rgba(255,255,255,.07),transparent 27%),linear-gradient(145deg,rgba(var(--station-rgb),.09),rgba(5,6,7,.2) 78%);filter:none;box-shadow:0 0 8px rgba(var(--station-rgb),.72),0 0 30px rgba(var(--station-rgb),.55),0 12px 28px rgba(0,0,0,.58),inset 0 0 14px rgba(var(--station-rgb),.08)}
     .power[data-on="true"] .dc-label,.scan[aria-pressed="true"] .dc-label{text-shadow:0 0 8px var(--station-accent),1px 0 var(--station-secondary)}
     .power[data-on="true"]:before,.scan[aria-pressed="true"]:before{border-color:rgba(var(--station-rgb),.48);animation:control-breathe 1.8s ease-in-out infinite}
-    .power[data-on="true"]:after,.scan[aria-pressed="true"]:after{content:"";display:block;position:absolute;left:-5px;right:-5px;top:18%;z-index:3;height:2px;background:var(--station-secondary);box-shadow:0 9px 0 color-mix(in srgb,var(--station-accent) 78%,transparent),0 18px 0 color-mix(in srgb,var(--station-secondary) 48%,transparent);transform-origin:center;will-change:transform;animation:control-glitch 2.35s steps(1,end) infinite;pointer-events:none}
+    .power[data-on="true"]:after,.scan[aria-pressed="true"]:after{content:"";display:block;position:absolute;inset:3px;z-index:3;border-radius:50%;background:repeating-linear-gradient(0deg,transparent 0 7px,color-mix(in srgb,var(--station-secondary) 34%,transparent) 7px 8px,transparent 8px 13px),repeating-linear-gradient(0deg,transparent 0 11px,color-mix(in srgb,var(--station-accent) 25%,transparent) 11px 13px,transparent 13px 19px);background-size:100% 58px,100% 76px;mix-blend-mode:screen;transform-origin:center;will-change:transform,background-position,opacity;animation:control-glitch 2.35s steps(2,end) infinite;pointer-events:none}
     .scan[aria-pressed="true"]:after{animation-duration:1.65s;animation-direction:alternate-reverse}
     .power[data-on="true"] .dc-ring,.scan[aria-pressed="true"] .dc-ring{border-radius:38%;clip-path:polygon(10% 0,90% 0,100% 10%,100% 90%,90% 100%,10% 100%,0 90%,0 10%)}
     /* Open spectrum is noisy in the programme display, not in the receiver hardware. */
-    [data-reception="static"]{--audio-low:0!important;--audio-mid:0!important;--audio-high:0!important}
-    [data-reception="static"] .reality .static-field,[data-reception="static"] .frequency-tear{opacity:0!important;animation:none!important}
-    [data-reception="static"] .power[data-on="true"],[data-reception="static"] .scan[aria-pressed="true"]{animation:none;box-shadow:0 0 10px rgba(var(--station-rgb),.28),0 12px 28px rgba(0,0,0,.58),inset 0 0 12px rgba(var(--station-rgb),.06)}
-    [data-reception="static"] .power[data-on="true"]:before,[data-reception="static"] .scan[aria-pressed="true"]:before,[data-reception="static"] .power[data-on="true"] .dc-ring,[data-reception="static"] .scan[aria-pressed="true"] .dc-ring,[data-reception="static"] .scan[aria-pressed="true"] .dc-sweep{animation:none}
-    [data-reception="static"] .power[data-on="true"]:after,[data-reception="static"] .scan[aria-pressed="true"]:after{display:none}
-    [data-reception="static"] .scan[aria-pressed="true"] .dc-sweep{opacity:0}
-    [data-reception="static"] .dial-track,[data-reception="static"] .dial-station,[data-reception="static"] .dial-needle,[data-reception="static"] .dial-number-svg,[data-reception="static"] .dial-unit-svg{filter:none}
+    [data-reception="static"],[data-reception="pirate"]{--audio-low:0!important;--audio-mid:0!important;--audio-high:0!important}
+    [data-reception="static"] .frequency-tear,[data-reception="pirate"] .frequency-tear{opacity:0!important;animation:none!important}
+    [data-reception="static"] .power[data-on="true"],[data-reception="static"] .scan[aria-pressed="true"],[data-reception="pirate"] .power[data-on="true"],[data-reception="pirate"] .scan[aria-pressed="true"]{animation:none;box-shadow:0 0 10px rgba(var(--station-rgb),.28),0 12px 28px rgba(0,0,0,.58),inset 0 0 12px rgba(var(--station-rgb),.06)}
+    [data-reception="static"] .power[data-on="true"]:before,[data-reception="static"] .scan[aria-pressed="true"]:before,[data-reception="static"] .power[data-on="true"] .dc-ring,[data-reception="static"] .scan[aria-pressed="true"] .dc-ring,[data-reception="static"] .scan[aria-pressed="true"] .dc-sweep,[data-reception="pirate"] .power[data-on="true"]:before,[data-reception="pirate"] .scan[aria-pressed="true"]:before,[data-reception="pirate"] .power[data-on="true"] .dc-ring,[data-reception="pirate"] .scan[aria-pressed="true"] .dc-ring,[data-reception="pirate"] .scan[aria-pressed="true"] .dc-sweep{animation:none}
+    [data-reception="static"] .power[data-on="true"]:after,[data-reception="static"] .scan[aria-pressed="true"]:after,[data-reception="pirate"] .power[data-on="true"]:after,[data-reception="pirate"] .scan[aria-pressed="true"]:after{display:none}
+    [data-reception="static"] .scan[aria-pressed="true"] .dc-sweep,[data-reception="pirate"] .scan[aria-pressed="true"] .dc-sweep{opacity:0}
+    [data-reception="static"] .dial-track,[data-reception="static"] .dial-station,[data-reception="static"] .dial-needle,[data-reception="static"] .dial-number-svg,[data-reception="static"] .dial-unit-svg,[data-reception="pirate"] .dial-track,[data-reception="pirate"] .dial-station,[data-reception="pirate"] .dial-needle,[data-reception="pirate"] .dial-number-svg,[data-reception="pirate"] .dial-unit-svg{filter:none}
     /* --- notice console fills its telemetry column (fixed, not content-grown --
        it must not balloon the whole row taller as scripted lines accumulate) --- */
     .notice-section{padding:0!important;overflow:hidden}
@@ -181,9 +181,9 @@
     .host-avatar.has-portrait .host-orbit{z-index:2;left:-4px;top:43px;width:128px;height:58px;opacity:.55}
     .host-avatar.has-portrait .host-cube{z-index:3}
     .host-avatar.has-portrait .host-id{z-index:3;right:0;padding:3px;background:rgba(0,0,0,.62)}
-    .host-avatar.pirate-avatar .host-portrait-frame:before{border-color:rgba(var(--station-rgb),.32);background:repeating-linear-gradient(0deg,rgba(var(--station-rgb),.08) 0 2px,transparent 2px 6px),rgba(2,3,4,.56)}
-    .host-avatar.pirate-avatar .host-portrait{height:calc(100% + 36px);filter:saturate(.55) contrast(1.38) brightness(.82) drop-shadow(3px 0 0 var(--station-secondary)) drop-shadow(-3px 0 0 rgba(var(--station-rgb),.55));animation:pirate-avatar-break 1.15s steps(2,end) infinite}
-    .host-avatar.pirate-avatar .host-portrait-frame:after{background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.13) 2px 3px,transparent 3px 8px),linear-gradient(90deg,transparent 0 18%,rgba(var(--station-rgb),.34) 18% 23%,transparent 23% 61%,rgba(255,255,255,.13) 61% 63%,transparent 63%);mix-blend-mode:screen;animation:pirate-avatar-scan .34s steps(3) infinite}
+    .host-avatar.pirate-avatar .host-portrait-frame:before{border-color:rgba(var(--station-rgb),.2);background:repeating-linear-gradient(0deg,rgba(0,0,0,.82) 0 4px,rgba(var(--station-rgb),.08) 4px 5px,transparent 5px 8px),rgba(2,3,4,.86)}
+    .host-avatar.pirate-avatar .host-portrait{height:calc(100% + 36px);opacity:.1;filter:saturate(.3) contrast(1.72) brightness(.48) blur(.6px) drop-shadow(3px 0 0 var(--station-secondary)) drop-shadow(-3px 0 0 rgba(var(--station-rgb),.45));animation:pirate-avatar-break 1.35s steps(2,end) infinite}
+    .host-avatar.pirate-avatar .host-portrait-frame:after{background:repeating-linear-gradient(0deg,rgba(0,0,0,.72) 0 3px,transparent 3px 5px,rgba(255,255,255,.12) 5px 6px,transparent 6px 9px),repeating-linear-gradient(90deg,transparent 0 13%,rgba(var(--station-rgb),.22) 13% 18%,rgba(0,0,0,.84) 18% 29%,transparent 29% 47%);mix-blend-mode:normal;opacity:.88;animation:pirate-avatar-scan .22s steps(2) infinite}
     .host-avatar.pirate-avatar .host-orbit{opacity:.25;border-style:dotted;animation-duration:1.7s}
     .host-avatar.pirate-avatar .host-cube{animation-duration:.78s}
     .host-avatar.unresolved-avatar .host-portrait-frame,.host-avatar.unresolved-avatar .host-head,.host-avatar.unresolved-avatar .host-orbit,.host-avatar.unresolved-avatar .host-cube,.host-avatar.unresolved-avatar .host-id{display:none}
@@ -204,14 +204,14 @@
     @keyframes cru-citation{0%,100%{opacity:.34;transform:translateY(0)}50%{opacity:.72;transform:translateY(-5px)}}
     @keyframes host-portrait-breathe{0%,100%{transform:scale(1.03)}50%{transform:scale(1.06)}}
     @keyframes host-portrait-scan{0%{background-position:0 0,-180px 0}100%{background-position:0 0,240px 0}}
-    @keyframes pirate-avatar-break{0%,76%,100%{transform:translate(0) scale(1.06);clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}78%{transform:translate(-6px,1px) scale(1.09);clip-path:polygon(0 0,100% 0,100% 31%,8% 34%,8% 51%,100% 48%,100% 100%,0 100%)}82%{transform:translate(5px,-2px) scale(1.04);clip-path:polygon(0 0,100% 0,100% 58%,0 54%,0 72%,94% 76%,94% 100%,0 100%)}86%{transform:translate(-2px,0) scale(1.08)}}
+    @keyframes pirate-avatar-break{0%,64%,100%{transform:translate(0) scale(1.06);clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:.07}66%{transform:translate(-7px,1px) scale(1.1);clip-path:polygon(0 0,100% 0,100% 27%,8% 33%,8% 48%,100% 44%,100% 100%,0 100%);opacity:.34}70%{transform:translate(6px,-2px) scale(1.04);clip-path:polygon(0 0,100% 0,100% 18%,0 23%,0 66%,94% 72%,94% 100%,0 100%);opacity:.12}76%{transform:translate(-2px,0) scale(1.09);clip-path:inset(19% 0 28% 0);opacity:.42}82%{transform:translate(4px,2px) scale(1.05);clip-path:inset(52% 0 8% 0);opacity:.18}}
     @keyframes pirate-avatar-scan{0%{background-position:0 0,-90px 0;transform:translateX(-3px)}50%{background-position:0 5px,60px 0;transform:translateX(4px)}100%{background-position:0 11px,180px 0;transform:translateX(-1px)}}
     @keyframes pirate-static-jump{0%{transform:translate(-2%,-1%) scale(1.03);background-position:0 0,0 0}50%{transform:translate(2%,1%) scale(1.06);background-position:7px -4px,-9px 0}100%{transform:translate(-1%,2%) scale(1.04);background-position:-5px 3px,13px 0}}
     @keyframes pirate-static-roll{to{transform:translateY(26%)}}
     @keyframes pirate-noise-shear{0%,100%{transform:translateX(-8%) skewX(-7deg);opacity:.48}50%{transform:translateX(9%) skewX(9deg);opacity:.86}}
     @keyframes pirate-shard{0%,100%{transform:translateX(-10px) scaleX(.45);opacity:.18}50%{transform:translateX(14px) scaleX(1.35);opacity:.82}}
     @keyframes host-thought-in{from{opacity:0;transform:translateY(5px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
-    @media(max-width:500px){.host-channel{grid-template-columns:minmax(0,1fr) 112px;min-height:148px}.host-avatar{width:108px;height:128px;transform:none}.host-avatar.has-portrait .host-orbit{width:108px;top:37px}.cru-brain{left:4%;transform:scale(.8);transform-origin:left top}.cru-book{right:2%;transform:scale(.76) rotateX(58deg) rotateZ(-7deg)}.cru-lobster{left:46%;transform:scale(.8)}.cru-citation{display:block;left:4%;font-size:6px}}
+    @media(max-width:500px){.dial-control .dc-ring{inset:8px}.power[data-on="true"],.scan[aria-pressed="true"]{box-shadow:0 0 7px rgba(var(--station-rgb),.6),0 0 18px rgba(var(--station-rgb),.34),0 10px 20px rgba(0,0,0,.55),inset 0 0 12px rgba(var(--station-rgb),.08)}.host-channel{grid-template-columns:minmax(0,1fr) 112px;min-height:148px}.host-avatar{width:108px;height:128px;transform:none}.host-avatar.has-portrait .host-orbit{width:108px;top:37px}.cru-brain{left:4%;transform:scale(.8);transform-origin:left top}.cru-book{right:2%;transform:scale(.76) rotateX(58deg) rotateZ(-7deg)}.cru-lobster{left:46%;transform:scale(.8)}.cru-citation{display:block;left:4%;font-size:6px}}
   </style>
 </head>
 <body>
@@ -224,6 +224,6 @@
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=20260907-host-ink"></script>
-  <script src="radio-player.js?v=30e91c8d9b&skin=5"></script>
+  <script src="radio-player.js?v=30e91c8d9b&skin=6"></script>
 </body>
 </html>
