@@ -61,8 +61,6 @@
    this.root=document.documentElement;this.root.dataset.view=this.mode;
    document.getElementById('view-toggle').addEventListener('click',()=>this.setView(this.mode==='quiet'?(this.dialOpen?'tune':'listen'):'quiet'));
    document.getElementById('tune-toggle').addEventListener('click',()=>{this.dialOpen=this.mode!=='tune';this.setView(this.dialOpen?'tune':'listen');});
-   document.getElementById('episode-start').addEventListener('click',()=>actions.episode(data.episodes[0].id));
-   document.getElementById('episode-exit').addEventListener('click',()=>actions.exitEpisode());
    document.getElementById('volume').addEventListener('input',e=>actions.volume(Number(e.target.value)));
    document.getElementById('playback-retry').addEventListener('click',()=>actions.retry());
    this.setView(this.mode);this.renderArchive();
@@ -71,7 +69,7 @@
   save(){try{localStorage.setItem('signal-receiver-v1',JSON.stringify({records:this.records,mode:this.mode}));}catch{}}
   remember(key,title,kind){if(this.records.some(r=>r.key===key))return;this.records.push({key,title,kind,date:new Date().toISOString().slice(0,10)});this.records=this.records.slice(-100);this.save();this.renderArchive();}
   renderArchive(){document.getElementById('discovery-count').textContent=String(this.records.length);document.getElementById('discovery-list').innerHTML=this.records.length?this.records.slice().reverse().map(r=>`<li><strong>${escape(r.title)}</strong><span>${escape(r.kind)} / ${escape(r.date)}</span></li>`).join(''):'<li>Found carriers and completed transmissions stay here, on this device.</li>';}
-  episode(item){const active=Boolean(item?.episodeId);this.root.dataset.episode=active?'true':'false';document.getElementById('episode-exit').hidden=!active;document.getElementById('transmission-title').textContent=active?item.episodeTitle:'The Continuity Dispute';document.getElementById('transmission-chapter').textContent=active?item.chapter:'Featured transmission / Crustacean Station';document.getElementById('episode-start').hidden=active;}
+  episode(item){this.root.dataset.episode=item?.episodeId?'true':'false';}
   cue(cue){if(!cue)return;this.root.dataset.phase=cue.phase;const heading=document.getElementById('scene-headline');if(heading)heading.textContent=cue.headline;const note=document.getElementById('line');if(note)note.textContent=cue.note;const log=document.getElementById('notice-log');log.innerHTML='';for(const[who,text]of cue.lines||[]){const line=document.createElement('div');line.className='console-line listener';const name=document.createElement('strong');name.className='who';name.textContent='['+who+'] ';line.append(name,document.createTextNode(text));log.append(line);}document.getElementById('scene-accessible').textContent=cue.headline;}
   progress(item,seconds){
    const elapsed=Math.floor(item ? seconds||0 : 0),duration=Math.floor(item?.durationSeconds||0);const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
@@ -1021,6 +1019,30 @@
     return { id: 'signal', label: 'signal fragment' };
   }
 
+  // Programmes are invitations on their home carrier, not a separate content lane.
+  // Additional programmes can opt out with `offer: false`; the receiver will then keep
+  // them out of the small, deliberately sparse preset badges.
+  function programmeOfferForStation(stationId) {
+    return (data.episodes || []).find(episode => episode.station === stationId && episode.offer !== false) || null;
+  }
+
+  function offerMeta(offer) {
+    return typeof offer?.offer === 'object' ? offer.offer : { symbol: '◉', label: 'special transmission' };
+  }
+
+  function offerDescription(offer) {
+    const meta = offerMeta(offer);
+    return offer ? `${(meta.label || 'special').toUpperCase()} / ${offer.title} — ${offer.description || 'Live transmission in progress.'}` : '';
+  }
+
+  function updateCompactTuning(item) {
+    const station = state.station;
+    const offer = item?.episodeId ? (data.episodes || []).find(episode => episode.id === item.episodeId) : programmeOfferForStation(station?.id);
+    if (byId('compact-station')) byId('compact-station').textContent = station?.name || 'SIGNAL';
+    const compact = byId('compact-event');
+    if (compact) { compact.textContent = offerDescription(offer) || item?.subtitle || station?.tagline || 'Carrier locked.'; compact.parentElement.dataset.event = String(Boolean(offer)); }
+  }
+
   function renderStation(station) {
     delete document.documentElement.dataset.previewStation;
     setConsoleSearching(false);
@@ -1035,6 +1057,7 @@
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
     document.querySelectorAll('.station[data-id]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
     setDialValue(stationDialValue(station));
+    updateCompactTuning();
   }
 
   function renderNow(deck, cutInLabel) {
@@ -1048,6 +1071,7 @@
     byId('now-title').textContent = item ? item.title : 'Off air';
     byId('now-subtitle').textContent = item ? item.subtitle : 'Power the receiver to join this station.';
     byId('break-note').textContent = item ? cutInLabel || '' : 'Crossfades in live -- press play to start the broadcast.';
+    updateCompactTuning(item);
     updateExternalMetadata(item);
     presentation?.episode(item);
     if (item) {
@@ -1611,6 +1635,14 @@
     if (state.power) startBroadcast();
   }
 
+  function joinProgrammeOffer(offer) {
+    if (!offer) return;
+    // Enter as a listener catching the programme at its opening, rather than exposing a
+    // detached "special programmes" destination in the receiver layout.
+    selectStation(offer.station, { episodeId: offer.id });
+    if (!state.power) setPower(true);
+  }
+
   async function startBroadcast() {
     ensureAudioGraph();
     if (state.transitioning) return;
@@ -1684,13 +1716,27 @@
   // Ordered by dial position (lowest frequency first), not catalog order -- so the preset
   // row reads left-to-right the same way the band itself does.
   data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b)).forEach((station, index) => {
+    const bay = document.createElement('div');
+    bay.className = 'station-bay';
+    const offer = programmeOfferForStation(station.id);
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
     button.setAttribute('aria-label', `Preset ${index + 1}: ${station.frequency} ${station.name}`);
     button.title = `${station.frequency} / ${station.name}`;
-    button.addEventListener('click', () => selectStation(station.id));
-    list.append(button);
+    button.addEventListener('click', () => offer ? joinProgrammeOffer(offer) : selectStation(station.id));
+    bay.append(button);
+    if (offer) {
+      const badge = document.createElement('button');
+      const meta = offerMeta(offer);
+      badge.type = 'button'; badge.className = 'programme-badge';
+      badge.textContent = meta.symbol || '◉';
+      badge.setAttribute('aria-label', `${meta.label || 'Special transmission'} on ${station.name}: ${offer.title}. ${offer.description || ''}`);
+      badge.title = offerDescription(offer);
+      badge.addEventListener('click', event => { event.stopPropagation(); joinProgrammeOffer(offer); });
+      bay.append(badge);
+    }
+    list.append(bay);
   });
   // computed, not hand-typed -- this footer count went stale once already (read "four" after
   // a fifth station shipped) since it used to be plain text in index.html

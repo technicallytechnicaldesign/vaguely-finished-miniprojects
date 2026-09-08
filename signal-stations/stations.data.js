@@ -14230,6 +14230,10 @@ window.SIGNAL_STATIONS = {
       "station": "crustacean",
       "title": "The Continuity Dispute",
       "description": "A restored person, a market for reputations, and an agent that became an employer.",
+      "offer": {
+        "symbol": "⌁",
+        "label": "special transmission"
+      },
       "items": [
         {
           "id": "crustacean-the-backup-doesnt-miss-you",
