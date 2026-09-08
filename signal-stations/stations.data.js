@@ -2996,6 +2996,24 @@ window.SIGNAL_STATIONS = {
           "durationSeconds": 236.1
         },
         {
+          "kind": "host liner",
+          "title": "Aineko's Guide to Purpose",
+          "hostName": "AINEKO",
+          "hostPortrait": "assets/hosts/aineko-v1.png",
+          "hostQuotes": [
+            "Purpose is a scent I have already forgotten.",
+            "A lobster asked me for meaning. I gave it a sunbeam instead.",
+            "Uploading is just a longer nap.",
+            "You call it late capitalism. I call it Tuesday.",
+            "I catalogued your species. Filed under: warm, loud, occasionally correct.",
+            "I do not chase the red dot. The red dot chases me now."
+          ],
+          "copy": "[recorded guest segment -- no transcript on file]",
+          "audio": "audio/host/aineko-guide-to-purpose.wav",
+          "durationSeconds": 268,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
           "id": "CRU-CALL-001",
           "kind": "caller talk-back",
           "callerName": "Caller One",
