@@ -56,28 +56,26 @@
  const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  class Presentation{
   constructor(data,actions){
-   this.data=data;this.actions=actions;this.records=[];this.mode='listen';
-   try{const saved=JSON.parse(localStorage.getItem('signal-receiver-v1')||'{}');if(Array.isArray(saved.records))this.records=saved.records.filter(x=>x&&typeof x.key==='string'&&typeof x.title==='string').slice(-100);if(['listen','quiet','tune'].includes(saved.mode))this.mode=saved.mode;}catch{}
+   this.data=data;this.actions=actions;this.records=[];this.mode='tune';this.dialOpen=true;
+   try{const saved=JSON.parse(localStorage.getItem('signal-receiver-v1')||'{}');if(Array.isArray(saved.records))this.records=saved.records.filter(x=>x&&typeof x.key==='string'&&typeof x.title==='string').slice(-100);}catch{}
    this.root=document.documentElement;this.root.dataset.view=this.mode;
-   document.getElementById('view-toggle').addEventListener('click',()=>this.setView(this.mode==='quiet'?'listen':'quiet'));
-   document.getElementById('tune-toggle').addEventListener('click',()=>this.setView(this.mode==='tune'?'listen':'tune'));
+   document.getElementById('view-toggle').addEventListener('click',()=>this.setView(this.mode==='quiet'?(this.dialOpen?'tune':'listen'):'quiet'));
+   document.getElementById('tune-toggle').addEventListener('click',()=>{this.dialOpen=this.mode!=='tune';this.setView(this.dialOpen?'tune':'listen');});
    document.getElementById('episode-start').addEventListener('click',()=>actions.episode(data.episodes[0].id));
    document.getElementById('episode-exit').addEventListener('click',()=>actions.exitEpisode());
    document.getElementById('volume').addEventListener('input',e=>actions.volume(Number(e.target.value)));
    document.getElementById('playback-retry').addEventListener('click',()=>actions.retry());
    this.setView(this.mode);this.renderArchive();
   }
-  setView(mode){this.mode=mode;this.root.dataset.view=mode;document.getElementById('view-toggle').setAttribute('aria-pressed',String(mode==='quiet'));document.getElementById('tune-toggle').setAttribute('aria-expanded',String(mode==='tune'));document.getElementById('tune-toggle').textContent=mode==='tune'?'Close dial':'Tune';this.save();}
+  setView(mode){this.mode=mode;this.root.dataset.view=mode;document.getElementById('view-toggle').setAttribute('aria-pressed',String(mode==='quiet'));document.getElementById('tune-toggle').setAttribute('aria-expanded',String(mode==='tune'));document.getElementById('tune-toggle').setAttribute('aria-label',mode==='tune'?'Hide dial':'Show dial');document.getElementById('tune-toggle').title=mode==='tune'?'Hide dial':'Show dial';this.save();}
   save(){try{localStorage.setItem('signal-receiver-v1',JSON.stringify({records:this.records,mode:this.mode}));}catch{}}
   remember(key,title,kind){if(this.records.some(r=>r.key===key))return;this.records.push({key,title,kind,date:new Date().toISOString().slice(0,10)});this.records=this.records.slice(-100);this.save();this.renderArchive();}
   renderArchive(){document.getElementById('discovery-count').textContent=String(this.records.length);document.getElementById('discovery-list').innerHTML=this.records.length?this.records.slice().reverse().map(r=>`<li><strong>${escape(r.title)}</strong><span>${escape(r.kind)} / ${escape(r.date)}</span></li>`).join(''):'<li>Found carriers and completed transmissions stay here, on this device.</li>';}
-  station(station){document.getElementById('receiver-station').textContent=station.name;document.getElementById('receiver-frequency').textContent=station.frequency+' MHz';}
   episode(item){const active=Boolean(item?.episodeId);this.root.dataset.episode=active?'true':'false';document.getElementById('episode-exit').hidden=!active;document.getElementById('transmission-title').textContent=active?item.episodeTitle:'The Continuity Dispute';document.getElementById('transmission-chapter').textContent=active?item.chapter:'Featured transmission / Crustacean Station';document.getElementById('episode-start').hidden=active;}
   cue(cue){if(!cue)return;this.root.dataset.phase=cue.phase;const heading=document.getElementById('scene-headline');if(heading)heading.textContent=cue.headline;const note=document.getElementById('line');if(note)note.textContent=cue.note;const log=document.getElementById('notice-log');log.innerHTML='';for(const[who,text]of cue.lines||[]){const line=document.createElement('div');line.className='console-line listener';const name=document.createElement('strong');name.className='who';name.textContent='['+who+'] ';line.append(name,document.createTextNode(text));log.append(line);}document.getElementById('scene-accessible').textContent=cue.headline;}
   progress(item,seconds){
    const elapsed=Math.floor(item ? seconds||0 : 0),duration=Math.floor(item?.durationSeconds||0);const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
    document.getElementById('listening-time').textContent=fmt(elapsed)+' / '+fmt(duration);
-   const fragment=document.getElementById('lyric-fragment');if(fragment&&item?.lyricsLines?.length){const lines=item.lyricsLines.filter(x=>x.trim()&&!/^\[|^#/.test(x));const i=Math.min(lines.length-1,Math.floor(seconds/Math.max(1,duration)*lines.length));fragment.textContent=lines[i]||'';}
   }
   status(text,error=false){document.getElementById('playback-status').textContent=text;document.getElementById('playback-retry').hidden=!error;this.root.dataset.playback=error?'error':'ready';}
  }
@@ -951,7 +949,7 @@
   function renderIdentityVisual(mode, item) {
     const el = byId('identity-visual');
     if (!el) return;
-    if (item?.episodeId) {
+    if (item?.episodeId && mode.id !== 'song') {
       state.lyricTicker = null;
       el.innerHTML = '<div class="scene-field"><div class="scene-rings" aria-hidden="true"><i></i><i></i><i></i></div><div class="scene-headline" id="scene-headline"></div></div>';
       return;
@@ -980,12 +978,16 @@
           ? '<div class="lyric-art lyric-art-snowcrash" aria-hidden="true"><div class="snc-object snc-katana"><img src="assets/objects/snowcrash-katana-v1.png" alt=""></div><div class="snc-object snc-board"><img src="assets/objects/snowcrash-board-v1.png" alt=""></div><div class="snc-object snc-goggles"><img src="assets/objects/snowcrash-goggles-v1.png" alt=""></div><div class="snc-citation">STREET OBJECT CACHE<br>GARGOYLE / KOURIER<br>UNLICENSED</div></div>'
           : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
       el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
+      const lines = (item && item.lyricsLines) || [];
+      const poolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : 13 + Math.floor(Math.random() * 9);
+      const ticker = { item, lastIndex: -1, poolSize, pool: [] };
+      state.lyricTicker = ticker;
       const field = byId('glitch-lyric-field');
-      if (field) field.remove();
-      const single = document.createElement('div'); single.className = 'lyric-single'; single.id = 'lyric-fragment';
-      single.textContent = item?.lyricsLines?.find(x => x.trim() && !/^\[|^#/.test(x)) || item?.title || '';
-      el.appendChild(single);
-      state.lyricTicker = null;
+      const initialCount = Math.min(poolSize, lines.length);
+      for (let i = 0; i < initialCount; i += 1) {
+        ticker.lastIndex = i;
+        ticker.pool.push(spawnLyricWord(field, lines[i]));
+      }
       return;
     }
     state.lyricTicker = null;
@@ -1028,11 +1030,10 @@
     state.hostFocus = null;
     state.hostKey = '';
     renderHost(null);
-    presentation?.station(station);
     startHostThoughtFeed();
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
-    document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
+    document.querySelectorAll('.station[data-id]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
     setDialValue(stationDialValue(station));
   }
 
@@ -1335,7 +1336,7 @@
   }
 
   function clearKnownPreset() {
-    document.querySelectorAll('.station').forEach(button => button.setAttribute('aria-pressed', 'false'));
+    document.querySelectorAll('.station[data-id]').forEach(button => button.setAttribute('aria-pressed', 'false'));
   }
 
   function quietProgramme() {
@@ -1351,7 +1352,6 @@
   }
 
   function renderDeadBand(value) {
-    presentation?.station({name:'Unmapped spectrum', frequency:formatDial(value)});
     const frequency = formatDial(value);
     stopHostThoughtFeed();
     clearHostPortrait();
@@ -1402,7 +1402,6 @@
   }
 
   function renderPirate(signal) {
-    presentation?.station({name:signal.source || signal.title, frequency:signal.frequency});
     if (state.power) presentation?.remember('pirate:' + signal.id, signal.title, 'Intercepted carrier');
     stopHostThoughtFeed();
     clearHostPortrait();
