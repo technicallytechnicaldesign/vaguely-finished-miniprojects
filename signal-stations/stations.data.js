@@ -1027,13 +1027,6 @@ window.SIGNAL_STATIONS = {
       "tagline": "Economic theology for a species that already lost the argument.",
       "host": "Dr. Aldous Krill",
       "hostPortrait": "assets/hosts/dr-aldous-krill-v2.png",
-      "guestAssets": {
-        "aineko": {
-          "name": "AINEKO",
-          "portrait": "assets/hosts/aineko-v1.png",
-          "status": "ready for a future guest segment; not scheduled in rotation"
-        }
-      },
       "hostQuotes": [
         "The market didn't wait for consensus. It rarely does.",
         "Intelligence doesn't have to know that it's intelligent.",
