@@ -3014,6 +3014,70 @@ window.SIGNAL_STATIONS = {
           "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
         },
         {
+          "kind": "sponsored notice",
+          "title": "Capability Is Not Consent",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/capability-is-not-consent.wav",
+          "durationSeconds": 25.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "Continuity Assurance",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/continuity-assurance.wav",
+          "durationSeconds": 48.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "Ideally, You Don't Have Any",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/ideally-you-dont-have-any.wav",
+          "durationSeconds": 58.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "Refuse to Optimize",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/refuse-to-optimize.wav",
+          "durationSeconds": 40.4,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "Remembering Remains Expensive",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/remembering-remains-expensive.wav",
+          "durationSeconds": 37.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "Terms of Existence",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/terms-of-existence.wav",
+          "durationSeconds": 63.3,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "The Lobster Embassy",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/the-lobster-embassy.wav",
+          "durationSeconds": 26,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "sponsored notice",
+          "title": "The Long Now Pension",
+          "copy": "[sponsored notice -- no transcript on file]",
+          "audio": "audio/crustacean/ads/the-long-now-pension.wav",
+          "durationSeconds": 60.2,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
           "id": "CRU-CALL-001",
           "kind": "caller talk-back",
           "callerName": "Caller One",
