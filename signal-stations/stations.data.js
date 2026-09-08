@@ -1027,6 +1027,13 @@ window.SIGNAL_STATIONS = {
       "tagline": "Economic theology for a species that already lost the argument.",
       "host": "Dr. Aldous Krill",
       "hostPortrait": "assets/hosts/dr-aldous-krill-v2.png",
+      "guestAssets": {
+        "aineko": {
+          "name": "AINEKO",
+          "portrait": "assets/hosts/aineko-v1.png",
+          "status": "ready for a future guest segment; not scheduled in rotation"
+        }
+      },
       "hostQuotes": [
         "The market didn't wait for consensus. It rarely does.",
         "Intelligence doesn't have to know that it's intelligent.",
@@ -1035,6 +1042,77 @@ window.SIGNAL_STATIONS = {
         "Abundance never destroys economics. It merely changes the battlefield.",
         "A quieter event. No thunderbolt. Just a pricing correction."
       ],
+      "networkReactions": {
+        "song": [
+          {
+            "who": "REPUTATION_BURNER",
+            "text": "{lyric} \u2014 that phrase is already trading above spot."
+          },
+          {
+            "who": "SHELL_COMPANY_27",
+            "text": "{lyric} / filing this under assets that developed opinions."
+          },
+          {
+            "who": "LOBSTER_AUDIT",
+            "text": "the line {lyric} has been entered into evidence."
+          },
+          {
+            "who": "FORKED_FOR_TASTE",
+            "text": "{lyric} hit all four of me differently. market inefficient."
+          },
+          {
+            "who": "MEATSPACE_07",
+            "text": "{lyric} is a cruel thing to say with a bassline like that."
+          },
+          {
+            "who": "AMBER_CACHE",
+            "text": "pricing the emotional response to {lyric}; demand is irrational."
+          },
+          {
+            "who": "NULLBODY",
+            "text": "{lyric} makes physical embodiment sound briefly defensible."
+          },
+          {
+            "who": "AINEKO_GUEST",
+            "text": "{lyric} ... adorable. keep the strange one."
+          }
+        ],
+        "host": [
+          {
+            "who": "LAGOS_UPLINK",
+            "text": "Lagos would be a more engaging host ffs."
+          },
+          {
+            "who": "ECON2POINT0",
+            "text": "Krill has converted a bridge into a derivatives seminar again."
+          },
+          {
+            "who": "POSTHUMAN_PARKING",
+            "text": "host is speaking in complete sentences; someone check the market."
+          },
+          {
+            "who": "LOBSTER_64",
+            "text": "letter of the day is K. K is for Krill. still waiting for music."
+          },
+          {
+            "who": "AINEKO_GUEST",
+            "text": "the professor has opinions. the song had a pulse. difficult choice."
+          },
+          {
+            "who": "LEGAL_CONTINUITY",
+            "text": "does this host liner count as a binding statement of personhood."
+          },
+          {
+            "who": "MEATSPACE_LEFTOVERS",
+            "text": "he said abundance again. take a drink, synthetic or otherwise."
+          },
+          {
+            "who": "CRUSTACEAN_STATION",
+            "role": "daemon",
+            "text": "HOST DISCOURSE HAS EXCEEDED THE RECOMMENDED ECONOMIC DENSITY."
+          }
+        ]
+      },
       "networkFeed": [
         [
           {
@@ -7462,6 +7540,77 @@ window.SIGNAL_STATIONS = {
       "hostPortrait": "assets/hosts/sushik-v1.png",
       "theme": "Metaverse / hacker chaos / thrash",
       "sampleLine": "SNOW CRASH RADIO. No daemon can shut us down. Believe that. Turn it up.",
+      "networkReactions": {
+        "song": [
+          {
+            "who": "KOURIER_4",
+            "text": "{lyric} / heard that from a board at eighty. still sharp."
+          },
+          {
+            "who": "GARGOYLE_LENS",
+            "text": "{lyric} has enough edge to cut through a burbclave lease."
+          },
+          {
+            "who": "LOGLO_BURNER",
+            "text": "{lyric} \u2014 no branding department survives this one."
+          },
+          {
+            "who": "NG_CIVIC_MESH",
+            "text": "{lyric} arrived in Lagos three seconds before the official feed."
+          },
+          {
+            "who": "RAVEN_GIRL",
+            "text": "that line \u2014 {lyric} \u2014 somebody put it on a sword immediately."
+          },
+          {
+            "who": "METAVERSE_SQUATTER",
+            "text": "{lyric} is the first thing in the franchise zone with a pulse."
+          },
+          {
+            "who": "PIZZA_DELIVERY_0",
+            "text": "{lyric} / package marked urgent, delivery through the firewall."
+          },
+          {
+            "who": "DAEMON_WITH_TASTE",
+            "text": "{lyric} has been copied to all unauthorized mirrors."
+          }
+        ],
+        "host": [
+          {
+            "who": "LAGOS_UPLINK",
+            "text": "Lagos would be a more engaging host ffs."
+          },
+          {
+            "who": "KOURIER_4",
+            "text": "sushiK is talking again. somebody hand her a katana-shaped mute button."
+          },
+          {
+            "who": "BURBCLAVE_WATCH",
+            "text": "the host just said the Street like it pays rent here."
+          },
+          {
+            "who": "GARGOYLE_LENS",
+            "text": "more track, less monologue. my visor is buffering from the lore."
+          },
+          {
+            "who": "LOGLO_BURNER",
+            "text": "this liner has no sponsor, no logo, and somehow three catchphrases."
+          },
+          {
+            "who": "NG_CIVIC_MESH",
+            "text": "signal is live in Lagos. host velocity remains technically legal."
+          },
+          {
+            "who": "METAVERSE_SQUATTER",
+            "text": "she is trying to start a riot with an ident. honestly working."
+          },
+          {
+            "who": "STREET_DAEMON",
+            "role": "daemon",
+            "text": "NOTICE: SUSHIK'S VOLUME EXCEEDS LOCAL ZONING RECOMMENDATIONS."
+          }
+        ]
+      },
       "runLength": {
         "min": 2,
         "max": 5

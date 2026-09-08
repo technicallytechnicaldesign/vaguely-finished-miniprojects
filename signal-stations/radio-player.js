@@ -666,6 +666,25 @@
     return feed.filter(scene => scene && scene.length);
   }
 
+  // Small live replies stop the station log from being a detached wallpaper: when a song
+  // is playing they borrow its currently visible lyric fragment, while host/ID moments get
+  // their own station-specific side-eye. The authored feed remains the main programme.
+  function networkReactionScene(station) {
+    const reactions = station?.networkReactions;
+    const item = state.decks?.[state.activeIndex]?.item;
+    const pool = item?.type === 'song' ? reactions?.song : reactions?.host;
+    if (!pool?.length || Math.random() > 0.38) return null;
+    const reaction = pool[Math.floor(Math.random() * pool.length)];
+    const lyricLines = item?.lyricsLines || [];
+    const lyric = lyricLines.length ? lyricLines[Math.floor(Math.random() * lyricLines.length)] : (item?.title || 'that last signal');
+    return [{
+      role: reaction.role || 'listener',
+      who: reaction.who || 'OPEN_CHANNEL',
+      text: reaction.text.replaceAll('{lyric}', `“${lyric}”`),
+      holdMs: reaction.holdMs || 1600
+    }];
+  }
+
   async function runNetworkFeed() {
     let feedStationId = null;
     let scenes = [];
@@ -683,8 +702,9 @@
       }
       if (!scenes.length) { await wait(CONSOLE_SCENE_GAP_MS); continue; }
       if (cursor >= order.length) { order = shuffle(scenes, Math.random); cursor = 0; }
-      const scene = order[cursor];
-      cursor += 1;
+      const reaction = networkReactionScene(state.station);
+      const scene = reaction || order[cursor];
+      if (!reaction) cursor += 1;
       for (const line of scene) {
         if (state.consoleMuted || director.current?.episodeId || feedStationId !== state.station?.id) break;
         await playFeedLine(line);
@@ -1032,15 +1052,28 @@
 
   function offerDescription(offer) {
     const meta = offerMeta(offer);
-    return offer ? `${(meta.label || 'special').toUpperCase()} / ${offer.title} — ${offer.description || 'Live transmission in progress.'}` : '';
+    const home = data.stations.find(station => station.id === offer?.station);
+    const channel = home ? `${home.frequency} / ${home.name}` : 'UNKNOWN CARRIER';
+    return offer ? `${(meta.label || 'special').toUpperCase()} / ${channel} / ${offer.title} — ${offer.description || 'Live transmission in progress.'}` : '';
+  }
+
+  function updateDialOfferTicker(offer) {
+    const ticker = byId('dial-event');
+    const copy = byId('dial-event-svg-text');
+    if (!ticker || !copy) return;
+    copy.textContent = offer ? `${offerMeta(offer).symbol || '◉'}  ${offerDescription(offer)}  /  ` : '';
+    ticker.dataset.active = String(Boolean(offer));
   }
 
   function updateCompactTuning(item) {
     const station = state.station;
-    const offer = item?.episodeId ? (data.episodes || []).find(episode => episode.id === item.episodeId) : programmeOfferForStation(station?.id);
+    // A programme is an invitation from elsewhere on the band. It disappears once the
+    // listener is already on its home carrier, where the programme is simply playing.
+    const offer = (data.episodes || []).find(episode => episode.offer !== false && episode.station !== station?.id) || null;
     if (byId('compact-station')) byId('compact-station').textContent = station?.name || 'SIGNAL';
     const compact = byId('compact-event');
     if (compact) { compact.textContent = offerDescription(offer) || item?.subtitle || station?.tagline || 'Carrier locked.'; compact.parentElement.dataset.event = String(Boolean(offer)); }
+    updateDialOfferTicker(offer);
   }
 
   function renderStation(station) {
@@ -1056,6 +1089,9 @@
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
     document.querySelectorAll('.station[data-id]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
+    document.querySelectorAll('.programme-badge[data-offer-station]').forEach(badge => {
+      badge.hidden = badge.dataset.offerStation === station.id;
+    });
     setDialValue(stationDialValue(station));
     updateCompactTuning();
   }
@@ -1258,6 +1294,18 @@
       const color = (station.visualProfile && station.visualProfile.accent) || '#56e5ff';
       return `<circle class="dial-carrier" style="--dot:${color}" cx="${pos.x.toFixed(1)}" cy="${pos.y.toFixed(1)}" r="4.5"></circle>`;
     }).join('');
+    const namespace = 'http://www.w3.org/2000/svg';
+    const eventPath = document.createElementNS(namespace, 'path');
+    eventPath.setAttribute('class', 'dial-event-path'); eventPath.id = 'dial-event-path';
+    eventPath.setAttribute('d', 'M 259.1 234 A 63 63 0 0 1 380.9 234');
+    const eventText = document.createElementNS(namespace, 'text');
+    eventText.setAttribute('class', 'dial-event-svg'); eventText.id = 'dial-event'; eventText.dataset.active = 'false';
+    const textPath = document.createElementNS(namespace, 'textPath');
+    textPath.setAttribute('href', '#dial-event-path'); textPath.setAttribute('startOffset', '8%');
+    const copy = document.createElementNS(namespace, 'tspan'); copy.id = 'dial-event-svg-text';
+    const animate = document.createElementNS(namespace, 'animate');
+    animate.setAttribute('attributeName', 'startOffset'); animate.setAttribute('values', '8%;-110%'); animate.setAttribute('dur', '30s'); animate.setAttribute('repeatCount', 'indefinite');
+    textPath.append(copy, animate); eventText.append(textPath); byId('dial-svg').append(eventPath, eventText);
   }
 
   // --- readout arch: a real semicircle concentric with the dial (same center 320,250,
@@ -1345,9 +1393,12 @@
     }, null);
     const previewRadius = 8 * BLEED_MULT;
     if (!nearest || nearest.distance > previewRadius) {
+      document.documentElement.style.setProperty('--tune-strength', '0.16');
       delete document.documentElement.dataset.previewStation;
       return null;
     }
+    const strength = Math.max(0.18, 1 - nearest.distance / previewRadius);
+    document.documentElement.style.setProperty('--tune-strength', strength.toFixed(3));
     applyVisualProfile(nearest.station);
     document.documentElement.dataset.previewStation = nearest.station.id;
     byId('dial-station').textContent = nearest.station.name;
@@ -1380,6 +1431,7 @@
     stopHostThoughtFeed();
     clearHostPortrait();
     delete document.documentElement.dataset.previewStation;
+    document.documentElement.style.setProperty('--tune-strength', '0.16');
     applyVisualProfile({ id: 'deadband', theme: 'multipath snow', visualProfile: { world: 'deadband', accent: '#7b8078', secondary: '#555d62', rgb: '123,128,120', label: 'multipath snow' } });
     clearKnownPreset();
     document.documentElement.dataset.broadcast = 'signal';
@@ -1614,6 +1666,7 @@
     if (!options.fromScan) stopScan();
     ensureAudioGraph();
     const root = document.documentElement;
+    root.style.setProperty('--tune-strength', '1');
     state.pirate.stop(state.ctx);
     state.staticChannel.setLevel(0, 0.12);
     if (state.preview) state.preview.clear(state.ctx);
@@ -1718,6 +1771,9 @@
   data.stations.slice().sort((a, b) => stationDialValue(a) - stationDialValue(b)).forEach((station, index) => {
     const bay = document.createElement('div');
     bay.className = 'station-bay';
+    const profile = station.visualProfile || {};
+    bay.style.setProperty('--badge-accent', profile.accent || '#56e5ff');
+    bay.style.setProperty('--badge-rgb', profile.rgb || '86,229,255');
     const offer = programmeOfferForStation(station.id);
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'station'; button.dataset.id = station.id;
@@ -1730,6 +1786,7 @@
       const badge = document.createElement('button');
       const meta = offerMeta(offer);
       badge.type = 'button'; badge.className = 'programme-badge';
+      badge.dataset.offerStation = station.id;
       badge.textContent = meta.symbol || '◉';
       badge.setAttribute('aria-label', `${meta.label || 'Special transmission'} on ${station.name}: ${offer.title}. ${offer.description || ''}`);
       badge.title = offerDescription(offer);
