@@ -2937,9 +2937,9 @@ window.SIGNAL_STATIONS = {
       },
       "breakRouting": {
         "weights": {
-          "host": 0.55,
-          "callIn": 0.45,
-          "adBlock": 0
+          "host": 0.45,
+          "callIn": 0.35,
+          "adBlock": 0.2
         },
         "callCooldownBreaks": 2,
         "maxBreaksWithoutCall": 4,
@@ -3089,6 +3089,54 @@ window.SIGNAL_STATIONS = {
           "copy": "[ad block intro -- no transcript on file]",
           "audio": "audio/host/ad-bridge-02.wav",
           "durationSeconds": 14.7,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "ad block outro",
+          "copy": "[exit -- no transcript on file]",
+          "audio": "audio/host/exit-01.wav",
+          "durationSeconds": 15.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "call segment outro",
+          "release": "public",
+          "rotation": "live",
+          "copy": "[exit -- no transcript on file]",
+          "audio": "audio/host/exit-01.wav",
+          "durationSeconds": 15.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "ad block outro",
+          "copy": "[exit -- no transcript on file]",
+          "audio": "audio/host/exit-02.wav",
+          "durationSeconds": 12.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "call segment outro",
+          "release": "public",
+          "rotation": "live",
+          "copy": "[exit -- no transcript on file]",
+          "audio": "audio/host/exit-02.wav",
+          "durationSeconds": 12.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "ad block outro",
+          "copy": "[exit -- no transcript on file]",
+          "audio": "audio/host/exit-03.wav",
+          "durationSeconds": 13.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "call segment outro",
+          "release": "public",
+          "rotation": "live",
+          "copy": "[exit -- no transcript on file]",
+          "audio": "audio/host/exit-03.wav",
+          "durationSeconds": 13.9,
           "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
         },
         {
