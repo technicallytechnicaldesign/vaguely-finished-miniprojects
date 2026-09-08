@@ -267,6 +267,7 @@
     reception: 'locked', pirateSignal: null, power: false, lyricTicker: null,
     hostQuoteTimer: null, hostQuoteIndex: 0, hostFocus: null, hostKey: '',
     consoleMuted: false, consoleGeneration: 0, playbackEpoch: 0, transitioning: false, failedAudio: new Set(), volume: 0.8,
+    offerWindow: null, offerTimer: null, lastOfferAt: 0,
   };
 
   function formatClock(seconds) {
@@ -1046,6 +1047,44 @@
     return (data.episodes || []).find(episode => episode.station === stationId && episode.offer !== false) || null;
   }
 
+  // The special-transmission ticker used to just check "is there an episode elsewhere" every
+  // render, which is a static yes/no for the whole session -- reported live 2026-09-08 as
+  // sitting on screen permanently and crowding out the ordinary station tagline/chatter
+  // whenever you weren't parked on the episode's one home carrier. It's meant to read as a rare
+  // interruption, not a standing banner: a low-odds roll opens a short window (2-5 minutes),
+  // then it closes on its own regardless of what's playing, with a real cooldown before the
+  // next one can open.
+  const OFFER_CHECK_MS = 20000;             // how often we roll the dice / check for expiry
+  const OFFER_MIN_GAP_MS = 8 * 60 * 1000;   // minimum quiet time between special transmissions
+  const OFFER_CHANCE_PER_CHECK = 0.05;      // ~1-in-20 odds per check once eligible -- keeps it rare
+  const OFFER_DURATION_MIN_MS = 2 * 60 * 1000;
+  const OFFER_DURATION_MAX_MS = 5 * 60 * 1000;
+
+  function eligibleOffer() {
+    const station = state.station;
+    return (data.episodes || []).find(episode => episode.offer !== false && episode.station !== station?.id) || null;
+  }
+
+  function tickOfferWindow() {
+    const now = Date.now();
+    if (state.offerWindow && now >= state.offerWindow.endsAt) state.offerWindow = null;
+    if (!state.offerWindow && state.power) {
+      const candidate = eligibleOffer();
+      const sinceLast = state.lastOfferAt ? now - state.lastOfferAt : Infinity;
+      if (candidate && sinceLast >= OFFER_MIN_GAP_MS && director.random() < OFFER_CHANCE_PER_CHECK) {
+        const duration = OFFER_DURATION_MIN_MS + director.random() * (OFFER_DURATION_MAX_MS - OFFER_DURATION_MIN_MS);
+        state.offerWindow = { offer: candidate, endsAt: now + duration };
+        state.lastOfferAt = now;
+      }
+    }
+    updateCompactTuning(state.hostFocus);
+  }
+
+  function startOfferWindowFeed() {
+    clearInterval(state.offerTimer);
+    state.offerTimer = setInterval(tickOfferWindow, OFFER_CHECK_MS);
+  }
+
   function offerMeta(offer) {
     return typeof offer?.offer === 'object' ? offer.offer : { symbol: '◉', label: 'special transmission' };
   }
@@ -1068,8 +1107,10 @@
   function updateCompactTuning(item) {
     const station = state.station;
     // A programme is an invitation from elsewhere on the band. It disappears once the
-    // listener is already on its home carrier, where the programme is simply playing.
-    const offer = (data.episodes || []).find(episode => episode.offer !== false && episode.station !== station?.id) || null;
+    // listener is already on its home carrier, where the programme is simply playing, and
+    // otherwise only shows up in the rare, timed windows tickOfferWindow() opens -- never as
+    // a standing banner. Also gated on power so a stale window can't linger on screen off air.
+    const offer = state.power && state.offerWindow && state.offerWindow.offer.station !== station?.id ? state.offerWindow.offer : null;
     if (byId('compact-station')) byId('compact-station').textContent = station?.name || 'SIGNAL';
     const compact = byId('compact-event');
     if (compact) { compact.textContent = offerDescription(offer) || item?.subtitle || station?.tagline || 'Carrier locked.'; compact.parentElement.dataset.event = String(Boolean(offer)); }
@@ -1863,5 +1904,6 @@
       try { navigator.mediaSession.setActionHandler(name, callback); } catch {}
     }
   }
+  startOfferWindowFeed();
   selectStation(new URLSearchParams(location.search).get('station') || data.defaultStation || data.stations[0].id);
 })();
