@@ -3078,6 +3078,20 @@ window.SIGNAL_STATIONS = {
           "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
         },
         {
+          "kind": "ad block intro",
+          "copy": "[ad block intro -- no transcript on file]",
+          "audio": "audio/host/ad-bridge-01.wav",
+          "durationSeconds": 14.8,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "ad block intro",
+          "copy": "[ad block intro -- no transcript on file]",
+          "audio": "audio/host/ad-bridge-02.wav",
+          "durationSeconds": 14.7,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
           "id": "CRU-CALL-001",
           "kind": "caller talk-back",
           "callerName": "Caller One",
