@@ -1,7 +1,98 @@
+(function(root){
+ function seeded(seed){let x=2166136261;for(const c of String(seed))x=Math.imul(x^c.charCodeAt(0),16777619);return()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+ class Director{
+  constructor(episodes=[],seed='signal'){this.episodes=episodes;this.seed=seed;this.random=seeded(seed);this.reset();}
+  reset(){this.queue=[];this.active=null;this.current=null;this.cueIndex=-1;this.completed=false;}
+  start(id){const ep=this.episodes.find(e=>e.id===id);if(!ep)throw Error('Unknown transmission');this.reset();this.active=ep;this.queue=ep.items.map(x=>({...x}));return ep;}
+  next(){return this.queue.shift()||null;}
+  enter(item){if(this.current===item)return false;this.current=item;this.cueIndex=-1;return true;}
+  tick(seconds){const cues=this.current?.cues||[];let i=-1;for(let n=0;n<cues.length;n++)if(cues[n].at<=seconds)i=n;if(i===this.cueIndex||i<0)return null;this.cueIndex=i;return cues[i];}
+ }
+ function cutIn(track,random=Math.random){
+  const duration=track.durationSeconds;const rule=track.transition||{};
+  if(rule.mode==='end'||!Number.isFinite(duration)||duration<6)return null;
+  if(Number.isFinite(rule.cutInSeconds))return Math.max(0,Math.min(duration-0.2,rule.cutInSeconds));
+  if(!Number.isFinite(track.outroConfidence)||track.outroConfidence<0.6)return null;
+  const latest=duration-1.5,earliest=Math.min(Math.max(track.outroStartSeconds??duration*.9,duration-8),latest);
+  return earliest+random()*Math.max(0,latest-earliest);
+ }
+ root.SignalDirector={Director,seeded,cutIn};
+ if(typeof module!=='undefined')module.exports=root.SignalDirector;
+})(typeof window!=='undefined'?window:globalThis);
+
+;
+(function(root){
+ class Deck {
+  constructor(ctx,dest,onTimeUpdate,onEnded,onFailure){
+   this.audio=new Audio();this.audio.preload='auto';this.audio.crossOrigin='anonymous';
+   this.source=ctx.createMediaElementSource(this.audio);this.gain=ctx.createGain();this.gain.gain.value=0;this.source.connect(this.gain).connect(dest);
+   this.item=null;this.cutInAt=null;this.firedCutIn=false;this.loadGeneration=0;this.cleanupTimers=new Set();this.cancelPlay=null;
+   this.audio.addEventListener('timeupdate',()=>onTimeUpdate(this));this.audio.addEventListener('ended',()=>onEnded(this));
+   this.audio.addEventListener('error',()=>{if(!this.cancelPlay)onFailure?.(this);});
+   const stalled=()=>{const at=this.audio.currentTime;this.scheduleCleanup(()=>{if(this.item&&!this.audio.paused&&Math.abs(this.audio.currentTime-at)<.1)onFailure?.(this);},8000);};
+   this.audio.addEventListener('waiting',stalled);this.audio.addEventListener('stalled',stalled);
+  }
+  load(item){this.reset();this.item=item;this.audio.src=item.audio;}
+  async play(timeoutMs=12000){
+   const generation=this.loadGeneration;let timer;
+   const ready=new Promise((resolve,reject)=>{
+    const finish=error=>{clearTimeout(timer);this.audio.removeEventListener('playing',playing);this.audio.removeEventListener('error',failed);if(this.cancelPlay===cancel)this.cancelPlay=null;error?reject(error):resolve(true);};
+    const playing=()=>finish();const failed=()=>finish(new Error('Audio could not load'));const cancel=()=>finish(new Error('Playback superseded'));
+    this.cancelPlay=cancel;this.audio.addEventListener('playing',playing,{once:true});this.audio.addEventListener('error',failed,{once:true});timer=setTimeout(()=>finish(new Error('Audio readiness timed out')),timeoutMs);
+    try{Promise.resolve(this.audio.play()).catch(finish);}catch(error){finish(error);}
+   });
+   await ready;if(this.loadGeneration!==generation)throw Error('Playback superseded');return true;
+  }
+  scheduleCleanup(callback,delay){const generation=this.loadGeneration;const timer=setTimeout(()=>{this.cleanupTimers.delete(timer);if(this.loadGeneration===generation)callback();},delay);this.cleanupTimers.add(timer);}
+  cancelCleanup(){this.cleanupTimers.forEach(clearTimeout);this.cleanupTimers.clear();}
+  reset(){this.cancelPlay?.();this.cancelCleanup();this.loadGeneration++;this.audio.pause();this.gain.gain.cancelScheduledValues(0);this.gain.gain.value=0;this.item=null;this.cutInAt=null;this.firedCutIn=false;}
+  fadeTo(target,ctx,seconds){const gain=this.gain.gain,now=ctx.currentTime;if(gain.cancelAndHoldAtTime)gain.cancelAndHoldAtTime(now);else{gain.cancelScheduledValues(now);gain.setValueAtTime(gain.value,now);}gain.linearRampToValueAtTime(target,now+seconds);}
+ }
+ root.SignalAudio={Deck};if(typeof module!=='undefined')module.exports=root.SignalAudio;
+})(typeof window!=='undefined'?window:globalThis);
+
+;
+(function(root){
+ const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ class Presentation{
+  constructor(data,actions){
+   this.data=data;this.actions=actions;this.records=[];this.mode='listen';
+   try{const saved=JSON.parse(localStorage.getItem('signal-receiver-v1')||'{}');if(Array.isArray(saved.records))this.records=saved.records.filter(x=>x&&typeof x.key==='string'&&typeof x.title==='string').slice(-100);if(['listen','quiet','tune'].includes(saved.mode))this.mode=saved.mode;}catch{}
+   this.root=document.documentElement;this.root.dataset.view=this.mode;
+   document.getElementById('view-toggle').addEventListener('click',()=>this.setView(this.mode==='quiet'?'listen':'quiet'));
+   document.getElementById('tune-toggle').addEventListener('click',()=>this.setView(this.mode==='tune'?'listen':'tune'));
+   document.getElementById('episode-start').addEventListener('click',()=>actions.episode(data.episodes[0].id));
+   document.getElementById('episode-exit').addEventListener('click',()=>actions.exitEpisode());
+   document.getElementById('volume').addEventListener('input',e=>actions.volume(Number(e.target.value)));
+   document.getElementById('playback-retry').addEventListener('click',()=>actions.retry());
+   this.setView(this.mode);this.renderArchive();
+  }
+  setView(mode){this.mode=mode;this.root.dataset.view=mode;document.getElementById('view-toggle').setAttribute('aria-pressed',String(mode==='quiet'));document.getElementById('tune-toggle').setAttribute('aria-expanded',String(mode==='tune'));document.getElementById('tune-toggle').textContent=mode==='tune'?'Close dial':'Tune';this.save();}
+  save(){try{localStorage.setItem('signal-receiver-v1',JSON.stringify({records:this.records,mode:this.mode}));}catch{}}
+  remember(key,title,kind){if(this.records.some(r=>r.key===key))return;this.records.push({key,title,kind,date:new Date().toISOString().slice(0,10)});this.records=this.records.slice(-100);this.save();this.renderArchive();}
+  renderArchive(){document.getElementById('discovery-count').textContent=String(this.records.length);document.getElementById('discovery-list').innerHTML=this.records.length?this.records.slice().reverse().map(r=>`<li><strong>${escape(r.title)}</strong><span>${escape(r.kind)} / ${escape(r.date)}</span></li>`).join(''):'<li>Found carriers and completed transmissions stay here, on this device.</li>';}
+  station(station){document.getElementById('receiver-station').textContent=station.name;document.getElementById('receiver-frequency').textContent=station.frequency+' MHz';}
+  episode(item){const active=Boolean(item?.episodeId);this.root.dataset.episode=active?'true':'false';document.getElementById('episode-exit').hidden=!active;document.getElementById('transmission-title').textContent=active?item.episodeTitle:'The Continuity Dispute';document.getElementById('transmission-chapter').textContent=active?item.chapter:'Featured transmission / Crustacean Station';document.getElementById('episode-start').hidden=active;}
+  cue(cue){if(!cue)return;this.root.dataset.phase=cue.phase;const heading=document.getElementById('scene-headline');if(heading)heading.textContent=cue.headline;const note=document.getElementById('line');if(note)note.textContent=cue.note;const log=document.getElementById('notice-log');log.innerHTML='';for(const[who,text]of cue.lines||[]){const line=document.createElement('div');line.className='console-line listener';const name=document.createElement('strong');name.className='who';name.textContent='['+who+'] ';line.append(name,document.createTextNode(text));log.append(line);}document.getElementById('scene-accessible').textContent=cue.headline;}
+  progress(item,seconds){
+   const elapsed=Math.floor(item ? seconds||0 : 0),duration=Math.floor(item?.durationSeconds||0);const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+   document.getElementById('listening-time').textContent=fmt(elapsed)+' / '+fmt(duration);
+   const fragment=document.getElementById('lyric-fragment');if(fragment&&item?.lyricsLines?.length){const lines=item.lyricsLines.filter(x=>x.trim()&&!/^\[|^#/.test(x));const i=Math.min(lines.length-1,Math.floor(seconds/Math.max(1,duration)*lines.length));fragment.textContent=lines[i]||'';}
+  }
+  status(text,error=false){document.getElementById('playback-status').textContent=text;document.getElementById('playback-retry').hidden=!error;this.root.dataset.playback=error?'error':'ready';}
+ }
+ root.SignalPresentation={Presentation,escape};
+})(window);
+
+;
 (() => {
   const data = window.SIGNAL_STATIONS;
+  const seed = new URLSearchParams(location.search).get('seed') || String(Date.now());
+  const director = new SignalDirector.Director(data.episodes || [], seed);
+  let presentation = null;
+  const esc = SignalPresentation.escape;
   const byId = id => document.getElementById(id);
-  const pick = items => items[Math.floor(Math.random() * items.length)];
+  const pick = items => items[Math.floor(director.random() * items.length)];
   // "spoken" item kinds: short produced/rendered content that transitions on a fixed tail
   // overlap, not an outro guess (that's for actual songs, which have real musical structure).
   const isCallIn = type => type === 'caller talk-back';
@@ -29,74 +120,8 @@
   const LINER_OVERLAP_S = 0.5;    // how much of a liner's tail overlaps whatever comes next
   const CALL_POST_GAP_MS = 300;   // let the mixed disconnect land before the requested song starts
 
-  function pickCutInSeconds(track) {
-    const dur = track.durationSeconds;
-    if (!dur || dur < 6) return Math.max(0, (dur || 6) - TAIL_BUFFER_S);
-    const outro = track.outroStartSeconds != null ? track.outroStartSeconds : dur * 0.9;
-    const latest = dur - TAIL_BUFFER_S;
-    const earliest = Math.min(Math.max(outro, dur - SONG_TAIL_WINDOW_S), latest);
-    return earliest + Math.random() * Math.max(0.3, latest - earliest);
-  }
-
-  class Deck {
-    constructor(ctx, dest, onTimeUpdate, onEnded) {
-      this.audio = new Audio();
-      this.audio.preload = 'auto';
-      this.audio.crossOrigin = 'anonymous';
-      this.source = ctx.createMediaElementSource(this.audio);
-      this.gain = ctx.createGain();
-      this.gain.gain.value = 0;
-      this.source.connect(this.gain).connect(dest);
-      this.item = null;     // {type:'song'|'liner', title, subtitle, audio, durationSeconds, ...}
-      this.cutInAt = null;  // seconds into this deck's own playback to trigger the next transition
-      this.firedCutIn = false;
-      this.loadGeneration = 0;
-      this.cleanupTimers = new Set();
-      // bound to the audio element's own 'timeupdate', not requestAnimationFrame: rAF gets
-      // throttled hard (sometimes fully paused) in a backgrounded/hidden browser tab, but
-      // 'timeupdate' keeps firing off real playback progress regardless of tab visibility.
-      this.audio.addEventListener('timeupdate', () => onTimeUpdate(this));
-      this.audio.addEventListener('ended', () => onEnded(this));
-    }
-    load(item) {
-      this.cancelCleanup();
-      this.loadGeneration += 1;
-      this.item = item;
-      this.cutInAt = null;
-      this.firedCutIn = false;
-      this.audio.src = item.audio;
-    }
-    scheduleCleanup(callback, delayMs) {
-      const generation = this.loadGeneration;
-      const timer = setTimeout(() => {
-        this.cleanupTimers.delete(timer);
-        if (this.loadGeneration !== generation) return;
-        callback();
-      }, delayMs);
-      this.cleanupTimers.add(timer);
-    }
-    cancelCleanup() {
-      this.cleanupTimers.forEach(timer => clearTimeout(timer));
-      this.cleanupTimers.clear();
-    }
-    reset() {
-      this.cancelCleanup();
-      this.loadGeneration += 1;
-      this.audio.pause();
-      this.gain.gain.value = 0;
-      this.item = null;
-      this.cutInAt = null;
-      this.firedCutIn = false;
-    }
-    async play() { try { await this.audio.play(); } catch (e) { /* needs a user gesture; surfaced by the caller */ } }
-    fadeTo(target, ctx, seconds) {
-      const g = this.gain.gain;
-      const now = ctx.currentTime;
-      g.cancelScheduledValues(now);
-      g.setValueAtTime(g.value, now);
-      g.linearRampToValueAtTime(target, now + seconds);
-    }
-  }
+  const Deck = SignalAudio.Deck;
+  const pickCutInSeconds = track => SignalDirector.cutIn(track, director.random);
 
   class JingleChannel {
     constructor(ctx, dest) {
@@ -245,7 +270,7 @@
     scanning: false, scanFrame: null, scanTimer: null, scanIndex: -1, seekFrame: null,
     reception: 'locked', pirateSignal: null, power: false, lyricTicker: null,
     hostQuoteTimer: null, hostQuoteIndex: 0, hostFocus: null, hostKey: '',
-    consoleMuted: false, consoleGeneration: 0,
+    consoleMuted: false, consoleGeneration: 0, playbackEpoch: 0, transitioning: false, failedAudio: new Set(), volume: 0.8,
   };
 
   function formatClock(seconds) {
@@ -344,8 +369,11 @@
   }
 
   function onDeckTimeUpdate(deck) {
+    if (!state.power || !deck.item) return;
     if (state.decks[state.activeIndex] !== deck) return; // only the currently-active deck can trigger a transition
     renderProgress(deck);
+    presentation?.progress(deck.item, deck.audio.currentTime);
+    if (deck.item?.episodeId) presentation?.cue(director.tick(deck.audio.currentTime));
     tickLyricTicker(deck);
     if (deck.item && deck.cutInAt != null && !deck.firedCutIn && deck.audio.currentTime >= deck.cutInAt) {
       deck.firedCutIn = true;
@@ -354,16 +382,18 @@
   }
 
   function onDeckEnded(deck) {
-    // mirrors armCutIn's null-cutInAt items (caller clips and call segment intro/filler/
-    // outro): those never fire the early-crossfade check in onDeckTimeUpdate, so this is
-    // the only place their transition gets triggered at all -- without it, a call block
-    // would play its intro and then just go dead instead of advancing to the first caller.
-    if (state.decks[state.activeIndex] !== deck || !deck.item || !(isCallIn(deck.item.type) || isCallSegment(deck.item.type))) return;
+    if (state.decks[state.activeIndex] !== deck || !deck.item || !state.power) return;
+    const epoch = state.playbackEpoch;
     setTimeout(() => {
-      if (state.decks[state.activeIndex] === deck && deck.item && (isCallIn(deck.item.type) || isCallSegment(deck.item.type))) {
-        startCrossfade(deck, 1 - state.activeIndex);
-      }
-    }, CALL_POST_GAP_MS);
+      if (epoch === state.playbackEpoch && state.decks[state.activeIndex] === deck && state.power) startCrossfade(deck, 1 - state.activeIndex);
+    }, (isCallIn(deck.item.type) || isCallSegment(deck.item.type)) ? CALL_POST_GAP_MS : 0);
+  }
+
+  function onDeckFailure(deck) {
+    if (!state.power || state.decks[state.activeIndex] !== deck || !deck.item) return;
+    state.failedAudio.add(deck.item.audio);
+    presentation?.status('Carrier interrupted. Recovering the next transmission.');
+    startCrossfade(deck, 1 - state.activeIndex);
   }
 
   function ensureAudioGraph() {
@@ -371,13 +401,14 @@
     const Ctx = window.AudioContext || window.webkitAudioContext;
     state.ctx = new Ctx();
     state.master = state.ctx.createGain();
+    state.master.gain.value = state.volume;
     state.analyser = state.ctx.createAnalyser();
     state.analyser.fftSize = 256;
     state.analyser.smoothingTimeConstant = 0.82;
     state.master.connect(state.analyser);
     state.analyser.connect(state.ctx.destination);
     const dest = state.master;
-    state.decks = [new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded), new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded)];
+    state.decks = [new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded, onDeckFailure), new Deck(state.ctx, dest, onDeckTimeUpdate, onDeckEnded, onDeckFailure)];
     state.jingle = new JingleChannel(state.ctx, dest);
     state.staticChannel = new StaticChannel(state.ctx, dest);
     state.pirate = new PirateChannel(state.ctx, dest);
@@ -410,7 +441,7 @@
 
   const rollRunLength = () => {
     const range = state.station.runLength || { min: 2, max: 5 };
-    return range.min + Math.floor(Math.random() * (range.max - range.min + 1));
+    return range.min + Math.floor(director.random() * (range.max - range.min + 1));
   };
 
   function tagValues(tags, key) {
@@ -435,7 +466,8 @@
   // path is the one property guaranteed unique even between same-titled takes (e.g. "Snow
   // Crash" take1/take2).
   function chooseTrack() {
-    const tracks = (state.station.tracks || []).filter(t => t.audio);
+    const tracks = (state.station.tracks || []).filter(t => t.audio && !state.failedAudio.has(t.audio));
+    if (!tracks.length) return null;
     const byAudio = new Map(tracks.map(t => [t.audio, t]));
     state.songBag = state.songBag.filter(audio => byAudio.has(audio));
     if (!state.songBag.length) state.songBag = shuffle(tracks.map(t => t.audio));
@@ -448,7 +480,7 @@
       const scored = state.songBag.map((audio, index) => ({ index, score: trackRequestScore(byAudio.get(audio), state.pendingRequestTags) }));
       const bestScore = Math.max(...scored.map(item => item.score));
       const best = bestScore > 0 ? scored.filter(item => item.score === bestScore) : scored;
-      bagIndex = best[Math.floor(Math.random() * best.length)].index;
+      bagIndex = best[Math.floor(director.random() * best.length)].index;
     } else {
       // avoid an immediate title repeat right at a bag-wrap boundary (the reshuffle can otherwise
       // land the same track that just finished as the very next pick)
@@ -459,7 +491,7 @@
     const track = byAudio.get(audio);
     state.pendingRequestTags = null;
     state.lastTrackTitle = track.title;
-    return { type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags, lyricsLines: track.lyricsLines };
+    return { ...track, type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags, lyricsLines: track.lyricsLines };
   }
 
   function pickLiner() {
@@ -486,7 +518,7 @@
     const minGap = state.station.stationJingleMinGap == null ? 3 : state.station.stationJingleMinGap;
     if (state.itemsSinceJingle < minGap) return null;
     const chance = state.station.stationJingleChance == null ? 0.12 : state.station.stationJingleChance;
-    if (Math.random() > chance) return null;
+    if (director.random() > chance) return null;
     state.itemsSinceJingle = 0;
     return toPlanItem(pick(jingles));
   }
@@ -518,10 +550,10 @@
     };
   }
 
-  function shuffle(items) {
+  function shuffle(items, random = director.random) {
     const shuffled = items.slice();
     for (let index = shuffled.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1));
+      const swapIndex = Math.floor(random() * (index + 1));
       [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
     }
     return shuffled;
@@ -644,21 +676,21 @@
     let order = [];
     let cursor = 0;
     for (;;) {
-      if (state.consoleMuted) { await wait(300); continue; }
+      if (state.consoleMuted || !state.power || director.current?.episodeId) { await wait(300); continue; }
       // re-check at every scene boundary (not mid-scene) so switching stations swaps the
       // feed's content promptly without cutting a scene off halfway through
       if (!state.station || state.station.id !== feedStationId) {
         feedStationId = state.station ? state.station.id : null;
         scenes = stationNetworkFeed(state.station);
-        order = shuffle(scenes);
+        order = shuffle(scenes, Math.random);
         cursor = 0;
       }
       if (!scenes.length) { await wait(CONSOLE_SCENE_GAP_MS); continue; }
-      if (cursor >= order.length) { order = shuffle(scenes); cursor = 0; }
+      if (cursor >= order.length) { order = shuffle(scenes, Math.random); cursor = 0; }
       const scene = order[cursor];
       cursor += 1;
       for (const line of scene) {
-        if (state.consoleMuted) break;
+        if (state.consoleMuted || director.current?.episodeId || feedStationId !== state.station?.id) break;
         await playFeedLine(line);
         await wait(line.holdMs || CONSOLE_LINE_GAP_MS);
       }
@@ -700,7 +732,7 @@
     const fillers = pool.filter(x => x.kind === 'call segment filler');
     const calls = availableCallIns();
     if (!intros.length || !outros.length || !fillers.length || calls.length < 2) return null;
-    const callCount = Math.min(calls.length, 4 + Math.floor(Math.random() * 2)); // 4-5, capped by pool size
+    const callCount = Math.min(calls.length, 4 + Math.floor(director.random() * 2)); // 4-5, capped by pool size
     const chosenCalls = shuffle(calls).slice(0, callCount);
     const shuffledFillers = shuffle(fillers);
     // pull the chosen callers out of the rotation bag so a plain pickCallIn() right after
@@ -721,7 +753,7 @@
     const viable = options.filter(option => option.available && option.weight > 0);
     if (!viable.length) return null;
     const total = viable.reduce((sum, option) => sum + option.weight, 0);
-    let roll = Math.random() * total;
+    let roll = director.random() * total;
     for (const option of viable) {
       roll -= option.weight;
       if (roll <= 0) return option.kind;
@@ -740,7 +772,7 @@
     const ads = pool.filter(x => x.kind === 'sponsored notice');
     if (!hooks.length || !outros.length || ads.length < 2) return null;
     const shuffled = shuffle(ads);
-    const adCount = Math.min(ads.length, 2 + Math.floor(Math.random() * 3)); // 2-4, capped by pool size
+    const adCount = Math.min(ads.length, 2 + Math.floor(director.random() * 3)); // 2-4, capped by pool size
     const chosenAds = shuffled.slice(0, adCount);
     return [pick(hooks), ...chosenAds, pick(outros)].map(toPlanItem);
   }
@@ -812,6 +844,8 @@
   }
 
   function decideNext() {
+    const authored = director.next();
+    if (authored) return authored;
     if (!(state.station.tracks || []).some(t => t.audio)) return null;
     if (state.pendingBlock && state.pendingBlock.length) return state.pendingBlock.shift();
     state.itemsSinceJingle += 1;
@@ -896,7 +930,7 @@
 
   function startHostThoughtFeed() {
     clearInterval(state.hostQuoteTimer);
-    state.hostQuoteTimer = setInterval(() => renderHost(state.hostFocus, { advance: true }), 9000);
+    state.hostQuoteTimer = setInterval(() => { if (state.power && !director.current?.episodeId) renderHost(state.hostFocus, { advance: true }); }, 9000);
   }
 
   function stopHostThoughtFeed() {
@@ -917,6 +951,11 @@
   function renderIdentityVisual(mode, item) {
     const el = byId('identity-visual');
     if (!el) return;
+    if (item?.episodeId) {
+      state.lyricTicker = null;
+      el.innerHTML = '<div class="scene-field"><div class="scene-rings" aria-hidden="true"><i></i><i></i><i></i></div><div class="scene-headline" id="scene-headline"></div></div>';
+      return;
+    }
     if (mode.id === 'ad') {
       el.innerHTML = '<div class="glitch-ad"><i>BUY MORE</i><i>CONSUME</i><i>UPGRADE YOUR SOUL</i><i>NO REFUNDS</i><i>OBEY THE BRAND</i></div>';
       return;
@@ -941,16 +980,12 @@
           ? '<div class="lyric-art lyric-art-snowcrash" aria-hidden="true"><div class="snc-object snc-katana"><img src="assets/objects/snowcrash-katana-v1.png" alt=""></div><div class="snc-object snc-board"><img src="assets/objects/snowcrash-board-v1.png" alt=""></div><div class="snc-object snc-goggles"><img src="assets/objects/snowcrash-goggles-v1.png" alt=""></div><div class="snc-citation">STREET OBJECT CACHE<br>GARGOYLE / KOURIER<br>UNLICENSED</div></div>'
           : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
       el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
-      const lines = (item && item.lyricsLines) || [];
-      const poolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : 13 + Math.floor(Math.random() * 9);
-      const ticker = { item, lastIndex: -1, poolSize, pool: [] };
-      state.lyricTicker = ticker;
       const field = byId('glitch-lyric-field');
-      const initialCount = Math.min(poolSize, lines.length);
-      for (let i = 0; i < initialCount; i += 1) {
-        ticker.lastIndex = i;
-        ticker.pool.push(spawnLyricWord(field, lines[i]));
-      }
+      if (field) field.remove();
+      const single = document.createElement('div'); single.className = 'lyric-single'; single.id = 'lyric-fragment';
+      single.textContent = item?.lyricsLines?.find(x => x.trim() && !/^\[|^#/.test(x)) || item?.title || '';
+      el.appendChild(single);
+      state.lyricTicker = null;
       return;
     }
     state.lyricTicker = null;
@@ -993,6 +1028,7 @@
     state.hostFocus = null;
     state.hostKey = '';
     renderHost(null);
+    presentation?.station(station);
     startHostThoughtFeed();
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
@@ -1009,17 +1045,32 @@
     if (byId('mode-label')) byId('mode-label').textContent = mode.label;
     if (byId('signal-lock')) byId('signal-lock').textContent = state.started ? 'signal locked' : 'receiver ready';
     byId('now-title').textContent = item ? item.title : 'Off air';
-    byId('now-subtitle').textContent = item ? item.subtitle : 'Choose a station with cleared tracks.';
+    byId('now-subtitle').textContent = item ? item.subtitle : 'Power the receiver to join this station.';
     byId('break-note').textContent = item ? cutInLabel || '' : 'Crossfades in live -- press play to start the broadcast.';
     updateExternalMetadata(item);
+    presentation?.episode(item);
+    if (item) {
+      presentation?.remember('station:' + state.station.id, state.station.name, 'Carrier');
+      if (!item.episodeId && director.active && director.current?.episodeId) {
+        presentation?.remember('episode:' + director.active.id, director.active.title, 'Transmission explored');
+        director.reset();
+      }
+      if (director.enter(item) && item.episodeId) {
+        state.consoleGeneration += 1;
+        presentation?.cue(director.tick(deck.audio.currentTime || 0));
+      } else if (item.episodeId) {
+        const cue = item.cues?.[director.cueIndex]; presentation?.cue(cue);
+      }
+    }
+    presentation?.progress(item, deck?.audio.currentTime || 0);
     renderProgress(deck);
   }
 
   function renderQueue() {
     const items = state.plan.slice(0, 3);
     byId('queue').innerHTML = items.length
-      ? items.map((item, index) => `<li><span>${index + 1}</span><strong>${item.title}</strong><small>${item.subtitle || ''}</small></li>`).join('')
-      : '<li class="empty">Add a cleared track to this station to begin.</li>';
+      ? items.map((item, index) => `<li><span>${index + 1}</span><strong>${esc(item.title)}</strong><small>${esc(item.subtitle || '')}</small></li>`).join('')
+      : '<li class="empty">Power on to join this station.</li>';
   }
 
   function refillPlan() {
@@ -1032,6 +1083,7 @@
 
   // --- the actual crossfade sequencer ------------------------------------------
   function armCutIn(deck) {
+    if (deck.item?.transition?.mode === 'end') { deck.cutInAt = null; return; }
     if (deck.item && (isCallIn(deck.item.type) || isCallSegment(deck.item.type))) {
       // same as a caller clip: play the intro/filler/outro out in full, no early cut-in --
       // a filler getting trimmed before the next caller starts would clip the bridge line.
@@ -1041,18 +1093,33 @@
     if (!deck.item || isSpokenKind(deck.item.type)) {
       deck.cutInAt = Math.max(0, (deck.item ? deck.audio.duration || deck.item.durationSeconds || 6 : 6) - LINER_OVERLAP_S);
     } else {
-      deck.cutInAt = pickCutInSeconds({ durationSeconds: deck.audio.duration || deck.item.durationSeconds, outroStartSeconds: deck.item.outroStartSeconds });
+      deck.cutInAt = pickCutInSeconds({ durationSeconds: deck.audio.duration || deck.item.durationSeconds, outroStartSeconds: deck.item.outroStartSeconds, outroConfidence: deck.item.outroConfidence, transition: deck.item.transition });
     }
   }
 
-  function startCrossfade(fromDeck, toIndex) {
+  async function startCrossfade(fromDeck, toIndex) {
+    if (state.transitioning || !state.power || state.reception !== 'locked') return;
+    state.transitioning = true;
+    const epoch = state.playbackEpoch;
     const toDeck = state.decks[toIndex];
-    const next = state.plan.shift();
-    refillPlan();
-    renderQueue();
-    if (!next) return;
-    toDeck.load(next);
-    toDeck.play();
+    let next = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const candidate = state.plan.shift(); refillPlan(); renderQueue();
+      if (!candidate) break;
+      if (state.failedAudio.has(candidate.audio)) continue;
+      toDeck.load(candidate);
+      presentation?.status('Acquiring next carrier…');
+      try { await toDeck.play(); next = candidate; }
+      catch (error) {
+        if (epoch !== state.playbackEpoch) return;
+        state.failedAudio.add(candidate.audio); toDeck.reset();
+      }
+      if (epoch !== state.playbackEpoch || !state.power) return;
+      if (next) break;
+    }
+    state.transitioning = false;
+    if (!next) { presentation?.status('Signal unavailable. Retry the receiver.', true); return; }
+    presentation?.status('Carrier locked');
 
     let totalFadeS;
     if (isSpokenKind(next.type)) {
@@ -1073,7 +1140,7 @@
     fromDeck.scheduleCleanup(() => fromDeck.audio.pause(), (totalFadeS + 0.2) * 1000);
 
     const isHostLine = next.type === 'host liner' || next.type === 'host bridge' || next.type === 'street report' || next.type === 'ad block intro';
-    if (isHostLine && state.station.jingle && Math.random() < (state.station.jingle.chance || 0)) {
+    if (isHostLine && state.station.jingle && director.random() < (state.station.jingle.chance || 0)) {
       state.jingle.play(state.station.jingle.audio, state.ctx, state.station.jingle.peak || 0.7);
     }
 
@@ -1272,6 +1339,10 @@
   }
 
   function quietProgramme() {
+    state.playbackEpoch += 1; state.transitioning = false;
+    director.reset(); state.consoleGeneration += 1;
+    if (state.jingle) { state.jingle.audio.pause(); state.jingle.gain.gain.cancelScheduledValues(0); state.jingle.gain.gain.value = 0; }
+    presentation?.episode(null);
     if (state.decks) state.decks.forEach(deck => deck.reset());
     state.started = false;
     state.plan = [];
@@ -1280,6 +1351,7 @@
   }
 
   function renderDeadBand(value) {
+    presentation?.station({name:'Unmapped spectrum', frequency:formatDial(value)});
     const frequency = formatDial(value);
     stopHostThoughtFeed();
     clearHostPortrait();
@@ -1330,6 +1402,8 @@
   }
 
   function renderPirate(signal) {
+    presentation?.station({name:signal.source || signal.title, frequency:signal.frequency});
+    if (state.power) presentation?.remember('pirate:' + signal.id, signal.title, 'Intercepted carrier');
     stopHostThoughtFeed();
     clearHostPortrait();
     delete document.documentElement.dataset.previewStation;
@@ -1379,11 +1453,13 @@
     if (state.preview) state.preview.clear(state.ctx);
     state.pirateSignal = signal;
     setReception('pirate');
-    state.staticChannel.setLevel(0.025, 0.16);
+    state.staticChannel.setLevel(state.power ? 0.025 : 0, 0.16);
     setDialValue(pirateDialValue(signal));
     byId('tuner-status').textContent = 'illegal carrier';
     byId('tuner-note').textContent = `Intercepted ${signal.id} at ${signal.frequency}. Do not expect it to remain.`;
     renderPirate(signal);
+    if (!state.power) { presentation?.status('Receiver off'); return; }
+    presentation?.status('Unverified carrier acquired');
     state.pirate.play(signal, state.ctx, () => {
       if (state.pirateSignal !== signal) return;
       state.pirateSignal = null;
@@ -1506,6 +1582,11 @@
   }
 
   function selectStation(id, options = {}) {
+    state.playbackEpoch += 1; state.transitioning = false; state.failedAudio.clear();
+    director.reset(); state.consoleGeneration += 1;
+    if (state.jingle) { state.jingle.audio.pause(); state.jingle.gain.gain.cancelScheduledValues(0); state.jingle.gain.gain.value = 0; }
+    if (byId('notice-log')) byId('notice-log').textContent = '';
+    if (options.episodeId) director.start(options.episodeId);
     const station = data.stations.find(item => item.id === id) || data.stations[0];
     if (!options.fromScan) stopScan();
     ensureAudioGraph();
@@ -1526,33 +1607,35 @@
     });
     refillPlan();
     renderStation(station); renderQueue(); renderNow(null);
-    pushSystemNotice(data.notice);
+    pushSystemNotice(state.station?.notice || data.notice);
     byId('skip').disabled = false;
     if (state.power) startBroadcast();
   }
 
   async function startBroadcast() {
     ensureAudioGraph();
-    await state.ctx.resume();
-    const first = state.plan.shift();
-    refillPlan();
-    renderQueue();
-    if (!first) return;
+    if (state.transitioning) return;
+    const epoch = state.playbackEpoch;
+    try { await state.ctx.resume(); } catch { presentation?.status('Tap Retry to enable audio.', true); return; }
+    if (epoch !== state.playbackEpoch || !state.power) return;
+    state.transitioning = true;
     const deck = state.decks[0];
-    deck.load(first);
-    const renderGeneration = deck.loadGeneration;
-    await deck.play();
-    if (state.reception !== 'locked' || deck.loadGeneration !== renderGeneration || deck.item !== first) return;
+    let first = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const candidate = state.plan.shift(); refillPlan(); renderQueue();
+      if (!candidate) break;
+      if (state.failedAudio.has(candidate.audio)) continue;
+      deck.load(candidate); presentation?.status('Acquiring carrier…');
+      try { await deck.play(); first = candidate; }
+      catch { if (epoch !== state.playbackEpoch) return; state.failedAudio.add(candidate.audio); deck.reset(); }
+      if (epoch !== state.playbackEpoch || !state.power) return;
+      if (first) break;
+    }
+    state.transitioning = false;
+    if (!first) { presentation?.status('Signal unavailable. Retry the receiver.', true); return; }
     deck.gain.gain.setValueAtTime(1, state.ctx.currentTime);
-    state.activeIndex = 0;
-    state.started = true;
-    const showStatus = () => {
-      if (state.reception !== 'locked' || deck.loadGeneration !== renderGeneration || deck.item !== first) return;
-      renderNow(deck, (isCallIn(first.type) || isCallSegment(first.type)) ? 'Open line to the Street.' : isSpokenKind(first.type) ? 'On the air, live.' : 'Song plays out, host cuts in on the tail.');
-    };
-    deck.audio.onloadedmetadata = () => { armCutIn(deck); showStatus(); };
-    if (deck.audio.readyState >= 1) armCutIn(deck);
-    showStatus();
+    state.activeIndex = 0; state.started = true;
+    armCutIn(deck); renderNow(deck); presentation?.status('Carrier locked');
   }
 
   // The power toggle IS the play control here -- a radio has an on/off switch, not a
@@ -1573,10 +1656,13 @@
       state.pirateSignal = null;
       quietProgramme();
       renderNow(null);
+      presentation?.status('Receiver off');
       return;
     }
     ensureAudioGraph();
-    await state.ctx.resume();
+    const epoch = state.playbackEpoch;
+    try { await state.ctx.resume(); } catch { presentation?.status('Tap Retry to enable audio.', true); return; }
+    if (!state.power || epoch !== state.playbackEpoch) return;
     if (state.reception === 'locked' && state.station) {
       if (!state.started) {
         // quietProgramme() (run on the last power-off) empties state.plan and never gets
@@ -1588,7 +1674,10 @@
         await startBroadcast();
       }
     } else {
-      enterDeadBand(Number(byId('tuner').value), { scanning: false });
+      const value = Number(byId('tuner').value);
+      const carrier = nearestCarrier(value);
+      if (carrier?.entry.kind === 'pirate' && carrier.distance <= carrier.entry.width) playPirateSignal(carrier.entry.item);
+      else enterDeadBand(value, { scanning: false });
     }
   }
 
@@ -1615,7 +1704,7 @@
     readoutArchResizeTimer = setTimeout(updateReadoutArch, 120);
   });
   window.addEventListener('load', updateReadoutArch); // catches any late webfont reflow
-  pushSystemNotice(data.notice);
+  pushSystemNotice(state.station?.notice || data.notice);
   runNetworkFeed();
 
   byId('scan').addEventListener('click', toggleScan);
@@ -1661,5 +1750,16 @@
     byId('waveform').innerHTML = Array.from({ length: 48 }, (_, index) => `<i style="--h:${(.18 + ((index * 37) % 71) / 100).toFixed(2)}"></i>`).join('');
   }
 
-  selectStation(data.defaultStation || data.stations[0].id);
+  presentation = new SignalPresentation.Presentation(data, {
+    episode(id) { const ep = data.episodes.find(e => e.id === id); if (!ep) return; selectStation(ep.station, {episodeId:id}); if (!state.power) setPower(true); },
+    exitEpisode() { selectStation(state.station.id); },
+    volume(value) { state.volume = value; if (state.master) state.master.gain.setTargetAtTime(value, state.ctx.currentTime, .04); },
+    retry() { state.failedAudio.clear(); quietProgramme(); refillPlan(); if (state.power) startBroadcast(); else setPower(true); }
+  });
+  if ('mediaSession' in navigator) {
+    for (const [name, callback] of Object.entries({play:()=>setPower(true), pause:()=>setPower(false), nexttrack:()=>byId('skip').click()})) {
+      try { navigator.mediaSession.setActionHandler(name, callback); } catch {}
+    }
+  }
+  selectStation(new URLSearchParams(location.search).get('station') || data.defaultStation || data.stations[0].id);
 })();
