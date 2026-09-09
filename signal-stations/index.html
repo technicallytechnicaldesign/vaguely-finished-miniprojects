@@ -361,6 +361,14 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 @keyframes live-object-glitch{0%,86%,100%{transform:translate(0);clip-path:inset(0);filter:none}88%{transform:translate(-3px,1px);clip-path:polygon(0 0,100% 0,100% 32%,0 36%,0 64%,100% 60%,100% 100%,0 100%);filter:saturate(1.3) contrast(1.2)}92%{transform:translate(2px,-1px);clip-path:inset(44% 0 18% 0)}95%{transform:translate(0);clip-path:inset(0)}}
 @keyframes live-tag-jitter{0%,88%,100%{transform:translate(0,0);opacity:1}90%{transform:translate(-2px,1px);opacity:.7}93%{transform:translate(2px,-1px);opacity:1}96%{transform:translate(-1px,0);opacity:.85}}
 @media(prefers-reduced-motion:reduce){.glitch-host-live .live-object,.glitch-host-live .live-object img,.glitch-host-live .live-tag{animation:none}}
+/* CRUSTACEAN's calmer variant (2026-09-09): a slow gentle breathe instead of SNOW CRASH's
+   pulse+rotate, no glitch clip-path on the art at all, and the tag just fades instead of
+   jittering position -- "less frantic," the maker's own words. */
+.glitch-host-live-calm .live-object{animation:live-object-breathe-calm 3.4s ease-in-out infinite}
+.glitch-host-live-calm .live-object img{animation:none}
+.glitch-host-live-calm .live-tag{letter-spacing:.32em;animation:live-tag-breathe-calm 3.4s ease-in-out infinite}
+@keyframes live-object-breathe-calm{0%,100%{transform:scale(1);opacity:.82}50%{transform:scale(1.035);opacity:1}}
+@keyframes live-tag-breathe-calm{0%,100%{opacity:.65}50%{opacity:1}}
 </style>
 </head>
 <body>
@@ -373,7 +381,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 <section class="panel transport" aria-label="Broadcast transport"><span class="transport-label">SIG / live control</span><button class="skip" id="skip" type="button" aria-label="Skip signal">›</button><span class="transport-label">Music / host / caller / report / ad</span></section>
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
-  <script src="stations.data.js?v=67a66cbd8088"></script>
-  <script src="radio-player.js?v=dde12380e9e7"></script>
+  <script src="stations.data.js?v=553ece0e2e15"></script>
+  <script src="radio-player.js?v=6f19569022e7"></script>
 </body>
 </html>

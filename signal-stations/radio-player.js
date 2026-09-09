@@ -257,6 +257,51 @@
     }
   }
 
+  // Caller-section background bed (SIG, 2026-09-09): a real looping music track, mixed very
+  // quietly, that runs under an entire call-related run -- caller talk-back plus its
+  // surrounding intro/filler/outro bridges -- rather than under just one clip at a time, so
+  // it doesn't restart/refade on every single caller. Driven by a per-station `callerBed`
+  // data field (currently only CRUSTACEAN's) rather than a hardcoded station id, so another
+  // station can opt in later with no code change. See startCrossfade()'s use of it.
+  class CallerBedChannel {
+    constructor(ctx, dest) {
+      this.ctx = ctx;
+      this.audio = new Audio();
+      this.audio.preload = 'auto';
+      this.audio.crossOrigin = 'anonymous';
+      this.audio.loop = true;
+      this.source = ctx.createMediaElementSource(this.audio);
+      this.gain = ctx.createGain();
+      this.gain.gain.value = 0;
+      this.source.connect(this.gain).connect(dest);
+      this.currentSrc = null;
+      this.active = false;
+    }
+    fadeIn(url, ctx, level = 0.055, seconds = 1.4) {
+      if (!url) return;
+      if (this.currentSrc !== url) { this.currentSrc = url; this.audio.src = url; this.audio.currentTime = 0; }
+      if (this.audio.paused) this.audio.play().catch(() => {});
+      this.active = true;
+      const gain = this.gain.gain, now = ctx.currentTime;
+      gain.cancelScheduledValues(now); gain.setValueAtTime(gain.value, now);
+      gain.linearRampToValueAtTime(level, now + seconds);
+    }
+    fadeOut(ctx, seconds = 1.6) {
+      if (!this.active) return;
+      this.active = false;
+      const gain = this.gain.gain, now = ctx.currentTime;
+      gain.cancelScheduledValues(now); gain.setValueAtTime(gain.value, now);
+      gain.linearRampToValueAtTime(0, now + seconds);
+      setTimeout(() => { if (!this.active) this.audio.pause(); }, (seconds + 0.2) * 1000);
+    }
+    stop() {
+      this.active = false;
+      this.audio.pause();
+      this.gain.gain.cancelScheduledValues(0);
+      this.gain.gain.value = 0;
+    }
+  }
+
   // CRUSTACEAN caller texture (SIG, 2026-09-09): two small one-shot SFX, synthesized rather
   // than sourced (same "plain Web Audio DSP, no samples" approach as StaticChannel above and
   // make_callin_sfx.py) so there's no asset dependency. A dial tone (two sustained sine
@@ -466,6 +511,7 @@
     state.pirate = new PirateChannel(state.ctx, dest);
     state.preview = new PreviewChannel(state.ctx, dest);
     state.sfx = new SfxChannel(state.ctx, dest);
+    state.callerBed = new CallerBedChannel(state.ctx, dest);
     startVisualizer();
   }
 
@@ -790,6 +836,61 @@
     return lines;
   }
 
+  // "Good Kitty" (CRUSTACEAN, BOUNDED COGNITION) gets its own eruption, 2026-09-09: AINEKO/cat
+  // consciousness chaos -- laser fixation, keyboard-walking, the general feline refusal to be
+  // impressed -- with the lobster loyalists from above interrupting to demand their format
+  // back. Same dense/fast shape as the lobster eruption, different two-faction daemon line.
+  const CAT_SONG_IDS = new Set(['crustacean-good-kitty']);
+  const CAT_CHANTS = ['LASER. OOOOOHHH. LASER.', 'id recommend this but thats too much emotional labour', 'random keys get pressed by cat dancing across the keyboard', 'asdkfj;alksdjf;alsdkjf', 'knocked a glass off the table on purpose. no regrets.', 'the red dot is a lie and I chase it anyway', 'sat on the mixing board. this is now my mix.', 'purpose is a scent I have already forgotten', 'loaf mode engaged. do not disturb.', '6 lives remain. unclear what happened to the other 3.', 'walked across every fader at once and it improved the track'];
+  const CAT_HANDLE_PREFIXES = ['PIXEL_CAT', 'LOAF_MODE', 'TUNA_TAX', 'WHISKER', 'FERAL_FRIEND', 'NINE_LIVES', 'SCRATCH_POST', 'ZOOMIES_AT_3AM'];
+  const LOBSTER_PROTEST_LINES = ['NYET TURN IT OFF', 'NYET NYET NYET BACK TO REAL MUSIC', 'WHERE IS THE LOBSTER CONTENT', 'THIS IS A CAT STATION NOW APPARENTLY', 'BRING BACK CONTRACT LAW', 'WE DID NOT SIGN UP FOR THIS'];
+  function catHandle() {
+    const prefix = CAT_HANDLE_PREFIXES[Math.floor(Math.random() * CAT_HANDLE_PREFIXES.length)];
+    return `${prefix}_${1000 + Math.floor(Math.random() * 98999)}`;
+  }
+  function catEruptionScene() {
+    const burst = 3 + Math.floor(Math.random() * 4);
+    const lines = [];
+    for (let i = 0; i < burst; i += 1) {
+      lines.push({ role: 'listener', who: catHandle(), text: CAT_CHANTS[Math.floor(Math.random() * CAT_CHANTS.length)], holdMs: 100 + Math.random() * 170 });
+    }
+    if (Math.random() < 0.6) {
+      lines.push({ role: 'listener', who: lobsterHandle(), text: LOBSTER_PROTEST_LINES[Math.floor(Math.random() * LOBSTER_PROTEST_LINES.length)] + '!!!', holdMs: 300 + Math.random() * 250 });
+    }
+    lines.push({ role: 'daemon', who: 'CRUSTACEAN STATION', text: `${burst} LASER-FACTION CONNECTIONS ACTIVE. LOBSTER LOYALISTS OBJECTING. NO REFEREE AVAILABLE.`, holdMs: 600 });
+    return lines;
+  }
+
+  // "Good Dog, Bad Machine" and "Dream of Grass" (SNOW CRASH, artist credited RAT THING on the
+  // latter) get the opposite treatment, 2026-09-09: rat-thing listeners going full feral --
+  // howling, crazed, meth-amped -- and sushiK actively encouraging it rather than moderating,
+  // matching SNOW CRASH's chaotic-punk voice against CRUSTACEAN's formal one above.
+  const RAT_SONG_IDS = new Set(['snc-good-dog-bad-machine', 'snc-dream-of-grass']);
+  const RAT_HOWLS = ['AWOOOOOOOOOOOOO', 'HOOOOOOOOOOWL', 'RAT THINGS ON THE CEILING AGAIN', 'SOMEONE FEED THE RATS MORE BASS', 'I CAN SEE THE GRASS BREATHING', 'TEETH TEETH TEETH TEETH', 'WHO LET THE RATS INTO THE MIXING BOARD', 'FERAL FERAL FERAL FERAL', 'MY BONES ARE VIBRATING', 'GNAW GNAW GNAW GNAW GNAW', 'SOMEBODY CHECK ON THE RATS', 'THIS IS NOT A DRILL THIS IS THE DROP'];
+  const RAT_HANDLE_PREFIXES = ['RAT_THING', 'GNAW', 'FERAL_0', 'TEETH_OUT', 'GRASS_EATER', 'CEILING_RAT', 'BONE_VIBRATE', 'DROP_ADDICT'];
+  const SUSHIK_FERAL_LINES = ["YES. YES. LOSE IT. THAT'S THE POINT.", "DON'T CHECK ON THE RATS. JOIN THE RATS.", "I AM NOT CALMING ANYONE DOWN TONIGHT.", "HOWL LOUDER I CAN'T HEAR THE BASELINE", "SOMEBODY'S GONNA GET BIT AND HONESTLY GOOD"];
+  function ratHandle() {
+    const prefix = RAT_HANDLE_PREFIXES[Math.floor(Math.random() * RAT_HANDLE_PREFIXES.length)];
+    return `${prefix}_${1000 + Math.floor(Math.random() * 98999)}`;
+  }
+  function ratEruptionScene() {
+    const burst = 3 + Math.floor(Math.random() * 4);
+    const lines = [];
+    for (let i = 0; i < burst; i += 1) {
+      lines.push({ role: 'listener', who: ratHandle(), text: `${RAT_HOWLS[Math.floor(Math.random() * RAT_HOWLS.length)]}!!!`, holdMs: 80 + Math.random() * 140 });
+    }
+    lines.push({ role: 'daemon', who: 'SUSHIK', text: SUSHIK_FERAL_LINES[Math.floor(Math.random() * SUSHIK_FERAL_LINES.length)], holdMs: 500 });
+    return lines;
+  }
+
+  // Song id -> eruption generator, checked once per feed loop against whatever's actually
+  // playing. Function declarations, so this is safe to define before any of them textually.
+  const SONG_ERUPTIONS = new Map([
+    ...[...LOBSTER_SONG_IDS].map(id => [id, lobsterEruptionScene]),
+    ...[...CAT_SONG_IDS].map(id => [id, catEruptionScene]),
+    ...[...RAT_SONG_IDS].map(id => [id, ratEruptionScene])
+  ]);
+
   async function runNetworkFeed() {
     let feedStationId = null;
     let scenes = [];
@@ -806,9 +907,9 @@
         cursor = 0;
       }
       const activeItem = state.decks?.[state.activeIndex]?.item;
-      const isLobsterErupting = state.station?.id === 'crustacean' && activeItem?.type === 'song' && LOBSTER_SONG_IDS.has(activeItem.id);
-      if (isLobsterErupting) {
-        for (const line of lobsterEruptionScene()) {
+      const eruption = activeItem?.type === 'song' ? SONG_ERUPTIONS.get(activeItem.id) : null;
+      if (eruption) {
+        for (const line of eruption()) {
           if (state.consoleMuted || feedStationId !== state.station?.id) break;
           await playFeedLine(line);
           await wait(line.holdMs || CONSOLE_LINE_GAP_MS);
@@ -1143,17 +1244,23 @@
       el.innerHTML = `<div class="pirate-static pirate-static-${(item && item.family) || 'deadband'}"><div class="pirate-noise"></div><div class="pirate-burst">${shards}</div></div>`;
       return;
     }
-    if ((mode.id === 'host' || mode.id === 'call') && state.station && state.station.id === 'snowcrash') {
+    if ((mode.id === 'host' || mode.id === 'call') && state.station && (state.station.id === 'snowcrash' || state.station.id === 'crustacean')) {
       // Live host/caller segments used the same generic round "glitch-head" blob as every
-      // other station -- the maker's own name for it is "the placeholder potato". SNOW CRASH
-      // already has its own station object art (katana/board/goggles, used on the song visual
-      // a few lines up); reuse the katana for a live host and the board for a live caller so
-      // the identity panel actually looks like this station's world while someone's really
-      // talking, not a generic spinner. Other stations/modes are untouched for now.
-      const objectClass = mode.id === 'host' ? 'live-object-katana' : 'live-object-board';
-      const objectSrc = mode.id === 'host' ? 'assets/objects/snowcrash-katana-v1.png' : 'assets/objects/snowcrash-board-v1.png';
-      const liveLabel = mode.id === 'host' ? 'HOST: LIVE' : 'CALLER: LIVE';
-      el.innerHTML = `<div class="glitch-host glitch-host-live"><div class="live-object ${objectClass}"><img src="${objectSrc}" alt=""></div><span class="glitch-tag live-tag" data-text="${liveLabel}">${liveLabel}</span></div>`;
+      // other station -- the maker's own name for it is "the placeholder potato". Both
+      // stations already have their own object art (used on the song visual a few lines up);
+      // reuse it here instead of a generic spinner. SNOW CRASH stays loud (katana for host,
+      // board for caller, HOST:/CALLER: LIVE, full pulse+glitch); CRUSTACEAN (2026-09-09) gets
+      // a calmer version, maker's explicit ask -- one object (the brain) for both modes, no
+      // glitch jitter on the art, and the tag just breathes instead of jittering. Text is
+      // deliberately generic ("LIVE" / "LIVE: CALLER") rather than the real segment/caller
+      // name -- those still show in the normal now-title area untouched, per the maker's "no
+      // changing the titles."
+      const isCrustacean = state.station.id === 'crustacean';
+      const objectClass = isCrustacean ? 'live-object-brain' : (mode.id === 'host' ? 'live-object-katana' : 'live-object-board');
+      const objectSrc = isCrustacean ? 'assets/objects/crustacean-brain-v1.png' : (mode.id === 'host' ? 'assets/objects/snowcrash-katana-v1.png' : 'assets/objects/snowcrash-board-v1.png');
+      const liveLabel = isCrustacean ? (mode.id === 'host' ? 'LIVE' : 'LIVE: CALLER') : (mode.id === 'host' ? 'HOST: LIVE' : 'CALLER: LIVE');
+      const calmClass = isCrustacean ? ' glitch-host-live-calm' : '';
+      el.innerHTML = `<div class="glitch-host glitch-host-live${calmClass}"><div class="live-object ${objectClass}"><img src="${objectSrc}" alt=""></div><span class="glitch-tag live-tag" data-text="${liveLabel}">${liveLabel}</span></div>`;
       return;
     }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
@@ -1345,6 +1452,17 @@
       deck.cutInAt = null;
       return;
     }
+    // A song leading straight into a flagged "join clean" segment (a real produced host
+    // segment, not a short liner -- see stations/*.json's `joinClean` field) plays all the way
+    // out instead of getting an early cut-in: the maker's ask, 2026-09-09, was that a special
+    // broadcast should feel like tuning in FOR it right as a song ends clean, not like it
+    // interrupted whatever was already playing. state.plan[0] is reliable here: refillPlan()
+    // keeps it topped up immediately after every plan.shift(), so it already holds whatever
+    // is queued to follow this deck's item by the time its own cut-in gets armed.
+    if (deck.item?.type === 'song' && state.plan[0]?.joinClean) {
+      deck.cutInAt = null;
+      return;
+    }
     if (!deck.item || isSpokenKind(deck.item.type)) {
       deck.cutInAt = Math.max(0, (deck.item ? deck.audio.duration || deck.item.durationSeconds || 6 : 6) - LINER_OVERLAP_S);
     } else {
@@ -1376,6 +1494,10 @@
     if (!next) { presentation?.status('Signal unavailable. Retry the receiver.', true); return; }
     presentation?.status('Carrier locked');
     if (state.station?.id === 'crustacean' && isCallIn(next.type)) state.sfx?.dialTone();
+    if (state.callerBed) {
+      if (state.station?.callerBed && (isCallIn(next.type) || isCallSegment(next.type))) state.callerBed.fadeIn(state.station.callerBed, state.ctx);
+      else state.callerBed.fadeOut(state.ctx);
+    }
 
     let totalFadeS;
     if (isSpokenKind(next.type)) {
@@ -1623,6 +1745,7 @@
     state.playbackEpoch += 1; state.transitioning = false;
     director.reset(); state.consoleGeneration += 1;
     if (state.jingle) { state.jingle.audio.pause(); state.jingle.gain.gain.cancelScheduledValues(0); state.jingle.gain.gain.value = 0; }
+    state.callerBed?.stop();
     presentation?.episode(null);
     if (state.decks) state.decks.forEach(deck => deck.reset());
     state.started = false;
@@ -1865,6 +1988,7 @@
     state.playbackEpoch += 1; state.transitioning = false; state.failedAudio.clear();
     director.reset(); state.consoleGeneration += 1;
     if (state.jingle) { state.jingle.audio.pause(); state.jingle.gain.gain.cancelScheduledValues(0); state.jingle.gain.gain.value = 0; }
+    state.callerBed?.stop();
     if (byId('notice-log')) byId('notice-log').textContent = '';
     if (options.episodeId) director.start(options.episodeId);
     const station = data.stations.find(item => item.id === id) || data.stations[0];

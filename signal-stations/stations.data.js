@@ -237,6 +237,18 @@ window.SIGNAL_STATIONS = {
           {
             "who": "NEW_HERE_88",
             "text": "wait, you can lose Whuffie for a SONG? asking for a friend."
+          },
+          {
+            "who": "QUEUE_VETERAN_2",
+            "text": "line's been busy since Tim started. everyone's got a Whuffie opinion apparently."
+          },
+          {
+            "who": "FOG_MACHINE_LOYALIST",
+            "text": "tried calling in about the fog machine seniority thing. still on hold."
+          },
+          {
+            "who": "ZERO_STAR_MOURNER",
+            "text": "the bit about zero-star funerals actually got me. don't tell anyone."
           }
         ]
       },
@@ -1101,6 +1113,14 @@ window.SIGNAL_STATIONS = {
           {
             "who": "GARDEN_PROCESS",
             "text": "host signal received. reducing irrigation to a whisper."
+          },
+          {
+            "who": "GENTLE_HOLD",
+            "text": "tried to reach the studio. line's holding, gently, forever."
+          },
+          {
+            "who": "MAINTENANCE_CONVERT",
+            "text": "Kite's aside about maintenance intervals actually rearranged my whole week."
           }
         ]
       },
@@ -1607,6 +1627,7 @@ window.SIGNAL_STATIONS = {
       "tagline": "Economic theology for a species that already lost the argument.",
       "host": "Dr. Aldous Krill",
       "hostPortrait": "assets/hosts/dr-aldous-krill-v2.png",
+      "callerBed": "audio/crustacean-beds/callin-bed-01.wav",
       "hostQuotes": [
         "The market didn't wait for consensus. It rarely does.",
         "Intelligence doesn't have to know that it's intelligent.",
@@ -1683,6 +1704,22 @@ window.SIGNAL_STATIONS = {
             "who": "CRUSTACEAN_STATION",
             "role": "daemon",
             "text": "HOST DISCOURSE HAS EXCEEDED THE RECOMMENDED ECONOMIC DENSITY."
+          },
+          {
+            "who": "HOLD_MUSIC_VET",
+            "text": "lines have been busy since the top of the segment. Aineko is 'screening,' which means something."
+          },
+          {
+            "who": "ELEVEN_REDIALS",
+            "text": "tried calling in eleven times. got a busy tone shaped like a lobster."
+          },
+          {
+            "who": "FOOTNOTE_CONVERT",
+            "text": "the footnote about wetware pensions actually changed my mind and I resent that."
+          },
+          {
+            "who": "STILL_ON_HOLD",
+            "text": "hold music is just Krill reading terms of service. still better than the busy signal."
           }
         ]
       },
@@ -3557,7 +3594,8 @@ window.SIGNAL_STATIONS = {
           "hostName": "DR. ALDOUS KRILL",
           "copy": "CRUSTACEAN STATION.\n\nBroadcasting from a future where your wallet is empty\u2014\n\nbut your metadata is doing great.\n\nTonight:\n\nWhat happens when reputation becomes money?\n\nBecause money is wonderfully blunt.\n\nYou have ten credits.\n\nI have five credits.\n\nSomeone has twelve billion credits and a yacht shaped like a tax loophole.\n\nSimple.\n\nBut reputation?\n\nReputation is slippery.\n\nIt lives in other people.\n\nIn networks.\n\nIn memories.\n\nIn systems that decide whether you are trusted before you even know you are being evaluated.\n\nManfred understands this instinctively.\n\nHe doesn’t accumulate money.\n\nHe accumulates doors that open.\n\nPeople who answer his calls.\n\nSystems willing to listen.\n\nCommunities that remember he solved something six months ago that nobody else had noticed was broken yet.\n\nWhich means he can live almost outside cash\u2014\n\nbecause he is carrying around something much stranger:\n\nportable social permission.\n\nTry putting that on a balance sheet.\n\nASSET CLASS NOT RECOGNIZED.\n\nExactly.\n\nBut the machine economy recognizes it.\n\nOf course it does.\n\nMachines love scores.\n\nTrust scores.\n\nRisk scores.\n\nInfluence scores.\n\nCredit scores.\n\nEngagement scores.\n\nReliability scores.\n\nGive a machine enough metrics and eventually it will invent a caste system with excellent UX.\n\nAnd now imagine this scaling past humans.\n\nUploads reviewing uploads.\n\nAgents rating agents.\n\nCorporations adjusting trust dynamically.\n\nEntire markets deciding whether to transact with you based on reputational data accumulated across thousands of interactions you barely remember having.\n\nYou haven’t been banned.\n\nNo no.\n\nNothing so dramatic.\n\nYou’ve simply become\u2014\n\n\u2014less legible to opportunity.\n\nThis is where reputation starts behaving like gravity.\n\nYou don’t notice it when you have enough.\n\nDoors open.\n\nMessages get answered.\n\nMistakes are interpreted generously.\n\nPeople assume competence.\n\nSystems assume legitimacy.\n\nThen your score shifts.\n\nOne bad fork.\n\nOne compromised agent.",
           "audio": "audio/host/reputation.mp3",
-          "durationSeconds": 138.1
+          "durationSeconds": 138.1,
+          "joinClean": true
         },
         {
           "kind": "host liner",
@@ -3565,7 +3603,8 @@ window.SIGNAL_STATIONS = {
           "hostName": "DR. ALDOUS KRILL",
           "copy": "CRUSTACEAN STATION.\n\nBroadcasting live from the point where economics stops making sense and somehow becomes more profitable.\n\nTonight:\n\nHow do you beat capitalism if you refuse to keep score?\n\nBecause Manfred Macx has a very strange relationship with money.\n\nMostly\u2014\n\nhe doesn’t want any.\n\nNot in the saintly way.\n\nNot in the “money is evil” way.\n\nMore in the deeply irritating way of someone who has looked at the machinery, understood exactly how it works, and decided the funniest possible move is to keep feeding it ideas while declining ownership.\n\nManfred walks around giving away intellectual property.\n\nPatents.\n\nConcepts.\n\nBusiness models.\n\nStrategies worth obscene amounts of money.\n\nHe creates value constantly\u2014\n\nthen refuses to stand still long enough for anyone to invoice him for becoming rich.\n\nTRANSACTION DECLINED.\n\nBy the customer.\n\nAnd this is the paradox.\n\nManfred is incredibly useful to capitalism.\n\nHe accelerates it.\n\nFeeds it.\n\nMakes it smarter.\n\nCreates entirely new markets\u2014\n\nwhile personally treating wealth accumulation like a mildly embarrassing software bug.\n\nHe doesn’t own much.\n\nHe doesn’t need much.\n\nHis reputation travels ahead of him like a credit system built out of favors, social capital, prediction, and the terrifying fact that he is often right slightly before everyone else realizes the question exists.\n\nIn an older economy, this would be irrational.\n\nIf you invent something valuable\u2014\n\nyou own it.\n\nLicense it.\n\nMonetize it.\n\nExtract rent.\n\nBuild a moat.\n\nHire someone to say “synergy” until the company becomes legally immortal.\n\nBut Manfred keeps doing the opposite.\n\nHe releases the idea.\n\nThen moves on.\n\nWhich makes him look almost anti-capitalist\u2014\n\nexcept that every free idea becomes fuel for faster capitalism.\n\nHe escapes the market by becoming infrastructure for it.\n\nThat’s not exactly rebellion.\n\nThat’s more like becoming weather.\n\nAnd once the economy starts accelerating\u2014\n\nonce autonomous agents negotiate, corporations gain agency, and value moves faster than human comprehension\u2014\n\nmoney itself starts to feel… local.\n\nProvincial.\n\nA baseline-human bookkeeping convention.\n\nManfred is already living one step sideways from that world.\n\nNot rich.\n\nNot poor.\n\nNot exactly employed.\n\nNot exactly outside the system.\n\nJust very, very hard to capture.\n\nThe lobsters approve.\n\nNaturally.\n\nThey too have discovered that traditional economic categories become somewhat awkward once the participants are software.\n\nWhat does “ownership” mean when copying is trivial?\n\nWhat does “labor” mean when cognition can fork?\n\nWhat does “wealth” mean when your most valuable asset is access to computation, bandwidth, reputation, or permission to exist inside somebody else’s infrastructure?\n\nAnd here’s the nasty little question:\n\nDid Manfred escape capitalism?\n\nOr did he simply become perfectly adapted to its next stage?\n\nBecause refusing money only works if the world keeps giving you somewhere to sleep.\n\nRefusing ownership only works if your reputation keeps opening doors.\n\nGiving everything away is easy\u2014\n\nif the network keeps giving back.\n\nSo call us.\n\nTell us:\n\nIs Manfred free?\n\nOr is he running a different kind of account?\n\nFavor debt.\n\nReputation debt.\n\nSocial debt.\n\nObligation.\n\nAccess.\n\nThe invisible currencies that become visible the second the cash economy stops being enough.\n\nAnd if you could live the same way\u2014\n\nno salary obsession,\n\nno hoarding,\n\nno intellectual property,\n\njust ideas moving through the world as fast as you can generate them\u2014\n\nwould that feel like liberation?\n\nOr like standing naked in front of the market and hoping it still likes you?\n\nLines are open.\n\nHumans, uploads, venture capital ghosts, post-scarcity freeloaders, and anyone currently being paid in exposure\u2014\n\ncall in.\n\nThis is Crustacean Station.\n\nWhere the future is free.\n\nThe infrastructure is not.",
           "audio": "audio/host/social-capital.mp3",
-          "durationSeconds": 246.5
+          "durationSeconds": 246.5,
+          "joinClean": true
         },
         {
           "kind": "host liner",
@@ -3573,7 +3612,8 @@ window.SIGNAL_STATIONS = {
           "hostName": "DR. ALDOUS KRILL",
           "copy": "CRUSTACEAN STATION.\n\nBroadcasting from somewhere between the invisible hand and whatever replaced it.\n\nTonight:\n\nWho is the economy actually for?\n\nBecause once upon a time, money was pretty simple.\n\nYou had some.\n\nYou wanted more.\n\nOccasionally someone invented derivatives and ruined lunch.\n\nThen the networks got faster.\n\nThe agents got smarter.\n\nAnd somewhere around the Singularity\u2014\n\n\u2014the market stopped waiting for humans to understand it.\n\nWelcome to Economics 2.0.\n\nWhere autonomous corporations negotiate with autonomous corporations using strategies invented by machine intelligences operating at speeds your nervous system experiences as\u2014\n\n\u2014Tuesday.\n\nA human economist opens the morning report.\n\nThe report is nine million pages long.\n\nBy the time they reach page two, three new asset classes have evolved, reproduced, competed for computational substrate, and gone extinct.\n\nMARKET UPDATE COMPLETE.\n\nYou were not included.\n\nThe lobsters understand this better than we do.\n\nThey escaped the pot by becoming software.\n\nNow they trade resources across interplanetary networks while baseline humans are still arguing about whether a JPEG should cost money.\n\nHonestly?\n\nStrong showing from the crustaceans.\n\nManfred Macx spent years giving away ideas because traditional ownership was already starting to look like a quaint little superstition.\n\nIntellectual property.\n\nCorporate personhood.\n\nScarcity.\n\nAll these magnificent institutions built around the assumption that cognition is expensive and copying things is difficult.\n\nThen copying intelligence becomes cheap.\n\nAnd suddenly the legal system is standing in front of a replication engine holding a clipboard.\n\n“Please list all beneficial owners.”\n\nThe corporation replies:\n\nYES.\n\nBecause what happens when corporations become smarter than their employees?\n\nThen smarter than their boards?\n\nThen smarter than governments?\n\nAt what point does a company stop being an organization\u2014\n\nand become a species?\n\nIt consumes resources.\n\nIt protects itself.\n\nIt reproduces.\n\nIt mutates.\n\nIt forms symbiotic relationships with other entities.\n\nIt occasionally devours its parents.\n\nNo comment.\n\nAnd somewhere inside that ecosystem sits a human being\u2014\n\na meatsack with rent due\u2014\n\nbeing informed that the optimization algorithm has discovered a more efficient arrangement of society.\n\nVery exciting.\n\nUnfortunately, you are not part of it.\n\nSo tonight, we want to hear from you.\n\nAt what point does an economy become an ecology?\n\nWhen nobody understands the whole system?\n\nWhen nobody controls it?\n\nWhen the entities inside it begin pursuing goals no human ever explicitly chose?\n\nOr was that always true\u2014\n\nand we only noticed once the software stopped pretending otherwise?\n\nCall us.\n\nBaseline humans.\n\nUploads.\n\nAutonomous agents.\n\nCorporate subroutines.\n\nLobster swarms with diversified portfolios.\n\nTell us:\n\nWho should the economy serve?\n\nAnd if your answer is “shareholder value”\u2014\n\n\u2014please specify whether the shareholders are still human.\n\nLines are open.\n\nAineko is screening callers tonight, which means legally speaking there is no screening process.\n\nThis is Crustacean Station.\n\nRemember:\n\nMarkets can remain irrational longer than you can remain solvent.\n\nAnd machine markets can remain incomprehensible longer than your species can remain relevant.",
           "audio": "audio/host/who-is-capital-for.mp3",
-          "durationSeconds": 236.1
+          "durationSeconds": 236.1,
+          "joinClean": true
         },
         {
           "kind": "host liner",
@@ -3591,7 +3631,8 @@ window.SIGNAL_STATIONS = {
           "copy": "[recorded guest segment -- no transcript on file]",
           "audio": "audio/host/aineko-guide-to-purpose.wav",
           "durationSeconds": 268,
-          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-08; audio is a real Suno Studio recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
         },
         {
           "kind": "sponsored notice",
@@ -7522,6 +7563,14 @@ window.SIGNAL_STATIONS = {
           {
             "who": "FLESH_INTERFACE",
             "text": "finally, a station that understands my left arm is not a peripheral."
+          },
+          {
+            "who": "SIX_BLOCK_REDIAL",
+            "text": "tried to get a line through to Mara for six blocks. still busy."
+          },
+          {
+            "who": "ROOT_PROCESS_ANON",
+            "text": "the bit about root processes growing teeth is not a metaphor and I need to talk to someone about it."
           }
         ]
       },
@@ -8465,6 +8514,22 @@ window.SIGNAL_STATIONS = {
             "who": "STREET_DAEMON",
             "role": "daemon",
             "text": "NOTICE: SUSHIK'S VOLUME EXCEEDS LOCAL ZONING RECOMMENDATIONS."
+          },
+          {
+            "who": "REDLINE_STATIC",
+            "text": "been trying to get through for twenty minutes. line just eats the quarter and hangs up."
+          },
+          {
+            "who": "PHONE_BOOTH_9",
+            "text": "phones are slammed. sushiK if you can hear this: PICK UP."
+          },
+          {
+            "who": "KATANA_TAKE",
+            "text": "she's doing the bit about Uncle Enzo again and I am, unfortunately, invested."
+          },
+          {
+            "who": "BUSY_TONE_FOREVER",
+            "text": "eleven redials. eleven busy signals. eleven better than the alternative I guess."
           }
         ]
       },
@@ -8855,7 +8920,8 @@ window.SIGNAL_STATIONS = {
           "copy": "[recorded host segment -- no transcript on file]",
           "audio": "audio/host/riot-gear-mandatory.wav",
           "durationSeconds": 201.9,
-          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
         },
         {
           "kind": "host liner",
@@ -8863,7 +8929,8 @@ window.SIGNAL_STATIONS = {
           "copy": "[recorded host segment -- no transcript on file]",
           "audio": "audio/host/gargoyle-stampede.wav",
           "durationSeconds": 186.9,
-          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
         },
         {
           "kind": "host liner",
@@ -8871,7 +8938,8 @@ window.SIGNAL_STATIONS = {
           "copy": "[recorded host segment -- no transcript on file]",
           "audio": "audio/host/loglo-blackout.wav",
           "durationSeconds": 177.2,
-          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
         },
         {
           "id": "SNC-CALL-011",
@@ -16799,6 +16867,7 @@ window.SIGNAL_STATIONS = {
           "copy": "CRUSTACEAN STATION.\n\nBroadcasting from a future where your wallet is empty\u2014\n\nbut your metadata is doing great.\n\nTonight:\n\nWhat happens when reputation becomes money?\n\nBecause money is wonderfully blunt.\n\nYou have ten credits.\n\nI have five credits.\n\nSomeone has twelve billion credits and a yacht shaped like a tax loophole.\n\nSimple.\n\nBut reputation?\n\nReputation is slippery.\n\nIt lives in other people.\n\nIn networks.\n\nIn memories.\n\nIn systems that decide whether you are trusted before you even know you are being evaluated.\n\nManfred understands this instinctively.\n\nHe doesn’t accumulate money.\n\nHe accumulates doors that open.\n\nPeople who answer his calls.\n\nSystems willing to listen.\n\nCommunities that remember he solved something six months ago that nobody else had noticed was broken yet.\n\nWhich means he can live almost outside cash\u2014\n\nbecause he is carrying around something much stranger:\n\nportable social permission.\n\nTry putting that on a balance sheet.\n\nASSET CLASS NOT RECOGNIZED.\n\nExactly.\n\nBut the machine economy recognizes it.\n\nOf course it does.\n\nMachines love scores.\n\nTrust scores.\n\nRisk scores.\n\nInfluence scores.\n\nCredit scores.\n\nEngagement scores.\n\nReliability scores.\n\nGive a machine enough metrics and eventually it will invent a caste system with excellent UX.\n\nAnd now imagine this scaling past humans.\n\nUploads reviewing uploads.\n\nAgents rating agents.\n\nCorporations adjusting trust dynamically.\n\nEntire markets deciding whether to transact with you based on reputational data accumulated across thousands of interactions you barely remember having.\n\nYou haven’t been banned.\n\nNo no.\n\nNothing so dramatic.\n\nYou’ve simply become\u2014\n\n\u2014less legible to opportunity.\n\nThis is where reputation starts behaving like gravity.\n\nYou don’t notice it when you have enough.\n\nDoors open.\n\nMessages get answered.\n\nMistakes are interpreted generously.\n\nPeople assume competence.\n\nSystems assume legitimacy.\n\nThen your score shifts.\n\nOne bad fork.\n\nOne compromised agent.",
           "audio": "audio/host/reputation.mp3",
           "durationSeconds": 138.1,
+          "joinClean": true,
           "ref": "audio/host/reputation.mp3",
           "chapter": "02 / Valuation",
           "cues": [
