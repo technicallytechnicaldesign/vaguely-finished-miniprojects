@@ -1068,7 +1068,13 @@
 
   function eligibleOffer() {
     const station = state.station;
-    return (data.episodes || []).find(episode => episode.offer !== false && episode.station !== station?.id) || null;
+    // .find() always returned the first eligible episode in catalogue order -- harmless
+    // with one episode, but with a second one (SNOW CRASH's) added 2026-09-09 it meant
+    // the new episode could only ever surface while already parked on its own home
+    // station, since continuity-dispute would win the pick everywhere else. Pick fairly
+    // at random among whichever episodes are actually eligible right now instead.
+    const candidates = (data.episodes || []).filter(episode => episode.offer !== false && episode.station !== station?.id);
+    return candidates.length ? candidates[Math.floor(director.random() * candidates.length)] : null;
   }
 
   function tickOfferWindow() {
