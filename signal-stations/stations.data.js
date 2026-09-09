@@ -166,6 +166,446 @@ window.SIGNAL_STATIONS = {
   "notice": "SIGNAL / choose a carrier",
   "stations": [
     {
+      "id": "adhoc",
+      "visualProfile": {
+        "world": "adhoc",
+        "accent": "#3dffb0",
+        "secondary": "#ffb020",
+        "rgb": "61,255,176",
+        "label": "Ad-hocracy exchange"
+      },
+      "name": "AD HOC RADIO",
+      "frequency": "42.0",
+      "tagline": "Reputation is the only currency. Death is just downtime.",
+      "host": "Tim",
+      "theme": "Post-scarcity satire / Whuffie economy / ad-hocracy",
+      "sampleLine": "AD HOC RADIO. Your body's replaceable. Your number isn't. Keep it up.",
+      "hostQuotes": [
+        "Good morning, ad hocs. Your Whuffie's down two points overnight. We'll talk about it.",
+        "Nobody's dead. They're just restoring from Tuesday. Try to be nice to them anyway.",
+        "You can't out-vote a scoreboard. You can only stop checking it, which nobody does.",
+        "Preservation isn't a job title, it's a grudge with a badge.",
+        "The metrics are correct. The metrics are also not the whole ride.",
+        "Somebody's going for a funeral with zero stars and a full recovery. Send flowers or don't, they'll be back Thursday.",
+        "This is the ad hoc that keeps the lights low and the ghosts exactly where we found them.",
+        "Consensus took four hours and nobody actually agreed on anything. Business as usual."
+      ],
+      "networkReactions": {
+        "song": [
+          {
+            "who": "WAITLIST_VET",
+            "text": "{lyric} / heard this in the queue for the third time this week. still gets me."
+          },
+          {
+            "who": "DEADHEAD_09",
+            "text": "{lyric}. printed it, taped it inside my locker, next to the old ride map."
+          },
+          {
+            "who": "WHUFFIE_WATCH",
+            "text": "{lyric} / score just moved. can't prove it was the song. won't rule it out."
+          },
+          {
+            "who": "RESTORED_TWICE",
+            "text": "{lyric} hits different when you've actually lost the twenty-two hours."
+          },
+          {
+            "who": "LINE_STANDER_9",
+            "text": "{lyric} / put this on the queue speakers and nobody complained once."
+          },
+          {
+            "who": "CASTMEMBER_GHOST",
+            "text": "{lyric} / some of us are still doing the bit nobody asked us to keep doing."
+          },
+          {
+            "who": "AD_HOC_QUORUM",
+            "text": "motion to add {lyric} to the permanent rotation. seconded. passed, four to three."
+          }
+        ],
+        "host": [
+          {
+            "who": "BACKUP_BUREAU",
+            "text": "Tim's the only host who reads the whole scoreboard on air instead of just the top line."
+          },
+          {
+            "who": "OLD_GUARD_MANSION",
+            "text": "finally someone who says 'heritage' without doing air quotes."
+          },
+          {
+            "who": "DEBRA_STAN_04",
+            "text": "Tim's still bitter about the last remodel. we get it. we voted for it anyway."
+          },
+          {
+            "who": "NEW_HERE_88",
+            "text": "wait, you can lose Whuffie for a SONG? asking for a friend."
+          }
+        ]
+      },
+      "networkFeed": [
+        [
+          {
+            "role": "listener",
+            "who": "WAITLIST_VET",
+            "text": "Line for the Mansion's back around the berm again. Some things restore perfectly."
+          },
+          {
+            "role": "listener",
+            "who": "DEBRA_STAN_04",
+            "text": "The new queue system cut that in half. Just saying."
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "AD_HOC_QUORUM",
+            "text": "vote closed: keep the fog machines, retire the fog machine guy's seniority claim on them"
+          },
+          {
+            "role": "listener",
+            "who": "OLD_GUARD_MANSION",
+            "text": "you can't legislate feelings about a fog machine and yet here we are"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "RESTORED_TWICE",
+            "text": "Second backup this year. Body's fine. Everyone's weirdly formal with me now."
+          },
+          {
+            "role": "listener",
+            "who": "NEW_HERE_88",
+            "text": "is that a Whuffie thing or a you thing"
+          },
+          {
+            "role": "listener",
+            "who": "RESTORED_TWICE",
+            "text": "at this point, honestly unclear"
+          }
+        ],
+        [
+          {
+            "role": "signal",
+            "who": "AD_HOC_RADIO",
+            "text": "carrier steady / quorum in session / nobody has died permanently in nine years"
+          },
+          {
+            "role": "listener",
+            "who": "CASTMEMBER_GHOST",
+            "text": "nine years and the mansion still creaks on cue. some maintenance is a performance."
+          }
+        ]
+      ],
+      "tracks": [
+        {
+          "id": "adh-backup-was-yesterday",
+          "title": "Backup Was Yesterday",
+          "artist": "Continuity Glitch",
+          "durationSeconds": 204.1,
+          "outroStartSeconds": 201,
+          "outroConfidence": 0.28,
+          "tags": {
+            "source": [
+              "adhoc"
+            ],
+            "tempo": "slow",
+            "style": []
+          },
+          "lyricsLines": [
+            "Good morning, welcome back",
+            "Your body passed the test",
+            "Your pulse is strong",
+            "Your teeth are new",
+            "Your paperwork looks blessed",
+            "One little issue",
+            "Tiny delay",
+            "Nothing to ruin your magical day",
+            "The restore went clean",
+            "The sync went great",
+            "Your backup was yesterday",
+            "Backup was yesterday",
+            "Yesterday, yesterday",
+            "Who was I between then and now?",
+            "Nobody saved",
+            "Backup was yesterday",
+            "Smile and sign your name",
+            "If I can't remember dying",
+            "Did it happen to me the same?",
+            "I know the park",
+            "I know the ride",
+            "I know which jokes I used to like",
+            "I know my friends",
+            "I know my face",
+            "But something's missing from the space",
+            "Twenty-two hours",
+            "Gone off-grid",
+            "Maybe I loved you",
+            "Maybe I quit",
+            "Maybe I changed",
+            "Maybe I knew",
+            "Something important",
+            "Something true",
+            "Backup was yesterday",
+            "Yesterday, yesterday",
+            "Body restored successfully",
+            "Continuity delayed",
+            "Backup was yesterday",
+            "Please enjoy your stay",
+            "If the person who went missing",
+            "Was me\u2014",
+            "who came back today?",
+            "Did I forgive you?",
+            "Did we fight?",
+            "Did I leave here Friday night?",
+            "Did I finally change my mind?",
+            "Did I become someone worth saving in the missing time?",
+            "Backup was yesterday",
+            "Yesterday, yesterday",
+            "Death is cheap",
+            "Storage is cheap",
+            "Missing hours aren't",
+            "Backup was yesterday",
+            "Smile and sign your name",
+            "Welcome back to paradise",
+            "You probably feel the same",
+            "Probably.",
+            "Probably.",
+            "Probably.",
+            "Have a magical day."
+          ],
+          "audio": "audio/adhoc/backup-was-yesterday.mp3"
+        },
+        {
+          "id": "adh-deadheading-the-haunted",
+          "title": "Deadheading the Haunted",
+          "artist": "Ghost Maintenance",
+          "durationSeconds": 225.7,
+          "outroStartSeconds": 224,
+          "outroConfidence": 0.15,
+          "tags": {
+            "source": [
+              "adhoc"
+            ],
+            "tempo": "slow",
+            "style": []
+          },
+          "lyricsLines": [
+            "Dust on the velvet, ghosts in a row",
+            "I know every hinge, every trick in the show",
+            "Every painted shadow, every practiced scream",
+            "Every little flaw in the old machine",
+            "They say improve it",
+            "Make it clean",
+            "Sharper ghosts on better screens",
+            "But if you polish every scar away",
+            "What exactly did you save?",
+            "I'm deadheading the Haunted Mansion",
+            "Keeping the old ghosts in rotation",
+            "Call it stubborn, call it devotion",
+            "I call it memory with locomotion",
+            "Deadheading the Haunted Mansion",
+            "No upgrade without an exorcism",
+            "You can optimize the whole damn place",
+            "But you can't benchmark grace",
+            "Debra's got numbers, Debra's got proof",
+            "Fresh new wonders under every roof",
+            "Guests come smiling, Whuffie climbs",
+            "Progress works embarrassingly fine",
+            "Still I know the bend in every hall",
+            "The fake cold breeze, the stretching wall",
+            "You call it obsolete, I call it true",
+            "Maybe that's the problem too",
+            "What belongs to everyone",
+            "Feels suspiciously like mine",
+            "When I've loved it long enough",
+            "To confuse care with design",
+            "I'm deadheading the Haunted Mansion",
+            "Keeping the old ghosts in rotation",
+            "Call it heritage, call it possession",
+            "Same old ride, new obsession",
+            "Deadheading the Haunted Mansion",
+            "Holding the past by its lapels",
+            "Everybody says let go\u2014",
+            "The ghosts say something else",
+            "PERSONAL BIAS:",
+            "PLEASE DEFINE",
+            "Deadheading the Haunted Mansion",
+            "Every room a little confession",
+            "I said I fought for preservation",
+            "Maybe I fought",
+            "to stay important.",
+            "Keep the lights low",
+            "Keep the gears turning",
+            "Keep every ghost exactly where I found it",
+            "Have a magical day."
+          ],
+          "audio": "audio/adhoc/deadheading-the-haunted.mp3"
+        },
+        {
+          "id": "adh-debra-has-better-metrics",
+          "title": "Debra Has Better Metrics",
+          "artist": "Dashboard Wraith",
+          "durationSeconds": 221.4,
+          "outroStartSeconds": 220,
+          "outroConfidence": 0.28,
+          "tags": {
+            "source": [
+              "adhoc"
+            ],
+            "tempo": "fast",
+            "style": []
+          },
+          "lyricsLines": [
+            "Debra has better metrics",
+            "Debra has cleaner charts",
+            "Debra can prove the guests are happy",
+            "With percentages and hearts",
+            "Debra has brighter lighting",
+            "Debra has faster queues",
+            "Debra has focus-tested ghosts",
+            "And nothing left to lose",
+            "You brought history",
+            "She brought results",
+            "You brought feelings",
+            "She brought adults",
+            "You said soul",
+            "She said show me",
+            "Now the scoreboard's glowing green",
+            "Debra has better metrics",
+            "Ooh, that's awkward",
+            "Debra has better metrics",
+            "And the numbers love her back",
+            "Whuffie up",
+            "Wait time down",
+            "Smiling faces all around",
+            "You can call it sacrilege",
+            "But Debra has better metrics",
+            "You know every crack in plaster",
+            "Every squeak beneath the floor",
+            "She knows exactly what the average guest",
+            "Would like a little more",
+            "You say memory can't be measured",
+            "She says maybe yours can't be",
+            "Then she ships the new attraction",
+            "And everybody seems pleased",
+            "Legacy",
+            "Heritage",
+            "Sentiment",
+            "Attachment",
+            "Lovely words",
+            "Terrible graphs",
+            "Please advance to the next slide",
+            "Debra has better metrics",
+            "Ooh, that's awkward",
+            "Debra has better metrics",
+            "And the numbers love her back",
+            "Whuffie up",
+            "Wait time down",
+            "Innovation all around",
+            "You can call her soulless",
+            "But Debra has better metrics",
+            "Maybe she's wrong",
+            "Maybe you're right",
+            "Maybe truth isn't hiding",
+            "Inside either side",
+            "But if everybody's cheering",
+            "And nobody agrees with you\u2014",
+            "How long before conviction",
+            "Starts looking like ego too?",
+            "Debra has better metrics",
+            "Smile for the dashboard",
+            "Debra has better metrics",
+            "And the dashboard never cries",
+            "Whuffie up",
+            "You go down",
+            "Future's coming through the town",
+            "Call it progress",
+            "Call it theft",
+            "Either way\u2014",
+            "she passed the test."
+          ],
+          "audio": "audio/adhoc/debra-has-better-metrics.mp3"
+        },
+        {
+          "id": "adh-whuffie-funeral",
+          "title": "Whuffie Funeral",
+          "artist": "Reputation Corpse",
+          "durationSeconds": 207.4,
+          "outroStartSeconds": 203,
+          "outroConfidence": 0.32,
+          "tags": {
+            "source": [
+              "adhoc"
+            ],
+            "tempo": "fast",
+            "style": []
+          },
+          "lyricsLines": [
+            "Woke up clean in a factory skin",
+            "Same old grin, let the new me in",
+            "Death took a swing, but death don't stick",
+            "Restore complete \u2014 now check the metrics",
+            "No coffin flowers, no widow in black",
+            "Nobody mourns when the backup comes back",
+            "But something happened while I was away:",
+            "Everybody stopped caring yesterday",
+            "Pulse is good",
+            "Memory's fine",
+            "Body says I'm doing divine",
+            "But look me up",
+            "Look me through\u2014",
+            "Tell me what the numbers do",
+            "Throw me a Whuffie funeral",
+            "Zero stars, beautiful",
+            "I can live forever",
+            "But nobody likes me now",
+            "Whuffie funeral",
+            "Social death's renewable",
+            "Bring me back a thousand times",
+            "I'm still not invited out",
+            "Used to walk in, doors opened wide",
+            "Little green numbers floating beside",
+            "Now I queue with the tourists, smile at the gate",
+            "Funny how forever still makes you wait",
+            "You don't need dollars, don't need a wage",
+            "Just everybody's love on a public gauge",
+            "We killed scarcity, conquered the grave",
+            "Then built a scoreboard and learned to behave",
+            "No rent due",
+            "No final breath",
+            "Nothing left to fear but reputational death",
+            "You can shoot me dead",
+            "I'll come back new",
+            "Just don't tell the network what I did to you",
+            "Throw me a Whuffie funeral",
+            "Zero stars, beautiful",
+            "I can live forever",
+            "But nobody likes me now",
+            "Whuffie funeral",
+            "Perfectly reversible",
+            "Body restored, status declined",
+            "Please enjoy your second life",
+            "BACKUP: VALID",
+            "BODY: GOOD",
+            "MEMORY: MOSTLY UNDERSTOOD",
+            "Have a magical day.",
+            "Whuffie funeral",
+            "Smile for the terminal",
+            "Death is just maintenance",
+            "Shame is permanent somehow",
+            "Whuffie funeral",
+            "Bright and clean and colourful",
+            "No hearse, no grave, no last goodbye\u2014",
+            "Just everybody watching",
+            "my number",
+            "go",
+            "down."
+          ],
+          "audio": "audio/adhoc/whuffie-funeral.mp3"
+        }
+      ],
+      "notice": "AD HOC RADIO / 4 tracks in rotation. AD HOC RADIO. Your body's replaceable. Your number isn't. Keep it up."
+    },
+    {
       "id": "afterhuman-loopback",
       "visualProfile": {
         "world": "talkback",
@@ -8063,210 +8503,6 @@ window.SIGNAL_STATIONS = {
       ],
       "interludes": [
         {
-          "kind": "host liner",
-          "copy": "SUSHIK IN THE BUILDING\u2014well, there is no building, there’s just the Street, and I am WIDE OPEN on it, so buckle your avatar in, we are going in loud.",
-          "audio": "audio/host/SNC-001.wav",
-          "durationSeconds": 8
-        },
-        {
-          "kind": "host liner",
-          "copy": "This is SNOW CRASH RADIO, broadcasting straight off somebody’s stolen bandwidth, and I would like to formally apologize to absolutely no one.",
-          "audio": "audio/host/SNC-002.wav",
-          "durationSeconds": 8.3
-        },
-        {
-          "kind": "host liner",
-          "copy": "Katana’s out, mic’s hot, loglo’s screaming down both sides of the Street\u2014let’s go, gargoyles, put the rig down for one song.",
-          "audio": "audio/host/SNC-003.wav",
-          "durationSeconds": 7.1
-        },
-        {
-          "kind": "host liner",
-          "copy": "If your avatar isn’t sweating right now that’s a you problem, not a sushiK problem.",
-          "audio": "audio/host/SNC-004.wav",
-          "durationSeconds": 4.7
-        },
-        {
-          "kind": "host liner",
-          "copy": "Kourier’s inbound doing a buck-forty through the burbclave, and somehow he’s STILL not as fast as this next track.",
-          "audio": "audio/host/SNC-005.wav",
-          "durationSeconds": 6
-        },
-        {
-          "kind": "host liner",
-          "copy": "Welcome to the only franchise-free zone left on the Street\u2014no logo, no loyalty card, just noise.",
-          "audio": "audio/host/SNC-006.wav",
-          "durationSeconds": 6.1
-        },
-        {
-          "kind": "host liner",
-          "copy": "That was Reason talking, and by Reason I mean the actual weapon, and by talking I mean it did not miss.",
-          "audio": "audio/host/SNC-007.wav",
-          "durationSeconds": 5.5
-        },
-        {
-          "kind": "host liner",
-          "copy": "SushiK’s got a daemon loose in the studio and frankly it’s improving the show.",
-          "audio": "audio/host/SNC-008.wav",
-          "durationSeconds": 4.2
-        },
-        {
-          "kind": "host liner",
-          "copy": "Black Sun’s a dumpster fire tonight and I mean that as the highest compliment.",
-          "audio": "audio/host/SNC-009.wav",
-          "durationSeconds": 4.1
-        },
-        {
-          "kind": "host liner",
-          "copy": "Somebody’s uncle just rented a burbclave three lots over from this frequency\u2014condolences, keep the volume up anyway.",
-          "audio": "audio/host/SNC-010.wav",
-          "durationSeconds": 6.8
-        },
-        {
-          "kind": "host liner",
-          "copy": "This next one’s for every gargoyle recording their own bad decisions in real time. Respect.",
-          "audio": "audio/host/SNC-011.wav",
-          "durationSeconds": 5.6
-        },
-        {
-          "kind": "host liner",
-          "copy": "The Metaverse doesn’t have weather so I brought my own, and it’s a category five.",
-          "audio": "audio/host/SNC-012.wav",
-          "durationSeconds": 4
-        },
-        {
-          "kind": "host liner",
-          "copy": "That’s sushiK, that’s the Street, that’s the loudest hour your headset’s rendered all week.",
-          "audio": "audio/host/SNC-013.wav",
-          "durationSeconds": 4.5
-        },
-        {
-          "kind": "host liner",
-          "copy": "We clocked this next track at Kourier speed, which means if you blink you already missed the chorus.",
-          "audio": "audio/host/SNC-014.wav",
-          "durationSeconds": 4.9
-        },
-        {
-          "kind": "host liner",
-          "copy": "No franchise. No brand deal. No off-switch. Just sushiK and whatever’s left of your eardrums.",
-          "audio": "audio/host/SNC-015.wav",
-          "durationSeconds": 5.4
-        },
-        {
-          "kind": "host liner",
-          "copy": "If a lawyer for a burbclave calls this station again, tell them sushiK’s avatar died and can’t come to the phone.",
-          "audio": "audio/host/SNC-016.wav",
-          "durationSeconds": 6.6
-        },
-        {
-          "kind": "host liner",
-          "copy": "This is not elevator music. This is the elevator falling. Enjoy the ride.",
-          "audio": "audio/host/SNC-017.wav",
-          "durationSeconds": 4.2
-        },
-        {
-          "kind": "host liner",
-          "copy": "Somewhere out there a courier’s delivering pizza in thirty minutes or less and I am DELIVERING RIFFS in zero.",
-          "audio": "audio/host/SNC-018.wav",
-          "durationSeconds": 6
-        },
-        {
-          "kind": "host liner",
-          "copy": "Keep both hands on your katana, folks, we’re taking this next corner way too fast.",
-          "audio": "audio/host/SNC-019.wav",
-          "durationSeconds": 4.7
-        },
-        {
-          "kind": "host liner",
-          "copy": "SNOW CRASH RADIO. No daemon can shut us down. Believe that. Turn it up.",
-          "audio": "audio/host/SNC-020.wav",
-          "durationSeconds": 3.9
-        },
-        {
-          "kind": "host bridge",
-          "copy": "That was enough distortion to crash a cheap gargoyle rig. righteous. Now lets shake the static out of your skull and get ready to THRASHHHHHH",
-          "audio": "audio/host/SNC-021.wav",
-          "durationSeconds": 7.4
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Citizens, couriers, hackers, katana freaks\u2014keep your avatars rendered and your reflexes hot. SushiK is not slowing down.",
-          "audio": "audio/host/SNC-022.wav",
-          "durationSeconds": 7.7
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Turn it up until your goggles fog. If your Reality is still distinguishable from your Street address, you’re doing it wrong.",
-          "audio": "audio/host/SNC-023.wav",
-          "durationSeconds": 6.5
-        },
-        {
-          "kind": "host bridge",
-          "copy": "This next one hits like a Deliverator coming through the front door at Mach five with thirty seconds left on the pizza clock. Dedicated to Hiro Protagonist, fastest driver this side of the jeeks.",
-          "audio": "audio/host/SNC-024.wav",
-          "durationSeconds": 10.8
-        },
-        {
-          "kind": "host bridge",
-          "copy": "That riff had more edge than a monomolecular katana and about the same regard for public safety. Get ready to slice your ears off with this next track!",
-          "audio": "audio/host/SNC-025.wav",
-          "durationSeconds": 8.7
-        },
-        {
-          "kind": "host bridge",
-          "copy": "If your avatar isn’t clipping through the floor from excessive headbanging, recalibrate your haptics and try again.",
-          "audio": "audio/host/SNC-026.wav",
-          "durationSeconds": 5.8
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Gargoyles on the rooftops, couriers in the lanes, hackers in the walls\u2014and right here in the middle of it, another track trying to melt your optic nerves.",
-          "audio": "audio/host/SNC-027.wav",
-          "durationSeconds": 8
-        },
-        {
-          "kind": "host bridge",
-          "copy": "That one went out to everybody running black-market firmware in a body they technically don’t own.",
-          "audio": "audio/host/SNC-028.wav",
-          "durationSeconds": 5
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Keep your Snow Crash clean, your nam-shub quarantined, and your volume irresponsibly high. no HIGHER.",
-          "audio": "audio/host/SNC-029.wav",
-          "durationSeconds": 5.9
-        },
-        {
-          "kind": "host bridge",
-          "copy": "You can keep your nice gated burbclave, citizen. SushiK lives where the neon flickers and the pavement has packet loss. LOUDER!",
-          "audio": "audio/host/SNC-030.wav",
-          "durationSeconds": 7.7
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Somebody just drew a katana in the Black Sun because of that chorus. lets see if this next track can cause a SCENE",
-          "audio": "audio/host/SNC-031.wav",
-          "durationSeconds": 6.1
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Strap in, Street rats. Next track arrives with zero brakes, no diplomatic immunity, and a suspicious amount of encrypted baggage.",
-          "audio": "audio/host/SNC-032.wav",
-          "durationSeconds": 7.6
-        },
-        {
-          "kind": "host bridge",
-          "copy": "If the Mafia asks, we were never here. If Uncle Enzo asks, tell him the next mix hacks and slaps.",
-          "audio": "audio/host/SNC-033.wav",
-          "durationSeconds": 5.6
-        },
-        {
-          "kind": "host bridge",
-          "copy": "Reality check: your meat body is sitting somewhere boring while your avatar is about to get kicked directly in the soul by a wall of synthetic guitar noise.",
-          "audio": "audio/host/SNC-034.wav",
-          "durationSeconds": 8.6
-        },
-        {
           "kind": "sponsored notice",
           "copy": "Metaverse avatar-upgrade ad: premium facial architectures, licensed celebrity bone structures, and an entrance-effects package for the Black Sun.",
           "audio": "audio/snowcrash/ads/avatare.mp3",
@@ -8598,6 +8834,30 @@ window.SIGNAL_STATIONS = {
               "thrash"
             ]
           }
+        },
+        {
+          "kind": "host liner",
+          "title": "Riot Gear Mandatory",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/riot-gear-mandatory.wav",
+          "durationSeconds": 201.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "host liner",
+          "title": "Gargoyle Stampede",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/gargoyle-stampede.wav",
+          "durationSeconds": 186.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "kind": "host liner",
+          "title": "Loglo Blackout",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/loglo-blackout.wav",
+          "durationSeconds": 177.2,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
         }
       ],
       "networkFeed": [
@@ -8926,6 +9186,46 @@ window.SIGNAL_STATIONS = {
             "who": "SNOW CRASH RADIO",
             "text": "COLLISION POLICY: WINNER KEEPS THE POLYGONS.",
             "holdMs": 2100
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "KOURIER_4",
+            "text": "caught a leak on some ad-hoc frequency, guy's out here 'deadheading' a haunted house. deadheading. like a flower."
+          },
+          {
+            "role": "listener",
+            "who": "GARGOYLE_LENS",
+            "text": "sounds like maintenance with a god complex"
+          },
+          {
+            "role": "daemon",
+            "who": "SNOW CRASH RADIO",
+            "text": "UNVERIFIED CARRIER AT 42.0MHZ. NOT OUR PROBLEM. TURN IT UP ANYWAY.",
+            "holdMs": 1800
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "RAVEN_GIRL",
+            "text": "apparently there's a whole economy over there running on likes. imagine getting arrested for bad vibes"
+          },
+          {
+            "role": "listener",
+            "who": "DAEMON_WITH_TASTE",
+            "text": "Whuffie. cute. try running a burbclave on somebody's mood"
+          },
+          {
+            "role": "exec",
+            "text": "cross-carrier.chatter --source=42.0MHz --topic=whuffie",
+            "holdMs": 600
+          },
+          {
+            "role": "listener",
+            "who": "HIRO_P",
+            "text": "at least our currency here is just violence"
           }
         ]
       ],
@@ -14789,7 +15089,7 @@ window.SIGNAL_STATIONS = {
         {
           "id": "snc-execute-me",
           "title": "Execute Me",
-          "artist": "gamingarchaeo",
+          "artist": "Kill Switch Prophet",
           "durationSeconds": 479.2,
           "outroStartSeconds": 465,
           "outroConfidence": 0.22,
@@ -15127,7 +15427,7 @@ window.SIGNAL_STATIONS = {
         {
           "id": "snc-fedland-cubicle",
           "title": "Fedland Cubicle",
-          "artist": "gamingarchaeo",
+          "artist": "Cubicle Zero",
           "durationSeconds": 300.1,
           "outroStartSeconds": 298,
           "outroConfidence": 0.25,
@@ -15332,7 +15632,7 @@ window.SIGNAL_STATIONS = {
         {
           "id": "snc-fiber-gospel",
           "title": "Fiber Gospel",
-          "artist": "gamingarchaeo",
+          "artist": "Bandwidth Evangelist",
           "durationSeconds": 359.5,
           "outroStartSeconds": 351,
           "outroConfidence": 0.45,
@@ -15500,7 +15800,7 @@ window.SIGNAL_STATIONS = {
         {
           "id": "snc-i-have-reason",
           "title": "I Have Reason",
-          "artist": "gamingarchaeo",
+          "artist": "Reason Actual",
           "durationSeconds": 271.3,
           "outroStartSeconds": 269,
           "outroConfidence": 0.33,
@@ -15679,7 +15979,7 @@ window.SIGNAL_STATIONS = {
         {
           "id": "snc-the-connection-is-the-crime",
           "title": "The Connection Is The Crime",
-          "artist": "gamingarchaeo",
+          "artist": "Uplink Fugitive",
           "durationSeconds": 237.2,
           "outroStartSeconds": 230,
           "outroConfidence": 0.4,
@@ -15861,7 +16161,7 @@ window.SIGNAL_STATIONS = {
         {
           "id": "snc-too-good-at-reading",
           "title": "Too Good at Reading",
-          "artist": "gamingarchaeo",
+          "artist": "Parse Error Messiah",
           "durationSeconds": 292.3,
           "outroStartSeconds": 287,
           "outroConfidence": 0.2,
@@ -16945,23 +17245,6 @@ window.SIGNAL_STATIONS = {
       },
       "items": [
         {
-          "kind": "host liner",
-          "copy": "SUSHIK IN THE BUILDING\u2014well, there is no building, there’s just the Street, and I am WIDE OPEN on it, so buckle your avatar in, we are going in loud.",
-          "audio": "audio/host/SNC-001.wav",
-          "durationSeconds": 8,
-          "ref": "audio/host/SNC-001.wav",
-          "chapter": "01 / Sign-on",
-          "type": "host liner",
-          "subtitle": "sushiK",
-          "title": "SUSHIK IN THE BUILDING\u2014well, there is no building, there’s just the Str…",
-          "transition": {
-            "mode": "end"
-          },
-          "episodeId": "extended-broadcast-block",
-          "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 0
-        },
-        {
           "id": "snc-snow-crash-take1",
           "title": "Snow Crash",
           "artist": "Nam-Shub Zero",
@@ -17121,24 +17404,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 8
-        },
-        {
-          "kind": "host bridge",
-          "copy": "That was enough distortion to crash a cheap gargoyle rig. righteous. Now lets shake the static out of your skull and get ready to THRASHHHHHH",
-          "audio": "audio/host/SNC-021.wav",
-          "durationSeconds": 7.4,
-          "ref": "audio/host/SNC-021.wav",
-          "chapter": "02 / Street report",
-          "type": "host bridge",
-          "subtitle": "sushiK",
-          "title": "That was enough distortion to crash a cheap gargoyle rig. righteous. No…",
-          "transition": {
-            "mode": "end"
-          },
-          "episodeId": "extended-broadcast-block",
-          "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 360.2
+          "startSeconds": 0
         },
         {
           "kind": "street report",
@@ -17155,7 +17421,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 367.59999999999997
+          "startSeconds": 352.2
         },
         {
           "id": "snc-query-me",
@@ -17325,7 +17591,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 381.59999999999997
+          "startSeconds": 366.2
         },
         {
           "id": "SNC-CALL-003",
@@ -17358,24 +17624,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 675.0999999999999
-        },
-        {
-          "kind": "host liner",
-          "copy": "Somebody’s uncle just rented a burbclave three lots over from this frequency\u2014condolences, keep the volume up anyway.",
-          "audio": "audio/host/SNC-010.wav",
-          "durationSeconds": 6.8,
-          "ref": "audio/host/SNC-010.wav",
-          "chapter": "04 / Sponsor block",
-          "type": "host liner",
-          "subtitle": "sushiK",
-          "title": "Somebody’s uncle just rented a burbclave three lots over from this freq…",
-          "transition": {
-            "mode": "end"
-          },
-          "episodeId": "extended-broadcast-block",
-          "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 707.7499999999999
+          "startSeconds": 659.7
         },
         {
           "kind": "ad block intro",
@@ -17392,7 +17641,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 714.5499999999998
+          "startSeconds": 692.35
         },
         {
           "kind": "sponsored notice",
@@ -17409,7 +17658,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 719.6499999999999
+          "startSeconds": 697.45
         },
         {
           "kind": "sponsored notice",
@@ -17426,7 +17675,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 783.9499999999998
+          "startSeconds": 761.75
         },
         {
           "kind": "ad block outro",
@@ -17443,7 +17692,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 828.7499999999998
+          "startSeconds": 806.55
         },
         {
           "id": "snc-grind-the-system",
@@ -17617,27 +17866,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 831.8499999999998
-        },
-        {
-          "kind": "host bridge",
-          "copy": "That riff had more edge than a monomolecular katana and about the same regard for public safety. Get ready to slice your ears off with this next track!",
-          "audio": "audio/host/SNC-025.wav",
-          "durationSeconds": 8.7,
-          "ref": "audio/host/SNC-025.wav",
-          "chapter": "05 / Closing run",
-          "type": "host bridge",
-          "subtitle": "sushiK",
-          "title": "That riff had more edge than a monomolecular katana and about the same…",
-          "transition": {
-            "mode": "end"
-          },
-          "episodeId": "extended-broadcast-block",
-          "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 1251.85
+          "startSeconds": 809.65
         }
       ],
-      "durationSeconds": 1260.55
+      "durationSeconds": 1229.65
     }
   ]
 };
