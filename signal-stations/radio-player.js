@@ -1110,6 +1110,21 @@
     ticker.dataset.active = String(Boolean(offer));
   }
 
+  // The preset-row programme badge (the small lit icon next to a station carrying an
+  // episode) had the exact same standing-banner bug as the ticker/tagline did before
+  // SIG-1317 -- it was built once from a plain "does this station have an episode"
+  // check and left in the DOM permanently, hidden only while parked on that station's
+  // own carrier. Reported live 2026-09-09: it spawns with the page and never goes away
+  // no matter how long you wait or which station you're on. It must follow the exact
+  // same rare/timed window as the ticker, not its own always-on rule.
+  function updateOfferBadges() {
+    const station = state.station;
+    const active = state.power && state.offerWindow ? state.offerWindow.offer.station : null;
+    document.querySelectorAll('.programme-badge[data-offer-station]').forEach(badge => {
+      badge.hidden = badge.dataset.offerStation !== active || badge.dataset.offerStation === station?.id;
+    });
+  }
+
   function updateCompactTuning(item) {
     const station = state.station;
     // A programme is an invitation from elsewhere on the band. It disappears once the
@@ -1117,6 +1132,7 @@
     // otherwise only shows up in the rare, timed windows tickOfferWindow() opens -- never as
     // a standing banner. Also gated on power so a stale window can't linger on screen off air.
     const offer = state.power && state.offerWindow && state.offerWindow.offer.station !== station?.id ? state.offerWindow.offer : null;
+    updateOfferBadges();
     if (byId('compact-station')) byId('compact-station').textContent = station?.name || 'SIGNAL';
     const compact = byId('compact-event');
     if (compact) { compact.textContent = offerDescription(offer) || item?.subtitle || station?.tagline || 'Carrier locked.'; compact.parentElement.dataset.event = String(Boolean(offer)); }
@@ -1136,9 +1152,6 @@
     const trackCount = (station.tracks || []).filter(t => t.audio).length;
     byId('track-count').textContent = trackCount ? `${trackCount} cleared track${trackCount === 1 ? '' : 's'} in rotation` : 'No cleared tracks in rotation';
     document.querySelectorAll('.station[data-id]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === station.id)));
-    document.querySelectorAll('.programme-badge[data-offer-station]').forEach(badge => {
-      badge.hidden = badge.dataset.offerStation === station.id;
-    });
     setDialValue(stationDialValue(station));
     updateCompactTuning();
   }
@@ -1843,7 +1856,7 @@
     if (offer) {
       const badge = document.createElement('button');
       const meta = offerMeta(offer);
-      badge.type = 'button'; badge.className = 'programme-badge';
+      badge.type = 'button'; badge.className = 'programme-badge'; badge.hidden = true;
       badge.dataset.offerStation = station.id;
       badge.textContent = meta.symbol || '◉';
       badge.setAttribute('aria-label', `${meta.label || 'Special transmission'} on ${station.name}: ${offer.title}. ${offer.description || ''}`);
