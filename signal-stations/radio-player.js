@@ -1366,10 +1366,14 @@
     // r=63 (the original value here) put this ring squeezed directly between the MHz
     // unit arc (r35) and the big frequency-number arc (r85), at only a 10px font --
     // reported live 2026-09-09 as functionally invisible even while active, buried
-    // under the "133.7" numerals. Moved out to r=115, well inside the dome's open
-    // upper band (dome top is r150) and clearly above the number arc's own top (r85 apex
-    // sits at y165 vs this ring's y135 apex), same 15deg-165deg angular span as before.
-    eventPath.setAttribute('d', 'M 208.9 220.2 A 115 115 0 0 1 431.1 220.2');
+    // under the "133.7" numerals. A first fix moved it to r=115 spanning 15deg-165deg,
+    // which cleared the number at its own apex (y135 vs the number's y165 apex) but that
+    // wide a span means the arc's own ENDS dip back down to y220 as the marquee text
+    // scrolls through them -- reported live on a real phone as still cutting right through
+    // "133.7". Narrowed to a tight 55deg-125deg span at r=140: both ends now sit at y135,
+    // same height as the apex, so the whole sweep stays in its own lane above the number
+    // instead of arcing back down into it.
+    eventPath.setAttribute('d', 'M 239.7 135.3 A 140 140 0 0 1 400.3 135.3');
     const eventText = document.createElementNS(namespace, 'text');
     eventText.setAttribute('class', 'dial-event-svg'); eventText.id = 'dial-event'; eventText.dataset.active = 'false';
     const textPath = document.createElementNS(namespace, 'textPath');
@@ -1878,11 +1882,25 @@
   buildDialFace();
   updateReadoutArch();
   let readoutArchResizeTimer = null;
-  window.addEventListener('resize', () => {
+  const scheduleReadoutArch = () => {
     clearTimeout(readoutArchResizeTimer);
     readoutArchResizeTimer = setTimeout(updateReadoutArch, 120);
-  });
+  };
+  window.addEventListener('resize', scheduleReadoutArch);
   window.addEventListener('load', updateReadoutArch); // catches any late webfont reflow
+  // window resize/load alone left this genuinely stale on a real phone (reported live
+  // 2026-09-09: the dome visibly stopped short of the identity panel below it) -- the
+  // panel's own height can still shift after those fire (a badge appearing changes the
+  // preset row's height, now-playing text wrapping to a different line count, a font
+  // finishing its swap after 'load' already ran) with no resize event to catch it.
+  // A ResizeObserver on the two boxes the arc is actually measured from reacts to any
+  // real size change directly, whatever caused it.
+  if ('ResizeObserver' in window) {
+    const archObserver = new ResizeObserver(scheduleReadoutArch);
+    const identityPanelEl = document.querySelector('.identity-panel');
+    if (identityPanelEl) archObserver.observe(identityPanelEl);
+    archObserver.observe(byId('dial-svg'));
+  }
   pushSystemNotice(state.station?.notice || data.notice);
   runNetworkFeed();
 

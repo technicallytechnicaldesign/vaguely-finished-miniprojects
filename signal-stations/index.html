@@ -129,7 +129,13 @@
     .dial-tick-label{fill:#c9d0d7;font:700 11.5px var(--font-head);paint-order:stroke;stroke:#050607;stroke-width:2px;stroke-linejoin:round;filter:drop-shadow(0 0 4px #000)}
     .dial-station{font-size:14px;font-weight:700;filter:drop-shadow(2px 0 var(--station-secondary)) drop-shadow(-2px 0 var(--station-accent)) drop-shadow(0 0 8px var(--station-accent))}
     .dial-needle{stroke:var(--station-accent);stroke-width:3;opacity:1;filter:drop-shadow(2px 0 var(--station-secondary)) drop-shadow(-2px 0 var(--station-accent)) drop-shadow(0 0 calc(3px + 9px * var(--audio-high)) var(--station-accent))}
-    .dial-readout-arch{stroke:rgba(var(--station-rgb),.08);filter:drop-shadow(0 0 18px rgba(var(--station-rgb),.52)) drop-shadow(0 0 34px rgba(var(--station-rgb),.25))}
+    /* This later rule was winning the cascade over the earlier .dial-readout-arch{}
+       declaration and made the stroke even FAINTER (.08, was .16) -- combined with the
+       fill's own near-black .88 opacity, the dome read as barely more than ambient glow,
+       so its straight sides and bottom edge (which is mathematically already touching the
+       identity panel below it, per updateReadoutArch()) never visibly registered as
+       "connected" to anything. Bumped the stroke to a real, legible line. */
+    .dial-readout-arch{stroke:rgba(var(--station-rgb),.4);filter:drop-shadow(0 0 18px rgba(var(--station-rgb),.52)) drop-shadow(0 0 34px rgba(var(--station-rgb),.25))}
     .dial-number-svg{fill:#fff;filter:drop-shadow(0 0 calc(2px + 6px * var(--audio-high)) rgba(var(--station-rgb),.54))}
     .dial-unit-svg{fill:var(--station-accent);filter:drop-shadow(0 0 7px var(--station-accent))}
     .station{box-shadow:0 12px 28px rgba(0,0,0,.58)}
@@ -285,16 +291,21 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .preset-row{position:relative;z-index:8;display:flex;align-items:center;justify-content:center;margin:0 0 14px}
 .preset-row{transform:translateY(-10px)}
 .preset-row .station-list{margin:0;padding:0;transform:none;gap:10px;flex-wrap:nowrap}
-.station-bay{position:relative;display:grid;justify-items:center;min-width:48px;padding-bottom:34px}
+.station-bay{position:relative;display:grid;justify-items:center;min-width:48px;padding-bottom:52px}
 .station-bay .station{position:relative;z-index:1}
 /* Reported live 2026-09-09: tapping the badge on mobile often missed the segment and just
    tuned the station normally instead -- at 26-28px this sat well under the ~44px minimum
    touch target, AND its top edge overlapped the station button's own bottom edge, so a
    thumb aimed at "the badge" had real odds of landing on the button underneath instead.
    Enlarged to a real touch target and moved clear of the button (no overlap) so the two
-   have separate, unambiguous hit areas. */
-.programme-badge{position:absolute;bottom:-30px;z-index:2;width:40px;height:40px;padding:0;border:1px solid var(--badge-accent,#56e5ff);border-radius:50%;background:#080c10;color:var(--badge-accent,#56e5ff);box-shadow:0 0 15px rgba(var(--badge-rgb,86,229,255),.6),inset 0 0 8px rgba(var(--badge-rgb,86,229,255),.16);font:700 18px/38px var(--font-head);cursor:pointer}
-.programme-badge:before{display:none}
+   have separate, unambiguous hit areas. Reported again the same day as reading "really far
+   below" the button once it was that far apart -- `bottom` was also negative (-30px),
+   which let the badge spill past its own reserved padding and overlap the content panel
+   below it. `bottom:0` keeps it inside the reserved space (padding-bottom sized to fit
+   exactly: button + a short real gap + the badge, no more), and the `:before` line below
+   visually welds it to the button above instead of leaving it looking detached. */
+.programme-badge{position:absolute;bottom:0;z-index:2;width:40px;height:40px;padding:0;border:1px solid var(--badge-accent,#56e5ff);border-radius:50%;background:#080c10;color:var(--badge-accent,#56e5ff);box-shadow:0 0 15px rgba(var(--badge-rgb,86,229,255),.6),inset 0 0 8px rgba(var(--badge-rgb,86,229,255),.16);font:700 18px/38px var(--font-head);cursor:pointer}
+.programme-badge:before{content:"";position:absolute;left:50%;bottom:100%;width:1px;height:12px;background:var(--badge-accent,#56e5ff);opacity:.65;transform:translateX(-50%);box-shadow:0 0 6px var(--badge-accent,#56e5ff)}
 .programme-badge:hover{filter:brightness(1.35);transform:translateY(-1px)}
 .programme-badge[hidden]{display:none}
 @keyframes badge-pulse{50%{opacity:.15}}
@@ -309,7 +320,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 [data-view=listen] .dial-view-control,[data-view=quiet] .dial-view-control{display:flex!important;align-items:center;justify-content:center;pointer-events:auto;z-index:9}
 [data-view=listen] .dial-view-control,[data-view=quiet] .dial-view-control{top:18px!important;width:40px;height:40px;font-size:8px}
 [data-view=listen] #tune-toggle,[data-view=quiet] #tune-toggle{left:72px}[data-view=listen] #view-toggle,[data-view=quiet] #view-toggle{right:72px}
-@media(max-width:620px){[data-view=tune] .tuner-panel{transform:translateY(30px)}.preset-row .station-list{gap:6px}.station-bay{min-width:44px}.programme-badge{width:36px;height:36px;bottom:-28px;font-size:16px;line-height:34px}.dial-view-control{width:40px;height:40px}#tune-toggle{left:17%}#view-toggle{right:17%}}
+@media(max-width:620px){[data-view=tune] .tuner-panel{transform:translateY(30px)}.preset-row .station-list{gap:6px}.station-bay{min-width:44px;padding-bottom:46px}.programme-badge{width:36px;height:36px;bottom:0;font-size:16px;line-height:34px}.dial-view-control{width:40px;height:40px}#tune-toggle{left:17%}#view-toggle{right:17%}}
 @media(max-width:360px){.preset-row .station-list{gap:3px}.station-bay{min-width:40px}.compact-tuning{inset-inline:70px}}
 </style>
 </head>
@@ -324,6 +335,6 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
   <script src="stations.data.js?v=d194797dd4e2"></script>
-  <script src="radio-player.js?v=5ffa16e09a54"></script>
+  <script src="radio-player.js?v=186998a4116a"></script>
 </body>
 </html>
