@@ -1453,14 +1453,21 @@
       return;
     }
     // A song leading straight into a flagged "join clean" segment (a real produced host
-    // segment, not a short liner -- see stations/*.json's `joinClean` field) plays all the way
-    // out instead of getting an early cut-in: the maker's ask, 2026-09-09, was that a special
-    // broadcast should feel like tuning in FOR it right as a song ends clean, not like it
-    // interrupted whatever was already playing. state.plan[0] is reliable here: refillPlan()
-    // keeps it topped up immediately after every plan.shift(), so it already holds whatever
-    // is queued to follow this deck's item by the time its own cut-in gets armed.
+    // segment, not a short liner -- see stations/*.json's `joinClean` field) skips the early
+    // cut-in and rides all the way to its own tail instead: the maker's ask, 2026-09-09, was
+    // that a special broadcast should feel like tuning in FOR it right as a song ends clean,
+    // not interrupting whatever was already playing. Originally implemented as cutInAt=null
+    // (wait for the literal end-of-file) -- reverted after maker feedback the same day: many
+    // tracks carry a few seconds of trailing near-silence after the last audible note, so
+    // "wait for true EOF" produced a small dead-air gap before the segment started, which read
+    // as a random cold-open rather than a clean handoff. Landing on the song's own tail
+    // instead (same LINER_OVERLAP_S point a liner-to-liner transition already uses) rides the
+    // last audible instant without either cutting into the outro early or waiting through
+    // silence. state.plan[0] is reliable here: refillPlan() keeps it topped up immediately
+    // after every plan.shift(), so it already holds whatever is queued to follow this deck's
+    // item by the time its own cut-in gets armed.
     if (deck.item?.type === 'song' && state.plan[0]?.joinClean) {
-      deck.cutInAt = null;
+      deck.cutInAt = Math.max(0, (deck.audio.duration || deck.item.durationSeconds || 6) - LINER_OVERLAP_S);
       return;
     }
     if (!deck.item || isSpokenKind(deck.item.type)) {
