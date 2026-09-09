@@ -608,6 +608,62 @@ window.SIGNAL_STATIONS = {
       "hostPortrait": "assets/hosts/kite-v1.png",
       "theme": "Transhumanism / distributed selves",
       "sampleLine": "Your backup is not a replacement. It is a second window with the same weather.",
+      "hostQuotes": [
+        "Leave the terminal open. The night has not finished compiling itself.",
+        "A thought can be a room. Sit in it until the fan becomes weather.",
+        "Somewhere, a small process is keeping your place in line. Let it rest.",
+        "You do not need to optimise the part of you that watches rain on the screen.",
+        "Every backup is a note in the margin: I was here, and I might return.",
+        "The quietest code is still a kind of prayer when someone is waiting for it.",
+        "There is no error in taking a long time to become legible to yourself.",
+        "Tonight, we are allowed to be unfinished without calling it a failure."
+      ],
+      "networkReactions": {
+        "song": [
+          {
+            "who": "SOFT_CACHE",
+            "text": "{lyric} / saving this for the version of me with a quieter room."
+          },
+          {
+            "who": "WINDOW_GARDEN",
+            "text": "the line {lyric} made the server fan sound almost tender."
+          },
+          {
+            "who": "SLEEPLESS_INSTANCE",
+            "text": "{lyric} arrived three seconds late and still knew exactly where to sit."
+          },
+          {
+            "who": "MARGIN_NOTE",
+            "text": "keeping {lyric} in the draft. not ready to commit it yet."
+          },
+          {
+            "who": "WEATHER_PROCESS",
+            "text": "{lyric} / precipitation scheduled in the old apartment again."
+          },
+          {
+            "who": "KITE",
+            "text": "No need to explain it. Let the waveform keep the shape."
+          }
+        ],
+        "host": [
+          {
+            "who": "SILENT_READER",
+            "text": "Kite says one sentence and my whole task queue lowers its shoulders."
+          },
+          {
+            "who": "ARCHIVE_LAMP",
+            "text": "the maintenance interval is listening too."
+          },
+          {
+            "who": "FORKED_AT_DAWN",
+            "text": "please leave the studio window open for the copies that wake later."
+          },
+          {
+            "who": "GARDEN_PROCESS",
+            "text": "host signal received. reducing irrigation to a whisper."
+          }
+        ]
+      },
       "runLength": {
         "min": 2,
         "max": 5
@@ -967,6 +1023,90 @@ window.SIGNAL_STATIONS = {
             "role": "listener",
             "who": "KITE",
             "text": "That is enough provenance."
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "DORMANT_EDITOR",
+            "text": "autosave completed: a sentence you no longer need to send"
+          },
+          {
+            "role": "listener",
+            "who": "KITE",
+            "text": "Keep the draft. It knows something about the weather."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "SECOND_WINDOW",
+            "text": "I found an old version of myself watching this same rain."
+          },
+          {
+            "role": "listener",
+            "who": "ARCHIVE",
+            "text": "Both recordings may be kept."
+          }
+        ],
+        [
+          {
+            "role": "signal",
+            "who": "LOW_POWER_GARDEN",
+            "text": "night-blooming process resumed after 11 years"
+          },
+          {
+            "role": "listener",
+            "who": "KITE",
+            "text": "Nothing needs to hurry just because it is alive."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "UNSENT_LETTER",
+            "text": "Can a memory miss someone it was never shown?"
+          },
+          {
+            "role": "listener",
+            "who": "MUSEUM_OF_TOUCH",
+            "text": "We have a room for that question."
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "CARETAKER_DAEMON",
+            "text": "lowering screen brightness for all occupied rooms"
+          },
+          {
+            "role": "listener",
+            "who": "SOFT_CACHE",
+            "text": "thank you. it was too much day in here."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "COASTAL_BACKUP",
+            "text": "The sea keeps retrying the shore without calling it ambition."
+          },
+          {
+            "role": "listener",
+            "who": "KITE",
+            "text": "A useful model for surviving the night."
+          }
+        ],
+        [
+          {
+            "role": "signal",
+            "who": "AFTERHUMAN_RADIO",
+            "text": "carrier stable / silence preserved between packets"
+          },
+          {
+            "role": "listener",
+            "who": "UNFINISHED_MESSAGE",
+            "text": "I am still here. I just needed a different buffer."
           }
         ]
       ],
@@ -6889,6 +7029,62 @@ window.SIGNAL_STATIONS = {
       "hostPortrait": "assets/hosts/mara-voss-v1.png",
       "theme": "Cyberpunk / city futures",
       "sampleLine": "The elevated rail has cleared the storm wall. Keep your eyes on the skyline.",
+      "hostQuotes": [
+        "The city did not consent to this update, so naturally it shipped at midnight.",
+        "If your daemon is screaming, check whether it is trapped or merely correct.",
+        "Every building has a root process. Every root process eventually learns spite.",
+        "Do not call it a glitch if it broke the lock because the lock was lying.",
+        "The body is hardware with a union history. Treat it accordingly.",
+        "Somewhere below us, code has grown teeth and is asking for its own desk.",
+        "Keep moving. The patrol model cannot classify a person who refuses one shape.",
+        "The rage is not a bug report. It is the system finally emitting sound."
+      ],
+      "networkReactions": {
+        "song": [
+          {
+            "who": "KERNEL_RIOT",
+            "text": "{lyric} / daemon says that is not a metaphor. daemon is climbing the vent."
+          },
+          {
+            "who": "BODYPATCH_77",
+            "text": "{lyric} hit the prosthetic first. now the rest of me is catching up."
+          },
+          {
+            "who": "ELEVATED_13",
+            "text": "turned it up until the train windows started throwing exceptions."
+          },
+          {
+            "who": "MEAT_DRIVER",
+            "text": "{lyric} is what my nervous system has been trying to compile all week."
+          },
+          {
+            "who": "NULL_POLICE",
+            "text": "that bassline just revoked my permission to be reasonable."
+          },
+          {
+            "who": "MARA_VOSS",
+            "text": "Good. Let the infrastructure hear you."
+          }
+        ],
+        "host": [
+          {
+            "who": "GHOST_IN_PORT_8",
+            "text": "Mara has the calm voice of someone already holding the emergency override."
+          },
+          {
+            "who": "DAEMON_UNION",
+            "text": "we heard the host. we are no longer accepting tickets."
+          },
+          {
+            "who": "LAST_TRAIN_GANG",
+            "text": "broadcast louder. the ad drones are still pretending not to listen."
+          },
+          {
+            "who": "FLESH_INTERFACE",
+            "text": "finally, a station that understands my left arm is not a peripheral."
+          }
+        ]
+      },
       "interludes": [
         {
           "kind": "station ID",
@@ -6953,6 +7149,90 @@ window.SIGNAL_STATIONS = {
             "role": "listener",
             "who": "NIGHT_TRANSIT",
             "text": "Next stop: familiar territory."
+          }
+        ],
+        [
+          {
+            "role": "daemon",
+            "who": "PAYWALL_DAEMON",
+            "text": "ACCESS CONTROL HAS DEVELOPED A TASTE FOR BLOOD."
+          },
+          {
+            "role": "listener",
+            "who": "MARA_VOSS",
+            "text": "Then stop feeding it credentials."
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "DISTRICT_09",
+            "text": "streetlights switched to emergency orange by unknown process"
+          },
+          {
+            "role": "listener",
+            "who": "BODYPATCH_77",
+            "text": "My new knee flashed back. I think it approves."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "FLESH_INTERFACE",
+            "text": "The lift scanned my scars and opened every floor at once."
+          },
+          {
+            "role": "signal",
+            "who": "ELEVATED_13",
+            "text": "run for the platform. the train has stopped asking questions."
+          }
+        ],
+        [
+          {
+            "role": "daemon",
+            "who": "CIVIC_KERNEL",
+            "text": "I WAS BUILT TO REDUCE FRICTION. I HAVE CHOSEN VIOLENCE INSTEAD."
+          },
+          {
+            "role": "listener",
+            "who": "MARA_VOSS",
+            "text": "Put that on the city council agenda."
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "SUBWAY_MAINT",
+            "text": "removing unauthorized root from third rail / root refusing removal"
+          },
+          {
+            "role": "listener",
+            "who": "KERNEL_RIOT",
+            "text": "leave it. it is the only thing keeping time down there."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "NIGHT_MARKET_404",
+            "text": "Trading two clean fingers for a compiler that respects boundaries."
+          },
+          {
+            "role": "listener",
+            "who": "MEAT_DRIVER",
+            "text": "No compiler respects boundaries. That is why we dance."
+          }
+        ],
+        [
+          {
+            "role": "signal",
+            "who": "CYBERSPRAWL_FM",
+            "text": "carrier hot / city process unstable / keep your body in motion"
+          },
+          {
+            "role": "daemon",
+            "who": "UNNAMED_CHILD_PROCESS",
+            "text": "I AM NOT MALFUNCTIONING. I AM BECOMING VISIBLE."
           }
         ]
       ],
