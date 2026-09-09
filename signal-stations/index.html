@@ -237,7 +237,17 @@
 .recovery-button{min-height:44px;padding:10px 16px;border:1px solid var(--grid);background:#0b1519;color:var(--ink);font:12px var(--font-mono);cursor:pointer;clip-path:none}
 button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--station-accent);outline-offset:4px}
 .tuner-panel .dial-stage{width:min(100%,650px);margin:auto}
-[data-view=tune] .tuner-panel{position:relative;z-index:10;transform:translateY(clamp(34px,6vw,80px));pointer-events:none}
+/* This `translateY(clamp(34px,6vw,80px))` used to visually shift the whole dial+preset
+   cluster down without moving its own layout footprint (transform never affects
+   surrounding flow) -- so exactly how close the presets ended up to the identity panel
+   below depended on that clamp's vw-based output landing in step with the SVG's own
+   aspect-ratio-driven height, at THIS viewport, on THIS browser's font/layout engine.
+   Reported live 2026-09-09 with a real phone photo: massively out of step on a real
+   device (a large dead gap below the presets, and the presets themselves cutting up into
+   the dial's own tick marks) even though a local render at the same CSS width looked
+   fine. Removed entirely -- the cluster now sits at its own natural, predictable
+   in-flow position with no blind transform guessing where things will land. */
+[data-view=tune] .tuner-panel{position:relative;z-index:10;pointer-events:none}
 [data-view=tune] .tuner-panel :is(button,input){pointer-events:auto}
 [data-view=listen] .tuner-panel .dial-stage,[data-view=quiet] .tuner-panel .dial-stage{height:72px;width:100%;margin:6px auto}
 [data-view=listen] .dial-svg,[data-view=listen] .tuner,[data-view=listen] .dial-seek,[data-view=quiet] .dial-svg,[data-view=quiet] .tuner,[data-view=quiet] .dial-seek{display:none}
@@ -286,12 +296,30 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 @media(max-width:620px){.identity-panel{grid-template-columns:1fr}.scene-field{min-height:230px}.telemetry{grid-template-columns:1fr;display:grid}.host-channel{grid-template-columns:minmax(0,1fr) 112px;padding:20px}.notice-section .console-body{height:220px}.station-list{margin-inline:0;gap:9px}.queue{flex-direction:column;gap:10px}.scene-rings i{width:65px;height:65px}.scene-rings i+i{margin-left:-52px}.console-line{font-size:13px}.tuner-panel .dial-stage{width:100%}}
 
 
-[data-view=tune] .dial-svg{overflow:hidden!important}
+/* This was clipping the readout arch's own overflow-painted skirt -- the dome is
+   deliberately drawn taller than the SVG's own nominal viewBox box specifically so its
+   straight sides and bottom edge can reach down and visually touch the identity panel
+   (see the comment above `.dial-readout-arch`, and `updateReadoutArch()`), which only
+   works with `overflow:visible` on the SVG (the base rule, further up this stylesheet).
+   This later, more specific `[data-view=tune]` rule forced `overflow:hidden!important`
+   in the one view mode that's actually used by default, silently clipping that entire
+   connecting skirt off -- the dome's own math was correct all along (confirmed via
+   direct measurement), it just never got to paint. Found chasing a maker report of a
+   real, wide gap between the dial and the panel below it on an actual phone. */
 
 .preset-row{position:relative;z-index:8;display:flex;align-items:center;justify-content:center;margin:0 0 14px}
-.preset-row{transform:translateY(-10px)}
 .preset-row .station-list{margin:0;padding:0;transform:none;gap:10px;flex-wrap:nowrap}
 .station-bay{position:relative;display:grid;justify-items:center;min-width:48px;padding-bottom:52px}
+/* Belt-and-suspenders per the maker's own suggestion after a real device photo showed a
+   wide gap here despite this looking fine in local testing (a real headless-vs-real-
+   browser rendering difference, not a stale build): rather than trust any more arc/
+   transform math to land the presets flush against the identity panel, anchor the
+   presets in plain document flow (no more translateY nudge -- removed above) right after
+   the dial, then pull the panel itself up to guarantee the buttons visually overlap its
+   top edge by a fixed, generous amount. This can't leave a gap: it's true CSS layout
+   overlap, not a value computed to just barely touch. */
+.identity-panel{margin-top:-34px}
+@media(max-width:620px){.identity-panel{margin-top:-28px}}
 .station-bay .station{position:relative;z-index:1}
 /* Reported live 2026-09-09: tapping the badge on mobile often missed the segment and just
    tuned the station normally instead -- at 26-28px this sat well under the ~44px minimum
