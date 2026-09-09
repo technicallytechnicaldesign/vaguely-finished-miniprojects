@@ -998,9 +998,9 @@
         : isSnowCrash
           ? '<div class="lyric-art lyric-art-snowcrash" aria-hidden="true"><div class="snc-object snc-katana"><img src="assets/objects/snowcrash-katana-v1.png" alt=""></div><div class="snc-object snc-board"><img src="assets/objects/snowcrash-board-v1.png" alt=""></div><div class="snc-object snc-goggles"><img src="assets/objects/snowcrash-goggles-v1.png" alt=""></div><div class="snc-citation">STREET OBJECT CACHE<br>GARGOYLE / KOURIER<br>UNLICENSED</div></div>'
           : isAfterhuman
-            ? '<div class="lyric-art lyric-art-afterhuman" aria-hidden="true"><div class="afh-object"><img src="assets/objects/afterhuman-pensive-code-v2.png" alt=""></div><div class="afh-citation">MEMORY LATTICE<br>SOFT PROCESS / OPEN WINDOW<br>DO NOT OPTIMISE</div></div>'
+            ? '<div class="lyric-art lyric-art-afterhuman" aria-hidden="true"><div class="station-midground mid-afterhuman"><img src="assets/objects/afterhuman-pensive-code-v2.png" alt=""></div></div>'
             : isCybersprawl
-              ? '<div class="lyric-art lyric-art-cybersprawl" aria-hidden="true"><div class="cyb-object"><img src="assets/objects/cybersprawl-daemon-rage-v2.png" alt=""></div><div class="cyb-citation">DAEMON BODY / UNSTABLE<br>ROOT PROCESS IN MOTION<br>NO SAFE MODE</div></div>'
+              ? '<div class="lyric-art lyric-art-cybersprawl" aria-hidden="true"><div class="station-midground mid-cybersprawl"><img src="assets/objects/cybersprawl-daemon-rage-v2.png" alt=""></div></div>'
               : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
       el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
       const lines = (item && item.lyricsLines) || [];
