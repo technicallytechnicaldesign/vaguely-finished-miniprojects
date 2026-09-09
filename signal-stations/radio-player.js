@@ -1821,7 +1821,12 @@
     button.style.setProperty('--button-accent', (station.visualProfile && station.visualProfile.accent) || '#56e5ff');
     button.setAttribute('aria-label', `Preset ${index + 1}: ${station.frequency} ${station.name}`);
     button.title = `${station.frequency} / ${station.name}`;
-    button.addEventListener('click', () => offer ? joinProgrammeOffer(offer) : selectStation(station.id));
+    // Tuning to a station's own preset must always be a normal tune-in, never an auto-join into
+    // its episode -- that had been hijacking every direct tune to CRUSTACEAN into the full
+    // 8-item "Continuity Dispute" transmission, permanently, instead of just playing the station.
+    // The separate badge below (and the rare, timed offer ticker) are the deliberate, occasional
+    // ways to join an episode; the station button itself must not.
+    button.addEventListener('click', () => selectStation(station.id));
     bay.append(button);
     if (offer) {
       const badge = document.createElement('button');
