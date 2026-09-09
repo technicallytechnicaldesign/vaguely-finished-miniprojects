@@ -350,6 +350,17 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 [data-view=listen] #tune-toggle,[data-view=quiet] #tune-toggle{left:72px}[data-view=listen] #view-toggle,[data-view=quiet] #view-toggle{right:72px}
 @media(max-width:620px){[data-view=tune] .tuner-panel{transform:translateY(30px)}.preset-row .station-list{gap:6px}.station-bay{min-width:44px;padding-bottom:46px}.programme-badge{width:36px;height:36px;bottom:0;font-size:16px;line-height:34px}.dial-view-control{width:40px;height:40px}#tune-toggle{left:17%}#view-toggle{right:17%}}
 @media(max-width:360px){.preset-row .station-list{gap:3px}.station-bay{min-width:40px}.compact-tuning{inset-inline:70px}}
+/* SNOW CRASH RADIO -- live host/caller identity visual (2026-09-09). Replaces the generic
+   round "glitch-head" blob with the station's own object art (katana for a live host, board
+   for a live caller), pulsing, plus a jittering HOST:/CALLER: LIVE tag -- see receiver.js's
+   renderIdentityVisual() for the station/mode gate. */
+.glitch-host-live .live-object{position:relative;width:clamp(120px,24vw,220px);aspect-ratio:1;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 calc(10px + 14px * var(--audio-mid)) var(--station-accent));animation:live-object-pulse 1.7s ease-in-out infinite}
+.glitch-host-live .live-object img{display:block;width:100%;height:auto;object-fit:contain;animation:live-object-glitch 3.2s steps(1,end) infinite}
+.glitch-host-live .live-tag{position:relative;margin-top:2px;color:var(--station-accent);font:700 13px var(--font-head);letter-spacing:.24em;text-transform:uppercase;text-shadow:2px 0 var(--station-secondary),-2px 0 var(--station-accent);animation:live-tag-jitter 2.6s steps(2,end) infinite}
+@keyframes live-object-pulse{0%,100%{transform:scale(1) rotate(-3deg);opacity:.92}50%{transform:scale(1.09) rotate(2deg);opacity:1}}
+@keyframes live-object-glitch{0%,86%,100%{transform:translate(0);clip-path:inset(0);filter:none}88%{transform:translate(-3px,1px);clip-path:polygon(0 0,100% 0,100% 32%,0 36%,0 64%,100% 60%,100% 100%,0 100%);filter:saturate(1.3) contrast(1.2)}92%{transform:translate(2px,-1px);clip-path:inset(44% 0 18% 0)}95%{transform:translate(0);clip-path:inset(0)}}
+@keyframes live-tag-jitter{0%,88%,100%{transform:translate(0,0);opacity:1}90%{transform:translate(-2px,1px);opacity:.7}93%{transform:translate(2px,-1px);opacity:1}96%{transform:translate(-1px,0);opacity:.85}}
+@media(prefers-reduced-motion:reduce){.glitch-host-live .live-object,.glitch-host-live .live-object img,.glitch-host-live .live-tag{animation:none}}
 </style>
 </head>
 <body>
@@ -362,7 +373,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 <section class="panel transport" aria-label="Broadcast transport"><span class="transport-label">SIG / live control</span><button class="skip" id="skip" type="button" aria-label="Skip signal">›</button><span class="transport-label">Music / host / caller / report / ad</span></section>
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
-  <script src="stations.data.js?v=cbcc2d93e146"></script>
-  <script src="radio-player.js?v=186998a4116a"></script>
+  <script src="stations.data.js?v=67a66cbd8088"></script>
+  <script src="radio-player.js?v=dde12380e9e7"></script>
 </body>
 </html>

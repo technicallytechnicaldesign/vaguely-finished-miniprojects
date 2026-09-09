@@ -115,6 +115,7 @@
   // avoid a hard silence, but the host's tail is essentially clear before anything rises.
   const LINER_OVERLAP_S = 0.5;    // how much of a liner's tail overlaps whatever comes next
   const CALL_POST_GAP_MS = 300;   // let the mixed disconnect land before the requested song starts
+  const CRUSTACEAN_CALLER_GAP_MS = 1500; // longer beat after a live CRUSTACEAN caller, filled with chitterLegs()
 
   const Deck = SignalAudio.Deck;
   const pickCutInSeconds = track => SignalDirector.cutIn(track, director.random);
@@ -256,6 +257,54 @@
     }
   }
 
+  // CRUSTACEAN caller texture (SIG, 2026-09-09): two small one-shot SFX, synthesized rather
+  // than sourced (same "plain Web Audio DSP, no samples" approach as StaticChannel above and
+  // make_callin_sfx.py) so there's no asset dependency. A dial tone (two sustained sine
+  // tones, classic telephony pair) right as a caller locks in, and a short "chittering legs"
+  // burst -- a handful of tiny randomized bandpassed noise grains -- in the pause after one
+  // caller ends and before the next segment starts. Both are one-shots: a fresh gain/oscillator
+  // graph per call, torn down after it finishes rather than a channel kept alive between uses.
+  class SfxChannel {
+    constructor(ctx, dest) { this.ctx = ctx; this.dest = dest; }
+    dialTone() {
+      const ctx = this.ctx, now = ctx.currentTime, dur = 0.45;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.1, now + 0.04);
+      gain.gain.setValueAtTime(0.1, now + dur - 0.08);
+      gain.gain.linearRampToValueAtTime(0, now + dur);
+      gain.connect(this.dest);
+      [350, 440].forEach(freq => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        osc.connect(gain);
+        osc.start(now); osc.stop(now + dur);
+      });
+    }
+    chitterLegs() {
+      const ctx = this.ctx, now = ctx.currentTime;
+      const grains = 10 + Math.floor(Math.random() * 6);
+      let t = now;
+      for (let i = 0; i < grains; i += 1) {
+        const grainDur = 0.012 + Math.random() * 0.018;
+        const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * grainDur), ctx.sampleRate);
+        const samples = buffer.getChannelData(0);
+        for (let s = 0; s < samples.length; s += 1) samples[s] = Math.random() * 2 - 1;
+        const src = ctx.createBufferSource(); src.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass'; filter.frequency.value = 1500 + Math.random() * 2600; filter.Q.value = 4 + Math.random() * 4;
+        const gain = ctx.createGain();
+        const peak = 0.05 + Math.random() * 0.05;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(peak, t + grainDur * 0.3);
+        gain.gain.linearRampToValueAtTime(0, t + grainDur);
+        src.connect(filter).connect(gain).connect(this.dest);
+        src.start(t); src.stop(t + grainDur);
+        t += grainDur + 0.02 + Math.random() * 0.07;
+      }
+    }
+  }
+
   const state = {
     station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, preview: null, master: null, analyser: null,
     activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
@@ -381,9 +430,15 @@
   function onDeckEnded(deck) {
     if (state.decks[state.activeIndex] !== deck || !deck.item || !state.power) return;
     const epoch = state.playbackEpoch;
+    // CRUSTACEAN, leaving an actual caller voice (not the intro/filler/outro bridges around
+    // it): a longer beat than the usual post-call gap, with a little chittering-legs texture
+    // filling it, before the next segment starts.
+    const isCrustaceanCaller = state.station?.id === 'crustacean' && isCallIn(deck.item.type);
+    if (isCrustaceanCaller) state.sfx?.chitterLegs();
+    const gapMs = isCrustaceanCaller ? CRUSTACEAN_CALLER_GAP_MS : (isCallIn(deck.item.type) || isCallSegment(deck.item.type)) ? CALL_POST_GAP_MS : 0;
     setTimeout(() => {
       if (epoch === state.playbackEpoch && state.decks[state.activeIndex] === deck && state.power) startCrossfade(deck, 1 - state.activeIndex);
-    }, (isCallIn(deck.item.type) || isCallSegment(deck.item.type)) ? CALL_POST_GAP_MS : 0);
+    }, gapMs);
   }
 
   function onDeckFailure(deck) {
@@ -410,6 +465,7 @@
     state.staticChannel = new StaticChannel(state.ctx, dest);
     state.pirate = new PirateChannel(state.ctx, dest);
     state.preview = new PreviewChannel(state.ctx, dest);
+    state.sfx = new SfxChannel(state.ctx, dest);
     startVisualizer();
   }
 
@@ -670,20 +726,68 @@
   // Small live replies stop the station log from being a detached wallpaper: when a song
   // is playing they borrow its currently visible lyric fragment, while host/ID moments get
   // their own station-specific side-eye. The authored feed remains the main programme.
+  // Rate and shape both tuned 2026-09-09 per maker feedback: was firing on ~38% of every
+  // scene check (too constant) and always the same "comment mentioning {lyric}" shape --
+  // slowed to ~16%, and now rolls between three formats: someone just yelling their favorite
+  // line verbatim (no commentary), the classic single authored comment, or two different
+  // voices piling on the same lyric back to back (comment / lyric / comment, via two people
+  // rather than splitting one sentence, which reads more like a real chat pile-on).
+  const REACTION_FIRE_CHANCE = 0.16;
+  const REACTION_YELL_CHANCE = 0.35;
+  const REACTION_PILEON_CHANCE = 0.55; // cumulative: yell, then this, then plain comment
   function networkReactionScene(station) {
     const reactions = station?.networkReactions;
     const item = state.decks?.[state.activeIndex]?.item;
     const pool = item?.type === 'song' ? reactions?.song : reactions?.host;
-    if (!pool?.length || Math.random() > 0.38) return null;
-    const reaction = pool[Math.floor(Math.random() * pool.length)];
+    if (!pool?.length || Math.random() > REACTION_FIRE_CHANCE) return null;
     const lyricLines = item?.lyricsLines || [];
     const lyric = lyricLines.length ? lyricLines[Math.floor(Math.random() * lyricLines.length)] : (item?.title || 'that last signal');
+    const roll = Math.random();
+    if (roll < REACTION_YELL_CHANCE && lyricLines.length) {
+      const reaction = pool[Math.floor(Math.random() * pool.length)];
+      return [{ role: reaction.role || 'listener', who: reaction.who || 'OPEN_CHANNEL', text: `“${lyric.toUpperCase()}”!!`, holdMs: 1100 }];
+    }
+    if (roll < REACTION_PILEON_CHANCE && pool.length >= 2) {
+      const [first, second] = shuffle(pool, Math.random);
+      return [
+        { role: first.role || 'listener', who: first.who || 'OPEN_CHANNEL', text: first.text.replaceAll('{lyric}', `“${lyric}”`), holdMs: first.holdMs || 1300 },
+        { role: second.role || 'listener', who: second.who || 'OPEN_CHANNEL', text: second.text.replaceAll('{lyric}', `“${lyric}”`), holdMs: second.holdMs || 1600 }
+      ];
+    }
+    const reaction = pool[Math.floor(Math.random() * pool.length)];
     return [{
       role: reaction.role || 'listener',
       who: reaction.who || 'OPEN_CHANNEL',
       text: reaction.text.replaceAll('{lyric}', `“${lyric}”`),
       holdMs: reaction.holdMs || 1600
     }];
+  }
+
+  // CRUSTACEAN's two "Little Red Lobster" songs (contract-law satire, KRILL & ASSOCIATES) get
+  // a special treatment (maker's request, 2026-09-09): the NET console erupts into a chanting
+  // lobster mob -- a dense, fast burst of one-off screaming handles, chased by the station
+  // daemon "kicking" an escalating (deliberately absurd) count of connections -- instead of
+  // the normal scripted feed/reaction cadence, for as long as one of those two tracks is the
+  // active item. Reverts to the normal feed the moment the song changes.
+  const LOBSTER_SONG_IDS = new Set(['crustacean-little-red-lobster-knows-contract-law', 'crustacean-little-red-lobster-knows']);
+  const LOBSTER_CHANTS = ['DA DA DA', 'DAAAAAAAAAAAAAAAAAA', 'DAVAIII DAVAIII WETWARE HOLDERS', 'LITTLE RED LOBSTER KNOWS', 'CONTRACT LAW BABY', 'CLAWS UP', 'I AM SHELL NOW', 'MOLTING RIGHTS FOREVER', 'WETWARE UNION NEVER DIES', 'OBJECTION SUSTAINED', 'SHE KNOWS THE LAW', 'RED LOBSTER SUPREMACY', 'FILE THE CLAIM', 'CRUSTACEAN JURISPRUDENCE', 'ALL RISE FOR THE LOBSTER'];
+  const LOBSTER_HANDLE_PREFIXES = ['LOBSTER', 'CLAW', 'SHELL', 'WETWARE', 'MOLT', 'KRILL_FAN', 'BISQUE', 'CARAPACE', 'PINCER', 'TIDEPOOL'];
+  let lobsterKickTotal = 0;
+  function lobsterHandle() {
+    const prefix = LOBSTER_HANDLE_PREFIXES[Math.floor(Math.random() * LOBSTER_HANDLE_PREFIXES.length)];
+    return `${prefix}_${1000 + Math.floor(Math.random() * 98999)}`;
+  }
+  function lobsterEruptionScene() {
+    const burst = 3 + Math.floor(Math.random() * 4);
+    const lines = [];
+    for (let i = 0; i < burst; i += 1) {
+      const shout = LOBSTER_CHANTS[Math.floor(Math.random() * LOBSTER_CHANTS.length)];
+      lines.push({ role: 'listener', who: lobsterHandle(), text: Math.random() < 0.5 ? `${shout}!!!` : shout, holdMs: 90 + Math.random() * 160 });
+    }
+    lobsterKickTotal += burst * (10 + Math.floor(Math.random() * 90));
+    if (lobsterKickTotal > 9999998999898999) lobsterKickTotal = burst; // the joke resets itself rather than overflowing
+    lines.push({ role: 'daemon', who: 'CRUSTACEAN STATION', text: `KICKING ${burst} LOBSTER CONNECTIONS. ${lobsterKickTotal.toLocaleString()} DISCONNECTED THIS SEGMENT AND CLIMBING.`, holdMs: 550 });
+    return lines;
   }
 
   async function runNetworkFeed() {
@@ -700,6 +804,17 @@
         scenes = stationNetworkFeed(state.station);
         order = shuffle(scenes, Math.random);
         cursor = 0;
+      }
+      const activeItem = state.decks?.[state.activeIndex]?.item;
+      const isLobsterErupting = state.station?.id === 'crustacean' && activeItem?.type === 'song' && LOBSTER_SONG_IDS.has(activeItem.id);
+      if (isLobsterErupting) {
+        for (const line of lobsterEruptionScene()) {
+          if (state.consoleMuted || feedStationId !== state.station?.id) break;
+          await playFeedLine(line);
+          await wait(line.holdMs || CONSOLE_LINE_GAP_MS);
+        }
+        await wait(250 + Math.random() * 350);
+        continue;
       }
       if (!scenes.length) { await wait(CONSOLE_SCENE_GAP_MS); continue; }
       if (cursor >= order.length) { order = shuffle(scenes, Math.random); cursor = 0; }
@@ -1028,6 +1143,19 @@
       el.innerHTML = `<div class="pirate-static pirate-static-${(item && item.family) || 'deadband'}"><div class="pirate-noise"></div><div class="pirate-burst">${shards}</div></div>`;
       return;
     }
+    if ((mode.id === 'host' || mode.id === 'call') && state.station && state.station.id === 'snowcrash') {
+      // Live host/caller segments used the same generic round "glitch-head" blob as every
+      // other station -- the maker's own name for it is "the placeholder potato". SNOW CRASH
+      // already has its own station object art (katana/board/goggles, used on the song visual
+      // a few lines up); reuse the katana for a live host and the board for a live caller so
+      // the identity panel actually looks like this station's world while someone's really
+      // talking, not a generic spinner. Other stations/modes are untouched for now.
+      const objectClass = mode.id === 'host' ? 'live-object-katana' : 'live-object-board';
+      const objectSrc = mode.id === 'host' ? 'assets/objects/snowcrash-katana-v1.png' : 'assets/objects/snowcrash-board-v1.png';
+      const liveLabel = mode.id === 'host' ? 'HOST: LIVE' : 'CALLER: LIVE';
+      el.innerHTML = `<div class="glitch-host glitch-host-live"><div class="live-object ${objectClass}"><img src="${objectSrc}" alt=""></div><span class="glitch-tag live-tag" data-text="${liveLabel}">${liveLabel}</span></div>`;
+      return;
+    }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
       el.innerHTML = `<div class="glitch-host"><div class="glitch-head"></div><span class="glitch-tag">${mode.label}</span></div>`;
       return;
@@ -1247,6 +1375,7 @@
     state.transitioning = false;
     if (!next) { presentation?.status('Signal unavailable. Retry the receiver.', true); return; }
     presentation?.status('Carrier locked');
+    if (state.station?.id === 'crustacean' && isCallIn(next.type)) state.sfx?.dialTone();
 
     let totalFadeS;
     if (isSpokenKind(next.type)) {

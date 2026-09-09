@@ -8499,6 +8499,20 @@ window.SIGNAL_STATIONS = {
           "copy": "SNOW CRASH RADIO station-ID jingle.",
           "audio": "assets/station-id-01.mp3",
           "durationSeconds": 16.4
+        },
+        {
+          "id": "SNC-JINGLE-02",
+          "kind": "station ID",
+          "copy": "SNOW CRASH RADIO station-ID jingle.",
+          "audio": "assets/station-id-02.wav",
+          "durationSeconds": 10.6
+        },
+        {
+          "id": "SNC-JINGLE-03",
+          "kind": "station ID",
+          "copy": "SNOW CRASH RADIO station-ID jingle.",
+          "audio": "assets/station-id-03.wav",
+          "durationSeconds": 10.5
         }
       ],
       "interludes": [
@@ -8858,6 +8872,87 @@ window.SIGNAL_STATIONS = {
           "audio": "audio/host/loglo-blackout.wav",
           "durationSeconds": 177.2,
           "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag."
+        },
+        {
+          "id": "SNC-CALL-011",
+          "kind": "caller talk-back",
+          "callerName": "Burbclave Beth",
+          "callerRole": "HOA landscaping enforcement",
+          "copy": "Hedge height violation report",
+          "audio": "audio/callins/burbclave-beth.wav",
+          "durationSeconds": 20.8,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "mid"
+            ],
+            "style": [
+              "thrash",
+              "petty"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-012",
+          "kind": "caller talk-back",
+          "callerName": "Double Pepperoni",
+          "callerRole": "Deliverator, mid-beef with a Kourier",
+          "copy": "Lane rights dispute",
+          "audio": "audio/callins/deliverator-vs-kourier.wav",
+          "durationSeconds": 29.9,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "fast"
+            ],
+            "style": [
+              "thrash",
+              "punk"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-013",
+          "kind": "caller talk-back",
+          "callerName": "The Hydrangea Lady",
+          "callerRole": "burbclave gardener, possibly a daemon",
+          "copy": "Suspicious horticulture bulletin",
+          "audio": "audio/callins/hydrangea-lady.wav",
+          "durationSeconds": 29.4,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "slow",
+              "mid"
+            ],
+            "style": [
+              "dark",
+              "experimental"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-014",
+          "kind": "caller talk-back",
+          "callerName": "Overtime",
+          "callerRole": "Kourier",
+          "copy": "Formal kourier komplaint",
+          "audio": "audio/callins/kourier-komplaint.wav",
+          "durationSeconds": 28.7,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "fast"
+            ],
+            "style": [
+              "thrash",
+              "industrial"
+            ]
+          }
         }
       ],
       "networkFeed": [
