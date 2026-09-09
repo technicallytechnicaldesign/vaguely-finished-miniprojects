@@ -1344,7 +1344,13 @@
     const namespace = 'http://www.w3.org/2000/svg';
     const eventPath = document.createElementNS(namespace, 'path');
     eventPath.setAttribute('class', 'dial-event-path'); eventPath.id = 'dial-event-path';
-    eventPath.setAttribute('d', 'M 259.1 234 A 63 63 0 0 1 380.9 234');
+    // r=63 (the original value here) put this ring squeezed directly between the MHz
+    // unit arc (r35) and the big frequency-number arc (r85), at only a 10px font --
+    // reported live 2026-09-09 as functionally invisible even while active, buried
+    // under the "133.7" numerals. Moved out to r=115, well inside the dome's open
+    // upper band (dome top is r150) and clearly above the number arc's own top (r85 apex
+    // sits at y165 vs this ring's y135 apex), same 15deg-165deg angular span as before.
+    eventPath.setAttribute('d', 'M 208.9 220.2 A 115 115 0 0 1 431.1 220.2');
     const eventText = document.createElementNS(namespace, 'text');
     eventText.setAttribute('class', 'dial-event-svg'); eventText.id = 'dial-event'; eventText.dataset.active = 'false';
     const textPath = document.createElementNS(namespace, 'textPath');
