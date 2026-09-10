@@ -635,7 +635,7 @@
     if (!jingles.length) return null;
     const minGap = state.station.stationJingleMinGap == null ? 3 : state.station.stationJingleMinGap;
     if (state.itemsSinceJingle < minGap) return null;
-    const chance = state.station.stationJingleChance == null ? 0.12 : state.station.stationJingleChance;
+    const chance = state.station.stationJingleChance == null ? 0.2 : state.station.stationJingleChance;
     if (director.random() > chance) return null;
     state.itemsSinceJingle = 0;
     return toPlanItem(pick(jingles));
@@ -1024,7 +1024,7 @@
     const ads = pool.filter(x => x.kind === 'sponsored notice');
     if (!hooks.length || !outros.length || ads.length < 2) return null;
     const shuffled = shuffle(ads);
-    const adCount = Math.min(ads.length, 2 + Math.floor(director.random() * 3)); // 2-4, capped by pool size
+    const adCount = Math.min(ads.length, director.random() < 0.7 ? 2 : 3); // normally 2, ~30% of blocks run 3, capped by pool size
     const chosenAds = shuffled.slice(0, adCount);
     return [pick(hooks), ...chosenAds, pick(outros)].map(toPlanItem);
   }
