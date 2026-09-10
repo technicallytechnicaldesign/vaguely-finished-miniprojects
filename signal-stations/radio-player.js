@@ -107,17 +107,14 @@
   const CALL_SEGMENT_KINDS = new Set(['call segment intro', 'call segment outro', 'call segment filler']);
 
   // --- crossfade/timing tuning -------------------------------------------------
-  // Songs always play out, essentially to their real end -- no more cutting in over the
-  // last chorus. The host is always the dominant, intelligible voice on entry: a fast duck
-  // (not a slow symmetric blend), the outgoing song drops to a low background level rather
-  // than an even 50/50 mix, then finishes fading out shortly after while the host talks.
-  const SONG_TAIL_WINDOW_S = 8;   // trigger the transition somewhere in the song's final N seconds
-  const TAIL_BUFFER_S = 1.5;      // never schedule a cut-in closer than this to a track's hard end
-  const HOST_RISE_S = 0.4;        // fast rise to full gain for the incoming host content
-  const SONG_DUCK_S = 0.6;        // fast duck of the outgoing song down to background level
-  const SONG_DUCK_LEVEL = 0.18;   // background level the song bleeds under the host at
-  const SONG_FULL_FADE_S = 1.8;   // after the duck, how long until the song is fully silent
-  const FADE_S = 2.2;             // symmetric crossfade duration for entering a song (liner/song -> song)
+  // Songs always play out to their own real end (SIG-mobile-early-cutin, 2026-09-10): no
+  // computed early cut-in over the outro anymore, after three straight sessions of that
+  // mechanism misbehaving on mobile. Entering a segment is now a clean handoff, not a blend:
+  // whatever was playing stops fast, a short static "tuning" click plays, then the segment
+  // starts at full volume -- see STATIC_CLICK_S and StaticChannel.burst().
+  const SONG_DUCK_S = 0.6;        // fast fade-out of whatever was playing before a segment starts
+  const STATIC_CLICK_S = 0.18;    // hiss-click lead-in before a segment's own audio becomes audible
+  const FADE_S = 2.2;             // symmetric crossfade duration for entering a song (song -> song)
   // Kept short on purpose (was 1.6s -- SIG feedback 2026-09-05: the host was getting
   // drowned out because the incoming song/ad had already climbed most of the way to full
   // volume before the host actually finished the sentence). This still overlaps enough to
@@ -127,7 +124,6 @@
   const CRUSTACEAN_CALLER_GAP_MS = 1500; // longer beat after a live CRUSTACEAN caller, filled with chitterLegs()
 
   const Deck = SignalAudio.Deck;
-  const pickCutInSeconds = track => SignalDirector.cutIn(track, director.random);
 
   class JingleChannel {
     constructor(ctx, dest) {
@@ -180,6 +176,20 @@
       gain.cancelScheduledValues(now);
       gain.setValueAtTime(gain.value, now);
       gain.linearRampToValueAtTime(level, now + seconds);
+    }
+    // A short "tuning click" -- rises fast, holds, then settles back to whatever ambient
+    // level was already playing (so it doesn't disturb the separate proximity/power-driven
+    // setLevel() calls elsewhere). Used as the handoff into a segment now that segments no
+    // longer interrupt a song mid-play -- see STATIC_CLICK_S in the crossfade sequencer.
+    burst(peak = 0.42, riseS = 0.03, holdS = 0.1, fallS = 0.22) {
+      const gain = this.gain.gain;
+      const now = this.ctx.currentTime;
+      const rest = gain.value;
+      gain.cancelScheduledValues(now);
+      gain.setValueAtTime(rest, now);
+      gain.linearRampToValueAtTime(peak, now + riseS);
+      gain.setValueAtTime(peak, now + riseS + holdS);
+      gain.linearRampToValueAtTime(rest, now + riseS + holdS + fallS);
     }
   }
 
@@ -1465,26 +1475,7 @@
     // segment, not a short liner -- see stations/*.json's `joinClean` field) skips the early
     // cut-in and rides all the way to its own tail instead: the maker's ask, 2026-09-09, was
     // that a special broadcast should feel like tuning in FOR it right as a song ends clean,
-    // not interrupting whatever was already playing. Originally implemented as cutInAt=null
-    // (wait for the literal end-of-file) -- reverted after maker feedback the same day: many
-    // tracks carry a few seconds of trailing near-silence after the last audible note, so
-    // "wait for true EOF" produced a small dead-air gap before the segment started, which read
-    // as a random cold-open rather than a clean handoff. Landing on the song's own tail
-    // instead (same LINER_OVERLAP_S point a liner-to-liner transition already uses) rides the
-    // last audible instant without either cutting into the outro early or waiting through
-    // silence. state.plan[0] is reliable here: refillPlan() keeps it topped up immediately
-    // after every plan.shift(), so it already holds whatever is queued to follow this deck's
-    // item by the time its own cut-in gets armed.
-    // Prefer the catalog's own ffprobe-measured durationSeconds over the live
-    // HTMLMediaElement's .duration: on mobile (Android Chrome especially, for MP3s without
-    // a proper VBR header) .duration is unreliable right when playback starts -- it can read
-    // as Infinity, or as a too-small estimate based on only the bytes fetched so far, before
-    // the browser finishes scanning the file. armCutIn only runs once per track, so a bad
-    // reading here used to get baked in permanently as a too-early cutInAt (near the START of
-    // the song, not its tail) -- this was previously masked for most tracks because the old
-    // low-confidence-returns-null rule skipped the whole calculation for them; removing that
-    // rule (so cut-ins always land in the song's own tail) exposed it. Falls back to the live
-    // reading only when the catalog genuinely has no duration for this item.
+    // not interrupting whatever was already playing.
     const knownDuration = deck.item ? (deck.item.durationSeconds || deck.audio.duration) : null;
     if (deck.item?.type === 'song' && state.plan[0]?.joinClean) {
       deck.cutInAt = Math.max(0, (knownDuration || 6) - LINER_OVERLAP_S);
@@ -1493,7 +1484,16 @@
     if (!deck.item || isSpokenKind(deck.item.type)) {
       deck.cutInAt = Math.max(0, (knownDuration || 6) - LINER_OVERLAP_S);
     } else {
-      deck.cutInAt = pickCutInSeconds({ durationSeconds: knownDuration, outroStartSeconds: deck.item.outroStartSeconds, outroConfidence: deck.item.outroConfidence, transition: deck.item.transition });
+      // Ordinary songs no longer carry a computed early cut-in at all (SIG-mobile-early-cutin,
+      // 2026-09-10, third pass): three sessions of chasing an early-cut-in timing bug (a bad
+      // window, then an unreliable duration source) across mobile made clear the whole "guess a
+      // point inside the song and interrupt it there" approach wasn't holding up in practice.
+      // Simplified per the maker's explicit direction: a song now always plays out to its own
+      // real end (the existing onDeckEnded/'ended' handler already advances the queue from
+      // there -- nothing else to wire). The transition INTO a segment gets a short static
+      // "tuning" hiss instead, in startCrossfade(), so the handoff still reads as a deliberate
+      // moment, not a blend.
+      deck.cutInAt = null;
     }
   }
 
@@ -1554,13 +1554,13 @@
 
     let totalFadeS;
     if (isSpokenKind(next.type)) {
-      // duck, don't blend: the host needs to be intelligible immediately, the outgoing song
-      // bleeds under it at a low level for a moment (it's already near its own natural end,
-      // see pickCutInSeconds) rather than competing at equal volume, then finishes fading out.
-      toDeck.fadeTo(1, state.ctx, HOST_RISE_S);
-      fromDeck.fadeTo(SONG_DUCK_LEVEL, state.ctx, SONG_DUCK_S);
-      fromDeck.scheduleCleanup(() => fromDeck.fadeTo(0, state.ctx, SONG_FULL_FADE_S), SONG_DUCK_S * 1000);
-      totalFadeS = SONG_DUCK_S + SONG_FULL_FADE_S;
+      // Clean handoff, not a blend (SIG-mobile-early-cutin, 2026-09-10): whatever was playing
+      // fades out fast, a short static "tuning" click plays over the gap, then the segment
+      // starts at full volume once the click settles. See STATIC_CLICK_S / StaticChannel.burst.
+      fromDeck.fadeTo(0, state.ctx, SONG_DUCK_S);
+      state.staticChannel?.burst();
+      toDeck.scheduleCleanup(() => toDeck.fadeTo(1, state.ctx, 0.15), STATIC_CLICK_S * 1000);
+      totalFadeS = SONG_DUCK_S;
     } else {
       fromDeck.fadeTo(0, state.ctx, FADE_S);
       toDeck.fadeTo(1, state.ctx, FADE_S);
