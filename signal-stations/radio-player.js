@@ -12,9 +12,18 @@
   const duration=track.durationSeconds;const rule=track.transition||{};
   if(rule.mode==='end'||!Number.isFinite(duration)||duration<6)return null;
   if(Number.isFinite(rule.cutInSeconds))return Math.max(0,Math.min(duration-0.2,rule.cutInSeconds));
-  if(!Number.isFinite(track.outroConfidence)||track.outroConfidence<0.6)return null;
-  const latest=duration-1.5,earliest=Math.min(Math.max(track.outroStartSeconds??duration*.9,duration-8),latest);
-  return earliest+random()*Math.max(0,latest-earliest);
+  // Segments always cut in late -- the song's own last 3-10s -- so a listener hears the song,
+  // not a near-instant jump to the segment. outroStartSeconds/outroConfidence, when trustworthy
+  // (>=0.6), bias where in that window the cut lands; low/missing confidence used to skip the
+  // early cut-in entirely (wait for literal end-of-file instead) -- removing the guaranteed
+  // late-window floor for a large share of the catalogue, which measured low confidence
+  // (0.18-0.47, logged "cold ending" pattern).
+  const latest=Math.max(duration-3,0.2),earliest=Math.max(duration-10,0);
+  let point=earliest+random()*Math.max(0,latest-earliest);
+  if(Number.isFinite(track.outroConfidence)&&track.outroConfidence>=0.6&&Number.isFinite(track.outroStartSeconds)){
+   point=Math.min(latest,Math.max(earliest,track.outroStartSeconds));
+  }
+  return Math.min(duration-0.2,point);
  }
  root.SignalDirector={Director,seeded,cutIn};
  if(typeof module!=='undefined')module.exports=root.SignalDirector;
@@ -361,7 +370,7 @@
     reception: 'locked', pirateSignal: null, power: false, lyricTicker: null,
     hostQuoteTimer: null, hostQuoteIndex: 0, hostFocus: null, hostKey: '',
     consoleMuted: false, consoleGeneration: 0, playbackEpoch: 0, transitioning: false, failedAudio: new Set(), volume: 0.8,
-    offerWindow: null, offerTimer: null, lastOfferAt: 0,
+    offerWindow: null, offerTimer: null, lastOfferAt: 0, recoveryAttempts: 0, recoveryTimer: null,
   };
 
   function formatClock(seconds) {
@@ -1477,6 +1486,31 @@
     }
   }
 
+  // Self-heal from a run of failed candidates (flaky mobile network/codec hiccups, not
+  // necessarily bad files) instead of leaving the receiver silently dead air until the
+  // listener notices and taps Retry by hand. Previously, exhausting 3 attempts just left a
+  // status message and returned -- nothing ever tried again on its own. Clears failedAudio
+  // before each retry: 3 fresh candidates failing in one pass reads as a connectivity blip,
+  // not 3 coincidentally-broken files, and permanently blacklisting them only shrinks the
+  // rotation further over a session. Capped and backed off so a genuinely offline device
+  // doesn't retry forever in a tight loop.
+  const MAX_RECOVERY_ATTEMPTS = 6;
+  function scheduleRecovery(epoch, retry) {
+    clearTimeout(state.recoveryTimer);
+    if (state.recoveryAttempts >= MAX_RECOVERY_ATTEMPTS) {
+      presentation?.status('Signal unavailable. Retry the receiver.', true);
+      return;
+    }
+    state.recoveryAttempts += 1;
+    const delayMs = Math.min(20000, 3000 * state.recoveryAttempts);
+    presentation?.status('Signal unavailable. Retrying…', true);
+    state.recoveryTimer = setTimeout(() => {
+      if (epoch !== state.playbackEpoch || !state.power) return;
+      state.failedAudio.clear();
+      retry();
+    }, delayMs);
+  }
+
   async function startCrossfade(fromDeck, toIndex) {
     if (state.transitioning || !state.power || state.reception !== 'locked') return;
     state.transitioning = true;
@@ -1498,7 +1532,8 @@
       if (next) break;
     }
     state.transitioning = false;
-    if (!next) { presentation?.status('Signal unavailable. Retry the receiver.', true); return; }
+    if (!next) { scheduleRecovery(epoch, () => startCrossfade(fromDeck, toIndex)); return; }
+    state.recoveryAttempts = 0;
     presentation?.status('Carrier locked');
     if (state.station?.id === 'crustacean' && isCallIn(next.type)) state.sfx?.dialTone();
     if (state.callerBed) {
@@ -1750,6 +1785,7 @@
 
   function quietProgramme() {
     state.playbackEpoch += 1; state.transitioning = false;
+    clearTimeout(state.recoveryTimer); state.recoveryAttempts = 0;
     director.reset(); state.consoleGeneration += 1;
     if (state.jingle) { state.jingle.audio.pause(); state.jingle.gain.gain.cancelScheduledValues(0); state.jingle.gain.gain.value = 0; }
     state.callerBed?.stop();
@@ -2052,7 +2088,8 @@
       if (first) break;
     }
     state.transitioning = false;
-    if (!first) { presentation?.status('Signal unavailable. Retry the receiver.', true); return; }
+    if (!first) { scheduleRecovery(epoch, () => startBroadcast()); return; }
+    state.recoveryAttempts = 0;
     deck.gain.gain.setValueAtTime(1, state.ctx.currentTime);
     state.activeIndex = 0; state.started = true;
     armCutIn(deck); renderNow(deck); presentation?.status('Carrier locked');
