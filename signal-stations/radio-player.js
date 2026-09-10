@@ -1475,14 +1475,25 @@
     // silence. state.plan[0] is reliable here: refillPlan() keeps it topped up immediately
     // after every plan.shift(), so it already holds whatever is queued to follow this deck's
     // item by the time its own cut-in gets armed.
+    // Prefer the catalog's own ffprobe-measured durationSeconds over the live
+    // HTMLMediaElement's .duration: on mobile (Android Chrome especially, for MP3s without
+    // a proper VBR header) .duration is unreliable right when playback starts -- it can read
+    // as Infinity, or as a too-small estimate based on only the bytes fetched so far, before
+    // the browser finishes scanning the file. armCutIn only runs once per track, so a bad
+    // reading here used to get baked in permanently as a too-early cutInAt (near the START of
+    // the song, not its tail) -- this was previously masked for most tracks because the old
+    // low-confidence-returns-null rule skipped the whole calculation for them; removing that
+    // rule (so cut-ins always land in the song's own tail) exposed it. Falls back to the live
+    // reading only when the catalog genuinely has no duration for this item.
+    const knownDuration = deck.item ? (deck.item.durationSeconds || deck.audio.duration) : null;
     if (deck.item?.type === 'song' && state.plan[0]?.joinClean) {
-      deck.cutInAt = Math.max(0, (deck.audio.duration || deck.item.durationSeconds || 6) - LINER_OVERLAP_S);
+      deck.cutInAt = Math.max(0, (knownDuration || 6) - LINER_OVERLAP_S);
       return;
     }
     if (!deck.item || isSpokenKind(deck.item.type)) {
-      deck.cutInAt = Math.max(0, (deck.item ? deck.audio.duration || deck.item.durationSeconds || 6 : 6) - LINER_OVERLAP_S);
+      deck.cutInAt = Math.max(0, (knownDuration || 6) - LINER_OVERLAP_S);
     } else {
-      deck.cutInAt = pickCutInSeconds({ durationSeconds: deck.audio.duration || deck.item.durationSeconds, outroStartSeconds: deck.item.outroStartSeconds, outroConfidence: deck.item.outroConfidence, transition: deck.item.transition });
+      deck.cutInAt = pickCutInSeconds({ durationSeconds: knownDuration, outroStartSeconds: deck.item.outroStartSeconds, outroConfidence: deck.item.outroConfidence, transition: deck.item.transition });
     }
   }
 
