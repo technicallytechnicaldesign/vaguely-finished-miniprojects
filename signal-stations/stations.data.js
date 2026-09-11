@@ -17905,6 +17905,25 @@ window.SIGNAL_STATIONS = {
       },
       "items": [
         {
+          "kind": "host liner",
+          "title": "LIVE: RIIIIIOT GRLS (AND BOIS)",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/riot-gear-mandatory.wav",
+          "durationSeconds": 201.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-09; audio is a real Suno Studio recording with no embedded lyrics/transcript tag.",
+          "joinClean": true,
+          "ref": "audio/host/riot-gear-mandatory.wav",
+          "chapter": "01 / Sign-on",
+          "type": "host liner",
+          "subtitle": "sushiK",
+          "transition": {
+            "mode": "end"
+          },
+          "episodeId": "extended-broadcast-block",
+          "episodeTitle": "Extended Broadcast Block",
+          "startSeconds": 0
+        },
+        {
           "id": "snc-snow-crash-take1",
           "title": "Snow Crash",
           "artist": "Nam-Shub Zero",
@@ -18067,7 +18086,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 0
+          "startSeconds": 201.9
         },
         {
           "kind": "street report",
@@ -18085,7 +18104,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 352.2
+          "startSeconds": 554.1
         },
         {
           "id": "snc-query-me",
@@ -18259,7 +18278,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 382.8
+          "startSeconds": 584.7
         },
         {
           "id": "SNC-CALL-011",
@@ -18290,7 +18309,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 676.3
+          "startSeconds": 878.2
         },
         {
           "kind": "ad block intro",
@@ -18308,7 +18327,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 697.0999999999999
+          "startSeconds": 899
         },
         {
           "kind": "sponsored notice",
@@ -18325,7 +18344,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 714.6999999999999
+          "startSeconds": 916.6
         },
         {
           "kind": "sponsored notice",
@@ -18342,7 +18361,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 778.9999999999999
+          "startSeconds": 980.9
         },
         {
           "kind": "ad block outro",
@@ -18360,7 +18379,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 823.7999999999998
+          "startSeconds": 1025.7
         },
         {
           "id": "snc-grind-the-system",
@@ -18539,10 +18558,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 839.2999999999998
+          "startSeconds": 1041.2
         }
       ],
-      "durationSeconds": 1259.3
+      "durationSeconds": 1461.2
     }
   ]
 };
