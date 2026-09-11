@@ -8788,30 +8788,6 @@ window.SIGNAL_STATIONS = {
           "durationSeconds": 11.9
         },
         {
-          "kind": "ad block intro",
-          "copy": "We'll be back after these messages from our post-capitalistic overlords.",
-          "audio": "audio/host/SNC-045.wav",
-          "durationSeconds": 5.1
-        },
-        {
-          "kind": "ad block intro",
-          "copy": "Back after these messages, beamed directly into your cortex.",
-          "audio": "audio/host/SNC-046.wav",
-          "durationSeconds": 4.5
-        },
-        {
-          "kind": "ad block intro",
-          "copy": "Our overlords say: don't touch that dial. But the Street doesn't care if you do.",
-          "audio": "audio/host/SNC-047.wav",
-          "durationSeconds": 5.4
-        },
-        {
-          "kind": "ad block intro",
-          "copy": "Quick word from the people who keep the lights and the loosh flowing.",
-          "audio": "audio/host/SNC-048.wav",
-          "durationSeconds": 4.3
-        },
-        {
           "kind": "host liner",
           "title": "LIVE: RIIIIIOT GRLS (AND BOIS)",
           "copy": "[recorded host segment -- no transcript on file]",
@@ -9045,6 +9021,27 @@ window.SIGNAL_STATIONS = {
           "copy": "[recorded host segment -- no transcript on file]",
           "audio": "audio/host/back-to-the-music.wav",
           "durationSeconds": 15.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "ad block intro",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/ad-intro-01.wav",
+          "durationSeconds": 17.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "ad block intro",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/ad-intro-02.wav",
+          "durationSeconds": 20.3,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "ad block intro",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/ad-intro-03.wav",
+          "durationSeconds": 24.7,
           "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
         }
       ],
@@ -18289,14 +18286,15 @@ window.SIGNAL_STATIONS = {
         },
         {
           "kind": "ad block intro",
-          "copy": "We'll be back after these messages from our post-capitalistic overlords.",
-          "audio": "audio/host/SNC-045.wav",
-          "durationSeconds": 5.1,
-          "ref": "audio/host/SNC-045.wav",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/ad-intro-01.wav",
+          "durationSeconds": 17.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript.",
+          "ref": "audio/host/ad-intro-01.wav",
           "chapter": "04 / Sponsor block",
           "type": "ad block intro",
           "subtitle": "sushiK",
-          "title": "We'll be back after these messages from our post-capitalistic overlords.",
+          "title": "[recorded host segment -- no transcript on file]",
           "transition": {
             "mode": "end"
           },
@@ -18319,7 +18317,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 685.6
+          "startSeconds": 698.1
         },
         {
           "kind": "sponsored notice",
@@ -18336,7 +18334,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 749.9
+          "startSeconds": 762.4
         },
         {
           "kind": "ad block outro",
@@ -18354,7 +18352,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 794.6999999999999
+          "startSeconds": 807.1999999999999
         },
         {
           "id": "snc-grind-the-system",
@@ -18533,10 +18531,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 810.1999999999999
+          "startSeconds": 822.6999999999999
         }
       ],
-      "durationSeconds": 1230.2
+      "durationSeconds": 1242.7
     }
   ]
 };
