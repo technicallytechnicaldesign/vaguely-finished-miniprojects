@@ -978,10 +978,11 @@
 
   // Assembles a full call segment as one contiguous run -- buildAdBlock()'s shape, applied
   // to the crustacean-style pooled intro/callers/filler/outro content (SIG-1080): a random
-  // intro, 4-5 distinct callers (no repeats within the run, capped by pool size), a random
-  // no-repeat filler bridging each consecutive caller pair, and a random outro. Falls back
-  // to null (plain per-clip pickCallIn) if a station doesn't have all three segment pools or
-  // fewer than 2 callers -- so every other station's call-ins are untouched by this.
+  // intro, 2 distinct callers (no repeats within the run, capped by pool size -- was 4-5,
+  // cut per maker feedback SIG-1481 2026-09-12: too many back-and-forths in one run), a
+  // random no-repeat filler bridging the pair, and a random outro. Falls back to null (plain
+  // per-clip pickCallIn) if a station doesn't have all three segment pools or fewer than 2
+  // callers -- so every other station's call-ins are untouched by this.
   function buildCallBlock() {
     const pool = (state.station.interludes || []).filter(x => x.audio);
     const intros = pool.filter(x => x.kind === 'call segment intro');
@@ -989,7 +990,7 @@
     const fillers = pool.filter(x => x.kind === 'call segment filler');
     const calls = availableCallIns();
     if (!intros.length || !outros.length || !fillers.length || calls.length < 2) return null;
-    const callCount = Math.min(calls.length, 4 + Math.floor(director.random() * 2)); // 4-5, capped by pool size
+    const callCount = Math.min(calls.length, 2); // was 4-5, capped by pool size
     const chosenCalls = shuffle(calls).slice(0, callCount);
     const shuffledFillers = shuffle(fillers);
     // pull the chosen callers out of the rotation bag so a plain pickCallIn() right after
