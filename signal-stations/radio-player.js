@@ -378,6 +378,7 @@
     station: null, ctx: null, decks: null, jingle: null, staticChannel: null, pirate: null, preview: null, master: null, analyser: null,
     activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
     callBag: [], lastCallerRole: '', callCooldown: 0, breaksSinceCall: 0,
+    linerBag: [], lastLinerAudio: '',
     lastBreakKind: '', pendingRequestTags: null, pendingBlock: [], itemsSinceJingle: 0,
     plan: [], // lookahead list of upcoming {type, title, subtitle, kindLabel} for the "on deck" panel
     started: false, visualizerStarted: false, tuneTimer: null,
@@ -617,6 +618,14 @@
     return { ...track, type: 'song', title: track.title, subtitle: track.artist, audio: track.audio, durationSeconds: track.durationSeconds, outroStartSeconds: track.outroStartSeconds, tags: track.tags, lyricsLines: track.lyricsLines };
   }
 
+  // Shuffle-bag, same no-repeat-until-exhausted pattern as chooseTrack()'s songBag/
+  // pickCallIn()'s callBag (maker feedback 2026-09-12: a uniform per-break coin flip left
+  // CRUSTACEAN's AINEKO segment -- 1 of only 4 host liners -- statistically real but rare
+  // enough (~11% of breaks, MEASURED via a 200k-run sim) that a listener could go hours
+  // without ever landing on it, while Dr. Krill's other 3 liners repeat freely. Every host
+  // liner a station has now plays once before any of them repeat, so a small pool (like
+  // CRUSTACEAN's 4) surfaces its rarest member on a bounded schedule instead of leaving it to
+  // chance. Keyed by `audio`, the one field guaranteed unique across liners.
   function pickLiner() {
     // ad kinds are never drawn here: sponsored notice only plays inside a block (see
     // buildAdBlock), and ad block intro/outro are block bookends, not general rotation.
@@ -625,7 +634,13 @@
     // side of it, or an outro with no call that just happened.
     const pool = (state.station.interludes || []).filter(x => x.audio && !isCallIn(x.kind) && x.kind !== 'sponsored notice' && !AD_BLOCK_KINDS.has(x.kind) && !isCallSegment(x.kind));
     if (!pool.length) return null;
-    return toPlanItem(pick(pool));
+    const byAudio = new Map(pool.map(x => [x.audio, x]));
+    state.linerBag = state.linerBag.filter(audio => byAudio.has(audio));
+    if (!state.linerBag.length) state.linerBag = shuffle(pool.map(x => x.audio));
+    const bagIndex = state.linerBag.findIndex(audio => audio !== state.lastLinerAudio);
+    const [audio] = state.linerBag.splice(bagIndex < 0 ? 0 : bagIndex, 1);
+    state.lastLinerAudio = audio;
+    return toPlanItem(byAudio.get(audio));
   }
 
   // Standalone station-ID jingles (station.stationJingles) are deliberately outside
@@ -2085,6 +2100,7 @@
     Object.assign(state, {
       station, activeIndex: 0, lastTrackTitle: '', songBag: [], songsSinceBreak: 0, breakAfter: 0,
       plan: [], pendingBlock: [], callBag: [], lastCallerRole: '', callCooldown: 0,
+      linerBag: [], lastLinerAudio: '',
       breaksSinceCall: 0, lastBreakKind: '', pendingRequestTags: null, itemsSinceJingle: 0, started: false
     });
     refillPlan();
