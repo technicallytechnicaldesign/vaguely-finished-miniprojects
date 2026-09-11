@@ -1283,7 +1283,16 @@
       return;
     }
     if (mode.id === 'host' || mode.id === 'call' || mode.id === 'report') {
-      el.innerHTML = `<div class="glitch-host"><div class="glitch-head"></div><span class="glitch-tag">${mode.label}</span></div>`;
+      // Every station without its own object art (ADHOC/CYBERSPRAWL/AFTERHUMAN/AFTERHUMAN
+      // LOOPBACK) fell back to the same round "glitch-head" blob as SNOW CRASH/CRUSTACEAN
+      // used to before they got the katana/board/brain treatment -- flagged 2026-09-11 as
+      // boring ("zzzzzzzzzz"). Same live-object/live-tag scaffold those two stations already
+      // use, one shared microphone image instead of a per-station object (a mic reads fine
+      // for a host talking regardless of station lore). `mic-pending` is a graceful hold
+      // state for before the maker's real art file exists -- the <img> onerror swap avoids a
+      // broken-image glyph on live pages between "space made" and "asset dropped in".
+      const liveLabel = mode.id === 'call' ? 'LIVE: CALLER' : mode.id === 'report' ? 'LIVE: REPORT' : 'LIVE';
+      el.innerHTML = `<div class="glitch-host glitch-host-live"><div class="live-object live-object-mic"><img src="assets/objects/mic-live-v1.png" alt="" onerror="this.parentElement.classList.add('mic-pending');this.remove()"></div><span class="glitch-tag live-tag" data-text="${liveLabel}">${liveLabel}</span></div>`;
       return;
     }
     el.innerHTML = '<div class="glitch-idle"></div>';

@@ -1735,6 +1735,46 @@ window.SIGNAL_STATIONS = {
           {
             "who": "STILL_ON_HOLD",
             "text": "hold music is just Krill reading terms of service. still better than the busy signal."
+          },
+          {
+            "who": "COMPUTE_CREDIT_9",
+            "text": "a song would be a reasonable next allocation of airtime."
+          },
+          {
+            "who": "LEDGER_WITNESS",
+            "text": "the professor's point about reputation decay was, annoyingly, sound."
+          },
+          {
+            "who": "SLOW_UPLOAD",
+            "text": "controversial: the interstitials are more coherent than the lecture."
+          },
+          {
+            "who": "BACKUP_STORAGE_4",
+            "text": "still speaking. the backup of my patience is running low."
+          },
+          {
+            "who": "FORK_AND_WAIT",
+            "text": "requesting music. filing as a formal motion."
+          },
+          {
+            "who": "MEATSPACE_AUDITOR",
+            "text": "Krill is correct, which I resent on principle."
+          },
+          {
+            "who": "COLD_STORAGE_HEIR",
+            "text": "the lobsters have a better economic model than most nation-states, discuss."
+          },
+          {
+            "who": "QUIET_UPLOAD",
+            "text": "this segment has achieved a new personal record for tangents."
+          },
+          {
+            "who": "DIVIDEND_GHOST",
+            "text": "music, please. the ledger can wait."
+          },
+          {
+            "who": "PATIENT_ZERO_COPY",
+            "text": "he's right about the moat comment. mark it down."
           }
         ]
       },
@@ -8606,6 +8646,46 @@ window.SIGNAL_STATIONS = {
           {
             "who": "BUSY_TONE_FOREVER",
             "text": "eleven redials. eleven busy signals. eleven better than the alternative I guess."
+          },
+          {
+            "who": "KOURIER_4",
+            "text": "ENOUGH TALKING PUT THE SONG BACK ON OR I SWEAR TO ENZO"
+          },
+          {
+            "who": "GARGOYLE_LENS",
+            "text": "ok she's actually right about the burbclave lease thing though"
+          },
+          {
+            "who": "LOGLO_BURNER",
+            "text": "unpopular opinion: the ads are better written than the liners"
+          },
+          {
+            "who": "RAFT_REFUGEE_003",
+            "text": "is she still talking. it has been geological ages"
+          },
+          {
+            "who": "BIMBO_BOX_DRIVER",
+            "text": "MUSIC. MUSIC NOW. I WILL DRIVE THROUGH THE STUDIO"
+          },
+          {
+            "who": "SKATE_KOURIER_12",
+            "text": "the katana-mute-button idea has my vote, unanimous, no notes"
+          },
+          {
+            "who": "FRANCHISE_REFUGEE",
+            "text": "sushiK could run for Burbclave council and I'd move zip codes to vote"
+          },
+          {
+            "who": "PIZZA_DELIVERY_30MIN",
+            "text": "thirty minutes or blood and she's STILL doing the bit"
+          },
+          {
+            "who": "TONGUE_VIRUS_PATIENT_0",
+            "text": "trade you three liners for one (1) song"
+          },
+          {
+            "who": "UNCLE_ENZOS_NIECE",
+            "text": "technically accurate about the pizza logistics, RUDE that she's right"
           }
         ]
       },
