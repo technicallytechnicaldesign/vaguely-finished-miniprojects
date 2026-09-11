@@ -321,7 +321,11 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ballad",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "Good morning, welcome back",
@@ -400,7 +404,10 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ambient",
+              "weird-pop"
+            ]
           },
           "lyricsLines": [
             "Dust on the velvet, ghosts in a row",
@@ -467,7 +474,9 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "pop"
+            ]
           },
           "lyricsLines": [
             "Debra has better metrics",
@@ -553,7 +562,9 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "chill"
+            ]
           },
           "lyricsLines": [
             "Woke up clean in a factory skin",
