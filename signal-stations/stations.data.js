@@ -7739,7 +7739,11 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "glitch",
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "# HUMAN IN THE LOOP",
@@ -7964,7 +7968,10 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "# SANITY CHECK FAILED",
@@ -8233,7 +8240,11 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "industrial",
+              "glitch",
+              "metal"
+            ]
           },
           "lyricsLines": [
             "# UNREACHABLE OBJECTS",
@@ -10641,7 +10652,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "synthwave",
+              "dance",
+              "edm"
+            ]
           },
           "lyricsLines": [
             "State your handle.",
@@ -10768,7 +10783,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "dance",
+              "edm"
+            ]
           },
           "lyricsLines": [
             "Plank down.",
@@ -10849,7 +10867,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chant"
+            ]
           },
           "lyricsLines": [
             "Do not provoke.",
@@ -10978,7 +10998,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chant"
+            ]
           },
           "lyricsLines": [
             "POOR IMPULSE CONTROL",
@@ -11110,7 +11132,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ambient",
+              "chill",
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "QUERY ME",
@@ -11270,7 +11296,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "anthem",
+              "metal"
+            ]
           },
           "lyricsLines": [
             "ROOT // BLADE",
@@ -11379,7 +11409,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "EXECUTE SNOW CRASH",
@@ -11531,7 +11564,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial"
+            ]
           },
           "lyricsLines": [
             "WELCOME TO THE METAVERSE.",
@@ -11676,7 +11711,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "THE STREET NEVER ENDS",
@@ -11830,7 +11867,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "edm",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "One pie.",
@@ -11928,7 +11968,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "You got one job.",
@@ -12028,7 +12071,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "chant",
+              "glitch"
+            ]
           },
           "lyricsLines": [
             "Eli-ma",
@@ -12069,7 +12115,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "synthwave",
+              "ballad",
+              "chill"
+            ]
           },
           "lyricsLines": [
             "Bass through glass.",
@@ -12221,7 +12271,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "glitch",
+              "industrial"
+            ]
           },
           "lyricsLines": [
             "civilization starting...",
@@ -12419,7 +12472,12 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "industrial",
+              "rage",
+              "thrash",
+              "metal"
+            ]
           },
           "lyricsLines": [
             "WE BUILT GODS // THEY SHIPPED SKINS",
@@ -12598,7 +12656,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "aggro",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "SECURITY EVENT",
@@ -12661,7 +12722,12 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "rage",
+              "punk",
+              "aggro",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "FUCK THE BURBCLAVES",
@@ -12818,7 +12884,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "industrial"
+            ]
           },
           "lyricsLines": [
             "Food is cheap.",
@@ -12924,7 +12992,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "glitch",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "LEGACY DEPENDENCIES",
@@ -13081,7 +13153,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "thrash",
+              "punk"
+            ]
           },
           "lyricsLines": [
             "BIMBO BOX",
@@ -13213,7 +13288,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "glitch",
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "Public access session initialized.",
@@ -13389,7 +13467,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chill",
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "WELCOME, SIR",
@@ -13535,7 +13616,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "industrial",
+              "metal",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "FIRST HACKER",
@@ -13677,7 +13762,11 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "glitch",
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "# HUMAN IN THE LOOP",
@@ -13901,7 +13990,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "industrial",
+              "thrash",
+              "rage"
+            ]
           },
           "lyricsLines": [
             "PRIORITY: STUPID",
@@ -14116,7 +14209,10 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "# SANITY CHECK FAILED",
@@ -14385,7 +14481,11 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "industrial",
+              "glitch",
+              "metal"
+            ]
           },
           "lyricsLines": [
             "# UNREACHABLE OBJECTS",
@@ -14591,7 +14691,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "edm"
+            ]
           },
           "lyricsLines": [
             "# LOANED BODY",
@@ -14793,7 +14895,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ballad",
+              "chill"
+            ]
           },
           "lyricsLines": [
             "# VECTOR // LOANED BODY",
@@ -15041,7 +15146,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "edm",
+              "dance"
+            ]
           },
           "lyricsLines": [
             "# VECTOR // LOANED BODY",
@@ -15289,7 +15397,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "industrial",
+              "edm"
+            ]
           },
           "lyricsLines": [
             "EXECUTE ME",
@@ -15627,7 +15738,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "Welcome, employee.",
@@ -15832,7 +15946,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chant",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "You have been told",
@@ -16000,7 +16117,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "industrial",
+              "edm"
+            ]
           },
           "lyricsLines": [
             "I HAVE REASON",
@@ -16179,7 +16299,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "THE CONNECTION IS THE CRIME",
@@ -16361,7 +16483,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "edm"
+            ]
           },
           "lyricsLines": [
             "TOO GOOD AT READING",
@@ -17448,7 +17572,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "EXECUTE SNOW CRASH",
@@ -17627,7 +17754,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ambient",
+              "chill",
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "QUERY ME",
