@@ -8746,48 +8746,6 @@ window.SIGNAL_STATIONS = {
           "durationSeconds": 40.4
         },
         {
-          "kind": "street report",
-          "copy": "Street conditions tonight: a hundred percent chance of loglo, scattered outages over the eastern arcologies, and a rolling brownout front moving in from the franchise districts around midnight. If your avatar starts flickering, that's not a glitch, that's the weather.",
-          "audio": "audio/host/SNC-035.wav",
-          "durationSeconds": 14
-        },
-        {
-          "kind": "street report",
-          "copy": "We've got reports of a bimbobox unit going down hard in three separate districts tonight, taking half a block of ambient advertising with it. Nobody's hurt, nobody ever is, but somewhere a marketing daemon is having a very bad night.",
-          "audio": "audio/host/SNC-036.wav",
-          "durationSeconds": 12.9
-        },
-        {
-          "kind": "street report",
-          "copy": "Looking at tonight's forecast: clear signal up top, heavy static down in the old fiber tunnels, and a real chance of somebody's uncle's daemon getting loose again before sunrise. Dress in layers. Bring a firewall.",
-          "audio": "audio/host/SNC-038.wav",
-          "durationSeconds": 12.4
-        },
-        {
-          "kind": "street report",
-          "copy": "Second bimbobox crash of the hour, this one right outside the Black Sun, and from what we're hearing it took out three billboards and somebody's entire personality cache. Sending our condolences to whoever's running backups tonight.",
-          "audio": "audio/host/SNC-039.wav",
-          "durationSeconds": 12.5
-        },
-        {
-          "kind": "street report",
-          "copy": "The lower loop is a warzone right now, Kouriers weaving through gridlock like the pizza clock actually means something, which, to be fair, it does. If you value your own avatar, stay off the shoulder lane.",
-          "audio": "audio/host/SNC-040.wav",
-          "durationSeconds": 10.9
-        },
-        {
-          "kind": "street report",
-          "copy": "Tonight's atmospheric outlook: loglo bright enough to read by, bandwidth thin enough to notice, and a fifteen percent chance somebody tries to sell you real estate in a burbclave that doesn't legally exist yet.",
-          "audio": "audio/host/SNC-041.wav",
-          "durationSeconds": 11.7
-        },
-        {
-          "kind": "street report",
-          "copy": "Every Kourier on the grid tonight is apparently trying to beat the same thirty-minute clock at the same time, which is exactly as safe as it sounds. Watch the crosswalks. Watch the rooftops. Just watch, honestly.",
-          "audio": "audio/host/SNC-043.wav",
-          "durationSeconds": 11.9
-        },
-        {
           "kind": "host liner",
           "title": "LIVE: RIIIIIOT GRLS (AND BOIS)",
           "copy": "[recorded host segment -- no transcript on file]",
@@ -9042,6 +9000,55 @@ window.SIGNAL_STATIONS = {
           "copy": "[recorded host segment -- no transcript on file]",
           "audio": "audio/host/ad-intro-03.wav",
           "durationSeconds": 24.7,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/ecological-terror.wav",
+          "durationSeconds": 27.2,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/get-on-the-street.wav",
+          "durationSeconds": 30.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/lo-glo-brownout.wav",
+          "durationSeconds": 49.9,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/street-report-01.wav",
+          "durationSeconds": 30.3,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/street-report-02.wav",
+          "durationSeconds": 34.4,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/street-report-03.wav",
+          "durationSeconds": 36.4,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
+        },
+        {
+          "kind": "street report",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/street-report-04.wav",
+          "durationSeconds": 37.9,
           "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
         }
       ],
@@ -18064,14 +18071,15 @@ window.SIGNAL_STATIONS = {
         },
         {
           "kind": "street report",
-          "copy": "Street conditions tonight: a hundred percent chance of loglo, scattered outages over the eastern arcologies, and a rolling brownout front moving in from the franchise districts around midnight. If your avatar starts flickering, that's not a glitch, that's the weather.",
-          "audio": "audio/host/SNC-035.wav",
-          "durationSeconds": 14,
-          "ref": "audio/host/SNC-035.wav",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/get-on-the-street.wav",
+          "durationSeconds": 30.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript.",
+          "ref": "audio/host/get-on-the-street.wav",
           "chapter": "02 / Street report",
           "type": "street report",
           "subtitle": "sushiK",
-          "title": "Street conditions tonight: a hundred percent chance of loglo, scattered…",
+          "title": "[recorded host segment -- no transcript on file]",
           "transition": {
             "mode": "end"
           },
@@ -18251,7 +18259,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 366.2
+          "startSeconds": 382.8
         },
         {
           "id": "SNC-CALL-011",
@@ -18282,7 +18290,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 659.7
+          "startSeconds": 676.3
         },
         {
           "kind": "ad block intro",
@@ -18300,7 +18308,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 680.5
+          "startSeconds": 697.0999999999999
         },
         {
           "kind": "sponsored notice",
@@ -18317,7 +18325,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 698.1
+          "startSeconds": 714.6999999999999
         },
         {
           "kind": "sponsored notice",
@@ -18334,7 +18342,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 762.4
+          "startSeconds": 778.9999999999999
         },
         {
           "kind": "ad block outro",
@@ -18352,7 +18360,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 807.1999999999999
+          "startSeconds": 823.7999999999998
         },
         {
           "id": "snc-grind-the-system",
@@ -18531,10 +18539,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 822.6999999999999
+          "startSeconds": 839.2999999999998
         }
       ],
-      "durationSeconds": 1242.7
+      "durationSeconds": 1259.3
     }
   ]
 };
