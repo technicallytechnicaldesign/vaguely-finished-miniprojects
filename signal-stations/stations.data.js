@@ -9405,7 +9405,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "synthwave",
+              "chant"
+            ]
           },
           "lyricsLines": [
             "Choose eyes.",
@@ -9547,7 +9550,9 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chant"
+            ]
           },
           "lyricsLines": [
             "Tired of unstable governments?",
@@ -9689,7 +9694,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ambient",
+              "chant",
+              "ballad"
+            ]
           },
           "lyricsLines": [
             "FACE CODE",
@@ -9834,7 +9843,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "synthwave",
+              "industrial"
+            ]
           },
           "lyricsLines": [
             "Camera: live.",
@@ -9935,7 +9947,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "aggro",
+              "industrial",
+              "thrash"
+            ]
           },
           "lyricsLines": [
             "GOOD DOG // BAD MACHINE",
@@ -10075,7 +10091,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "chant",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "Brothers.",
@@ -10244,7 +10263,12 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "punk",
+              "aggro",
+              "thrash",
+              "rage"
+            ]
           },
           "lyricsLines": [
             "GRIND THE SYSTEM",
@@ -10408,7 +10432,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "glitch",
+              "spoken",
+              "chant"
+            ]
           },
           "lyricsLines": [
             "speak://",
@@ -17870,7 +17898,12 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "punk",
+              "aggro",
+              "thrash",
+              "rage"
+            ]
           },
           "lyricsLines": [
             "GRIND THE SYSTEM",
