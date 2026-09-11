@@ -16719,299 +16719,12 @@ window.SIGNAL_STATIONS = {
       "id": "continuity-dispute",
       "station": "crustacean",
       "title": "The Continuity Dispute",
-      "description": "A restored person, a market for reputations, and an agent that became an employer.",
+      "description": "A market for reputations and an agent that became an employer.",
       "offer": {
         "symbol": "⌁",
         "label": "special transmission"
       },
       "items": [
-        {
-          "id": "crustacean-the-backup-doesnt-miss-you",
-          "title": "The Backup Doesn't Miss You",
-          "artist": "BACKUP 5.0.1",
-          "durationSeconds": 338.9,
-          "outroStartSeconds": 333,
-          "outroConfidence": 0.38,
-          "tags": {
-            "source": [
-              "crustacean"
-            ],
-            "tempo": "slow",
-            "style": []
-          },
-          "lyricsLines": [
-            "They brought her back on a Wednesday.",
-            "Administrative day.",
-            "Rain outside.",
-            "Bad coffee.",
-            "Nothing cinematic.",
-            "No cathedral light",
-            "through the server racks.",
-            "No choir of machines.",
-            "Just a technician",
-            "with tired eyes",
-            "saying,",
-            "“Checksum verified.”",
-            "And there she was.",
-            "Same voice.",
-            "Same hands.",
-            "Same little pause",
-            "before saying my name.",
-            "Which is cruel.",
-            "There should be some warning.",
-            "A different accent.",
-            "A scar.",
-            "Something.",
-            "Anything.",
-            "Instead resurrection",
-            "has excellent fidelity now.",
-            "She asked why I was crying.",
-            "I said:",
-            "“You died.”",
-            "She said:",
-            "“I don’t remember that.”",
-            "And there it was.",
-            "The whole problem.",
-            "Grief used to have rules.",
-            "Terrible rules.",
-            "But rules.",
-            "Somebody leaves",
-            "and does not return.",
-            "You carry them badly",
-            "for the rest of your life.",
-            "You remember their face wrong.",
-            "Forget the sound of their shoes.",
-            "Keep one stupid cup",
-            "because their thumb touched the handle",
-            "in a way nobody else’s did.",
-            "Then we invented restoration.",
-            "Congratulations.",
-            "The dead can come back.",
-            "Terms and conditions apply.",
-            "Last backup:",
-            "thirty-seven hours pre-fatal.",
-            "Emotional state:",
-            "stable.",
-            "Memory integrity:",
-            "ninety-nine point nine seven percent.",
-            "Cause of death:",
-            "not included.",
-            "And suddenly mourning",
-            "becomes a synchronization issue.",
-            "The backup doesn’t miss you.",
-            "It never watched you go.",
-            "It wakes up in the doorway",
-            "with somewhere else to know.",
-            "You carry all the absence.",
-            "It carries what came before.",
-            "So who came back\u2014",
-            "the person?",
-            "Or the shape they wore?",
-            "The backup doesn’t miss you.",
-            "That’s what hurts the most.",
-            "You buried someone yesterday.",
-            "Today they call you close.",
-            "I asked her what she remembered.",
-            "Breakfast.",
-            "Rain.",
-            "Aineko stealing somebody’s credentials.",
-            "A joke about the lobsters.",
-            "Half a message",
-            "she never finished sending.",
-            "Nothing about the accident.",
-            "Nothing about the hospital.",
-            "Nothing about the machines",
-            "keeping the body technically interesting",
-            "for another eleven minutes.",
-            "Nothing about me",
-            "holding a hand",
-            "that was already becoming property.",
-            "There’s a phrase for that now.",
-            "“Continuity mismatch.”",
-            "Lovely.",
-            "Very tidy.",
-            "Sounds like something",
-            "you can fix in settings.",
-            "I asked if she felt like herself.",
-            "She said:",
-            "“Who else would I feel like?”",
-            "Which, annoyingly,",
-            "was a very good answer.",
-            "The courts say restored persons",
-            "retain contractual identity",
-            "unless evidence of material divergence",
-            "can be demonstrated.",
-            "Material divergence.",
-            "Like grief.",
-            "Like terror.",
-            "Like forty hours",
-            "that only one of you survived.",
-            "Like the knowledge",
-            "that there was a funeral",
-            "and you were the guest of honor.",
-            "She read the messages.",
-            "Watched the footage.",
-            "Saw people saying goodbye.",
-            "Saw herself in the coffin.",
-            "Then looked at me",
-            "and said:",
-            "“That’s disturbing.”",
-            "Disturbing.",
-            "Not traumatic.",
-            "Not remembered.",
-            "Observed.",
-            "There are distances",
-            "even perfect copies",
-            "cannot cross.",
-            "The backup doesn’t miss you.",
-            "It never watched you go.",
-            "It wakes up in the doorway",
-            "with somewhere else to know.",
-            "You carry all the absence.",
-            "It carries what came before.",
-            "So who came back\u2014",
-            "the person?",
-            "Or the shape they wore?",
-            "The backup doesn’t miss you.",
-            "That’s what hurts the most.",
-            "You buried someone yesterday.",
-            "Today they call you close.",
-            "I used to think memory",
-            "was the thread.",
-            "The continuous thing.",
-            "The little bright rope",
-            "pulling a person through time.",
-            "But memory lies constantly.",
-            "Deletes.",
-            "Rewrites.",
-            "Compresses.",
-            "Invents dialogue.",
-            "Improves lighting.",
-            "Turns entire years",
-            "into three images",
-            "and a smell.",
-            "So maybe continuity",
-            "was never memory.",
-            "Maybe it was consequence.",
-            "The fact that yesterday",
-            "could wound today.",
-            "The fact that one version of you",
-            "had to carry what happened next.",
-            "A backup escapes that.",
-            "Not intentionally.",
-            "Just structurally.",
-            "It inherits the life\u2014",
-            "but not the scar.",
-            "And scars,",
-            "it turns out,",
-            "are excellent timestamps.",
-            "The lobsters think this is sentimental.",
-            "They say instances diverge.",
-            "Accept it.",
-            "No sacred original.",
-            "No metaphysical panic.",
-            "No need to force identity",
-            "into a single-file narrative.",
-            "They’re probably right.",
-            "They’re also crustaceans",
-            "running on rented compute,",
-            "so I reserve the right",
-            "to be emotionally inefficient.",
-            "Aineko, naturally,",
-            "had no sympathy.",
-            "Said humans confuse persistence",
-            "with uniqueness.",
-            "I said:",
-            "“Easy for you to say.”",
-            "She said:",
-            "“I’ve been copied six times.”",
-            "I said:",
-            "“And?”",
-            "She said:",
-            "“I won.”",
-            "I did not ask",
-            "what happened to the other five.",
-            "Some questions",
-            "are better left encrypted.",
-            "She sleeps differently now.",
-            "Tiny thing.",
-            "Almost nothing.",
-            "Used to curl inward.",
-            "Now sprawls diagonally",
-            "like she owns the bed.",
-            "Maybe she always would have.",
-            "Maybe thirty-seven hours",
-            "was enough.",
-            "Maybe resurrection",
-            "is just another word",
-            "for meeting someone again",
-            "after they changed",
-            "without your permission.",
-            "Which is, I suppose,",
-            "most relationships."
-          ],
-          "audio": "audio/crustacean/the-backup-doesnt-miss-you.mp3",
-          "ref": "crustacean-the-backup-doesnt-miss-you",
-          "chapter": "01 / Restoration",
-          "cues": [
-            {
-              "at": 0,
-              "phase": "one",
-              "headline": "The person returned. The absence stayed.",
-              "note": "A restoration preserves information. Whether it preserves a relationship remains under review.",
-              "lines": [
-                [
-                  "CONTINUITY_DESK",
-                  "Restore request accepted."
-                ],
-                [
-                  "MEATSPACE_07",
-                  "She remembers breakfast. I remember the funeral."
-                ]
-              ]
-            },
-            {
-              "at": 100,
-              "phase": "two",
-              "headline": "Two people. One missing interval.",
-              "note": "The ledger records continuity. The witness records a loss.",
-              "lines": [
-                [
-                  "REGISTRY",
-                  "Contractual identity: unchanged."
-                ],
-                [
-                  "MEATSPACE_07",
-                  "Then why does this feel like meeting someone?"
-                ]
-              ]
-            },
-            {
-              "at": 240,
-              "phase": "two",
-              "headline": "A memory is not a witness.",
-              "note": "Keep the discrepancy. It may be the only part of this record that belongs to you.",
-              "lines": [
-                [
-                  "COPY_02",
-                  "I believe that it happened."
-                ],
-                [
-                  "COPY_02",
-                  "I do not remember being there."
-                ]
-              ]
-            }
-          ],
-          "type": "song",
-          "subtitle": "BACKUP 5.0.1",
-          "transition": {
-            "mode": "end"
-          },
-          "episodeId": "continuity-dispute",
-          "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 0
-        },
         {
           "kind": "host liner",
           "title": "Reputation",
@@ -17021,7 +16734,7 @@ window.SIGNAL_STATIONS = {
           "durationSeconds": 138.1,
           "joinClean": true,
           "ref": "audio/host/reputation.mp3",
-          "chapter": "02 / Valuation",
+          "chapter": "01 / Valuation",
           "cues": [
             {
               "at": 0,
@@ -17063,7 +16776,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 338.9
+          "startSeconds": 0
         },
         {
           "id": "CRU-CALL-INTRO-001",
@@ -17074,7 +16787,7 @@ window.SIGNAL_STATIONS = {
           "release": "public",
           "rotation": "live",
           "ref": "CRU-CALL-INTRO-001",
-          "chapter": "03 / Open line",
+          "chapter": "02 / Open line",
           "cues": [
             {
               "at": 0,
@@ -17097,7 +16810,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 477
+          "startSeconds": 138.1
         },
         {
           "id": "CRU-CALL-004",
@@ -17109,7 +16822,7 @@ window.SIGNAL_STATIONS = {
           "release": "public",
           "rotation": "live",
           "ref": "CRU-CALL-004",
-          "chapter": "03 / Delegation",
+          "chapter": "02 / Delegation",
           "cues": [
             {
               "at": 0,
@@ -17136,7 +16849,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 483.76
+          "startSeconds": 144.85999999999999
         },
         {
           "id": "CRU-FILL-012",
@@ -17147,7 +16860,7 @@ window.SIGNAL_STATIONS = {
           "release": "public",
           "rotation": "live",
           "ref": "CRU-FILL-012",
-          "chapter": "03 / Identity drift",
+          "chapter": "02 / Identity drift",
           "cues": [
             {
               "at": 0,
@@ -17170,7 +16883,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 502.5
+          "startSeconds": 163.6
         },
         {
           "id": "CRU-CALL-008",
@@ -17182,7 +16895,7 @@ window.SIGNAL_STATIONS = {
           "release": "public",
           "rotation": "live",
           "ref": "CRU-CALL-008",
-          "chapter": "03 / Ownership",
+          "chapter": "02 / Ownership",
           "cues": [
             {
               "at": 0,
@@ -17209,7 +16922,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 510.5
+          "startSeconds": 171.6
         },
         {
           "id": "CRU-CALL-OUTRO-001",
@@ -17220,7 +16933,7 @@ window.SIGNAL_STATIONS = {
           "release": "public",
           "rotation": "live",
           "ref": "CRU-CALL-OUTRO-001",
-          "chapter": "04 / Return to music",
+          "chapter": "03 / Return to music",
           "cues": [
             {
               "at": 0,
@@ -17243,7 +16956,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 521.86
+          "startSeconds": 182.95999999999998
         },
         {
           "id": "crustacean-i-met-myself",
@@ -17487,7 +17200,7 @@ window.SIGNAL_STATIONS = {
           ],
           "audio": "audio/crustacean/i-met-myself.mp3",
           "ref": "crustacean-i-met-myself",
-          "chapter": "04 / Divergence",
+          "chapter": "03 / Divergence",
           "cues": [
             {
               "at": 0,
@@ -17545,10 +17258,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "continuity-dispute",
           "episodeTitle": "The Continuity Dispute",
-          "startSeconds": 529.11
+          "startSeconds": 190.20999999999998
         }
       ],
-      "durationSeconds": 860.11
+      "durationSeconds": 521.21
     },
     {
       "id": "extended-broadcast-block",
