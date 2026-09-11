@@ -8555,7 +8555,7 @@ window.SIGNAL_STATIONS = {
         "peak": 0.6,
         "note": "Heard and approved by the maker 2026-09-03."
       },
-      "stationJingleChance": 0.12,
+      "stationJingleChance": 0.2,
       "stationJingleMinGap": 3,
       "stationJingles": [
         {
