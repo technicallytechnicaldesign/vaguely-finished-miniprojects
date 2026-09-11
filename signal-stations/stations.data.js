@@ -8759,12 +8759,6 @@ window.SIGNAL_STATIONS = {
         },
         {
           "kind": "street report",
-          "copy": "Kourier traffic is running absolutely feral on the lower grid tonight, three pileups already and it is not even prime time. If you're catching a ride, hang on tight and do not, under any circumstances, ask your driver to slow down.",
-          "audio": "audio/host/SNC-037.wav",
-          "durationSeconds": 12.9
-        },
-        {
-          "kind": "street report",
           "copy": "Looking at tonight's forecast: clear signal up top, heavy static down in the old fiber tunnels, and a real chance of somebody's uncle's daemon getting loose again before sunrise. Dress in layers. Bring a firewall.",
           "audio": "audio/host/SNC-038.wav",
           "durationSeconds": 12.4
@@ -8789,21 +8783,9 @@ window.SIGNAL_STATIONS = {
         },
         {
           "kind": "street report",
-          "copy": "We are getting unconfirmed reports that an entire bimbobox chain just face-planted somewhere out past the toll corridor. If your feed just went silent for a second, that's why, and no, it is not coming back up before your next track.",
-          "audio": "audio/host/SNC-042.wav",
-          "durationSeconds": 12.7
-        },
-        {
-          "kind": "street report",
           "copy": "Every Kourier on the grid tonight is apparently trying to beat the same thirty-minute clock at the same time, which is exactly as safe as it sounds. Watch the crosswalks. Watch the rooftops. Just watch, honestly.",
           "audio": "audio/host/SNC-043.wav",
           "durationSeconds": 11.9
-        },
-        {
-          "kind": "street report",
-          "copy": "Quick Street report before we keep moving: weather's ugly, the bimboboxes are dropping like flies, and the Kouriers are somehow both the fastest and most dangerous thing on the grid tonight. Standard Tuesday. Let's get back to it.",
-          "audio": "audio/host/SNC-044.wav",
-          "durationSeconds": 12.9
         },
         {
           "kind": "ad block intro",
@@ -8828,24 +8810,6 @@ window.SIGNAL_STATIONS = {
           "copy": "Quick word from the people who keep the lights and the loosh flowing.",
           "audio": "audio/host/SNC-048.wav",
           "durationSeconds": 4.3
-        },
-        {
-          "kind": "ad block outro",
-          "copy": "And we're back. No refunds, no regrets.",
-          "audio": "audio/host/SNC-049.wav",
-          "durationSeconds": 3.1
-        },
-        {
-          "kind": "ad block outro",
-          "copy": "That's the ad block. The Street resumes.",
-          "audio": "audio/host/SNC-050.wav",
-          "durationSeconds": 3.2
-        },
-        {
-          "kind": "ad block outro",
-          "copy": "Thanks for holding still for that. Music's back.",
-          "audio": "audio/host/SNC-051.wav",
-          "durationSeconds": 3.6
         },
         {
           "kind": "host liner",
@@ -9075,6 +9039,13 @@ window.SIGNAL_STATIONS = {
               "thrash"
             ]
           }
+        },
+        {
+          "kind": "ad block outro",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/back-to-the-music.wav",
+          "durationSeconds": 15.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript."
         }
       ],
       "networkFeed": [
@@ -18369,14 +18340,15 @@ window.SIGNAL_STATIONS = {
         },
         {
           "kind": "ad block outro",
-          "copy": "And we're back. No refunds, no regrets.",
-          "audio": "audio/host/SNC-049.wav",
-          "durationSeconds": 3.1,
-          "ref": "audio/host/SNC-049.wav",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/back-to-the-music.wav",
+          "durationSeconds": 15.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-11; audio has no embedded transcript.",
+          "ref": "audio/host/back-to-the-music.wav",
           "chapter": "04 / Sponsor block",
           "type": "ad block outro",
           "subtitle": "sushiK",
-          "title": "And we're back. No refunds, no regrets.",
+          "title": "[recorded host segment -- no transcript on file]",
           "transition": {
             "mode": "end"
           },
@@ -18561,10 +18533,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 797.8
+          "startSeconds": 810.1999999999999
         }
       ],
-      "durationSeconds": 1217.8
+      "durationSeconds": 1230.2
     }
   ]
 };
