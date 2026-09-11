@@ -3888,6 +3888,26 @@ window.SIGNAL_STATIONS = {
           "rotation": "live"
         },
         {
+          "id": "CRU-CALL-INTRO-021",
+          "kind": "call segment intro",
+          "copy": "[recorded call segment intro -- no transcript on file]",
+          "audio": "audio/host/caller-intro-01.wav",
+          "durationSeconds": 19.65,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; real recording (48kHz stereo), not Kokoro-generated, replacing/extending the synthesized CRU-CALL-INTRO pool.",
+          "release": "public",
+          "rotation": "live"
+        },
+        {
+          "id": "CRU-CALL-INTRO-022",
+          "kind": "call segment intro",
+          "copy": "[recorded call segment intro -- no transcript on file]",
+          "audio": "audio/host/caller-intro-02.wav",
+          "durationSeconds": 20,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; real recording (48kHz stereo), not Kokoro-generated, replacing/extending the synthesized CRU-CALL-INTRO pool.",
+          "release": "public",
+          "rotation": "live"
+        },
+        {
           "id": "CRU-CALL-OUTRO-001",
           "kind": "call segment outro",
           "copy": "Enough consensual cognition for one segment. Back to the music before somebody forms a committee.",
@@ -4064,6 +4084,26 @@ window.SIGNAL_STATIONS = {
           "copy": "That's enough talkback from the accelerating weird. Back to the music, we'll reopen the phonelines once reality finishes buffering.",
           "audio": "audio/callins/CRU-CALL-OUTRO-020.wav",
           "durationSeconds": 9.09,
+          "release": "public",
+          "rotation": "live"
+        },
+        {
+          "id": "CRU-CALL-OUTRO-021",
+          "kind": "call segment outro",
+          "copy": "[recorded call segment outro -- no transcript on file]",
+          "audio": "audio/host/caller-outro-01.wav",
+          "durationSeconds": 14,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; real recording (48kHz stereo), not Kokoro-generated, replacing/extending the synthesized CRU-CALL-OUTRO pool.",
+          "release": "public",
+          "rotation": "live"
+        },
+        {
+          "id": "CRU-CALL-OUTRO-022",
+          "kind": "call segment outro",
+          "copy": "[recorded call segment outro -- no transcript on file]",
+          "audio": "audio/host/caller-outro-02.wav",
+          "durationSeconds": 10.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; real recording (48kHz stereo), not Kokoro-generated, replacing/extending the synthesized CRU-CALL-OUTRO pool.",
           "release": "public",
           "rotation": "live"
         },
