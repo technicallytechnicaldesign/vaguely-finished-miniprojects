@@ -110,10 +110,15 @@
   // Songs always play out to their own real end (SIG-mobile-early-cutin, 2026-09-10): no
   // computed early cut-in over the outro anymore, after three straight sessions of that
   // mechanism misbehaving on mobile. Entering a segment is now a clean handoff, not a blend:
-  // whatever was playing stops fast, a short static "tuning" click plays, then the segment
-  // starts at full volume -- see STATIC_CLICK_S and StaticChannel.burst().
+  // whatever was playing stops fast, then the segment starts at full volume. The static
+  // "tuning" hiss-click (StaticChannel.burst()) originally played before EVERY spoken kind --
+  // ads, street reports, station IDs included -- which read wrong (maker feedback 2026-09-11:
+  // "remove the static hiss between the adverts, it's meant to be between callers when they
+  // come on the air"). It's now scoped to caller pickups only (see startCrossfade below);
+  // every other spoken kind gets a plain clean cut, no hiss.
   const SONG_DUCK_S = 0.6;        // fast fade-out of whatever was playing before a segment starts
-  const STATIC_CLICK_S = 0.18;    // hiss-click lead-in before a segment's own audio becomes audible
+  const CLEAN_CUT_S = 0.08;       // silent gap before a non-caller segment's audio becomes audible
+  const CALLER_STATIC_CLICK_S = 0.55; // longer, quieter hiss lead-in specifically for a caller pickup
   const FADE_S = 2.2;             // symmetric crossfade duration for entering a song (song -> song)
   // Kept short on purpose (was 1.6s -- SIG feedback 2026-09-05: the host was getting
   // drowned out because the incoming song/ad had already climbed most of the way to full
@@ -180,7 +185,7 @@
     // A short "tuning click" -- rises fast, holds, then settles back to whatever ambient
     // level was already playing (so it doesn't disturb the separate proximity/power-driven
     // setLevel() calls elsewhere). Used as the handoff into a segment now that segments no
-    // longer interrupt a song mid-play -- see STATIC_CLICK_S in the crossfade sequencer.
+    // longer interrupt a song mid-play -- see CALLER_STATIC_CLICK_S in the crossfade sequencer.
     burst(peak = 0.42, riseS = 0.03, holdS = 0.1, fallS = 0.22) {
       const gain = this.gain.gain;
       const now = this.ctx.currentTime;
@@ -1562,13 +1567,21 @@
     }
 
     let totalFadeS;
-    if (isSpokenKind(next.type)) {
-      // Clean handoff, not a blend (SIG-mobile-early-cutin, 2026-09-10): whatever was playing
-      // fades out fast, a short static "tuning" click plays over the gap, then the segment
-      // starts at full volume once the click settles. See STATIC_CLICK_S / StaticChannel.burst.
+    if (isCallIn(next.type) || isCallSegment(next.type)) {
+      // Caller pickup: the tuning hiss belongs here (someone getting patched through), not on
+      // every spoken kind. Longer and quieter than the old universal click, maker's ask
+      // 2026-09-11 -- reads as the line settling before the caller's actually audible, not an
+      // advert-style channel-change blip.
       fromDeck.fadeTo(0, state.ctx, SONG_DUCK_S);
-      state.staticChannel?.burst();
-      toDeck.scheduleCleanup(() => toDeck.fadeTo(1, state.ctx, 0.15), STATIC_CLICK_S * 1000);
+      state.staticChannel?.burst(0.24, 0.06, 0.35, 0.55);
+      toDeck.scheduleCleanup(() => toDeck.fadeTo(1, state.ctx, 0.15), CALLER_STATIC_CLICK_S * 1000);
+      totalFadeS = SONG_DUCK_S;
+    } else if (isSpokenKind(next.type)) {
+      // Clean handoff, not a blend (SIG-mobile-early-cutin, 2026-09-10): whatever was playing
+      // fades out fast, then the segment starts at full volume after a short silent gap --
+      // no hiss here, that's caller-only (see the branch above).
+      fromDeck.fadeTo(0, state.ctx, SONG_DUCK_S);
+      toDeck.scheduleCleanup(() => toDeck.fadeTo(1, state.ctx, 0.15), CLEAN_CUT_S * 1000);
       totalFadeS = SONG_DUCK_S;
     } else {
       fromDeck.fadeTo(0, state.ctx, FADE_S);

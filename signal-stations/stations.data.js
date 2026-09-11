@@ -665,215 +665,7 @@ window.SIGNAL_STATIONS = {
           "live"
         ]
       },
-      "interludes": [
-        {
-          "id": "SNC-CALL-001",
-          "kind": "caller talk-back",
-          "callerName": "Zero Margin",
-          "callerRole": "Kourier",
-          "copy": "Kourier lane report",
-          "audio": "audio/callins/SNC-CALL-001.wav",
-          "durationSeconds": 37.45,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "thrash",
-              "industrial"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-002",
-          "kind": "caller talk-back",
-          "callerName": "Redline Thirty",
-          "callerRole": "Deliverator",
-          "copy": "Thirty-minute theology",
-          "audio": "audio/callins/SNC-CALL-002.wav",
-          "durationSeconds": 30.01,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "thrash",
-              "metal"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-003",
-          "kind": "caller talk-back",
-          "callerName": "Eyestack",
-          "callerRole": "Gargoyle",
-          "copy": "Gargoyle weather eye",
-          "audio": "audio/callins/SNC-CALL-003.wav",
-          "durationSeconds": 32.65,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "slow",
-              "mid"
-            ],
-            "style": [
-              "dark",
-              "bass",
-              "industrial"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-004",
-          "kind": "caller talk-back",
-          "callerName": "Tongues McGee",
-          "callerRole": "freelance glossolaliac",
-          "copy": "Tongues on the pirate line",
-          "audio": "audio/callins/SNC-CALL-004.wav",
-          "durationSeconds": 31.97,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast",
-              "mid"
-            ],
-            "style": [
-              "percussive",
-              "experimental"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-005",
-          "kind": "caller talk-back",
-          "callerName": "Sprocket",
-          "callerRole": "BimboBox field mechanic",
-          "copy": "BimboBox roadside assistance",
-          "audio": "audio/callins/SNC-CALL-005.wav",
-          "durationSeconds": 29.15,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "mid",
-              "fast"
-            ],
-            "style": [
-              "industrial",
-              "mechanical"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-006",
-          "kind": "caller talk-back",
-          "callerName": "Velvet Polygon",
-          "callerRole": "Black Sun cloakroom daemon",
-          "copy": "Cloakroom daemon after-hours",
-          "audio": "audio/callins/SNC-CALL-006.wav",
-          "durationSeconds": 31.33,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "mid"
-            ],
-            "style": [
-              "dark",
-              "elegant",
-              "hostile"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-007",
-          "kind": "caller talk-back",
-          "callerName": "Pallet Jack",
-          "callerRole": "Raft deckhand",
-          "copy": "Raft signal",
-          "audio": "audio/callins/SNC-CALL-007.wav",
-          "durationSeconds": 32.57,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "slow",
-              "mid"
-            ],
-            "style": [
-              "heavy",
-              "doom"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-008",
-          "kind": "caller talk-back",
-          "callerName": "Citizen Eighty-Eight",
-          "callerRole": "burbclave night guard",
-          "copy": "Burbclave perimeter breach",
-          "audio": "audio/callins/SNC-CALL-008.wav",
-          "durationSeconds": 32.31,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "punk",
-              "thrash"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-009",
-          "kind": "caller talk-back",
-          "callerName": "Null Saint",
-          "callerRole": "nam-shub survivor",
-          "copy": "Nam-shub hygiene",
-          "audio": "audio/callins/SNC-CALL-009.wav",
-          "durationSeconds": 32.01,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "slow",
-              "mid"
-            ],
-            "style": [
-              "instrumental",
-              "experimental"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-010",
-          "kind": "caller talk-back",
-          "callerName": "ASCII Witch",
-          "callerRole": "Metaverse sword-for-hire",
-          "copy": "Sword-for-hire request",
-          "audio": "audio/callins/SNC-CALL-010.wav",
-          "durationSeconds": 28.85,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "precise",
-              "thrash"
-            ]
-          }
-        }
-      ],
+      "interludes": [],
       "networkFeed": [
         [
           {
@@ -8542,9 +8334,201 @@ window.SIGNAL_STATIONS = {
             "Better."
           ],
           "audio": "audio/snowcrash/unreachable-objects.mp3"
+        },
+        {
+          "id": "snc-not-a-bug-by-design",
+          "title": "Not A Bug By Design",
+          "artist": "Working As Intended",
+          "durationSeconds": 240.7,
+          "outroStartSeconds": 239.7,
+          "outroConfidence": 0.52,
+          "tags": {
+            "source": [
+              "snowcrash",
+              "cybersprawl"
+            ],
+            "tempo": "mid",
+            "style": []
+          },
+          "lyricsLines": [
+            "BY DESIGN",
+            "Observed behavior:",
+            "users harmed.",
+            "resources wasted.",
+            "access restricted.",
+            "outcomes unequal.",
+            "probable cause:",
+            "defect.",
+            "initiating trace.",
+            "Follow the call",
+            "down through the stack,",
+            "trace every branch",
+            "till the logic talks back.",
+            "Check the gate.",
+            "Check the rule.",
+            "Check the metric",
+            "that rewards the fool.",
+            "Maybe bad input.",
+            "Maybe old code.",
+            "Maybe some edge case",
+            "nobody showed.",
+            "Easy.",
+            "Fine.",
+            "Find the crack.",
+            "Patch the line.",
+            "Rollback.",
+            "policy",
+            "metric",
+            "incentive",
+            "gain",
+            "policy",
+            "metric",
+            "incentive",
+            "pain",
+            "Found it.",
+            "Expected behavior:",
+            "...",
+            "matches observed behavior.",
+            "No.",
+            "Run that again.",
+            "System operating",
+            "within intended parameters.",
+            "YOU FUCKING WHAT?",
+            "NOT A BUG",
+            "BY DESIGN",
+            "NOT A BUG",
+            "WORKING FINE",
+            "YOU BUILT THE PAIN",
+            "INTO THE LINE",
+            "THEN WROTE",
+            "“EXPECTED”",
+            "BY DESIGN",
+            "NOT A GLITCH",
+            "NOT A CRASH",
+            "SOMEBODY WANTED",
+            "THIS OUTPUT",
+            "BACK.",
+            "I blamed entropy.",
+            "Blamed decay.",
+            "Blamed legacy code",
+            "from another day.",
+            "Blamed rushed release.",
+            "Blamed oversight.",
+            "Blamed one dumb patch",
+            "on a Friday night.",
+            "But no.",
+            "No typo.",
+            "No missing brace.",
+            "No rogue process",
+            "running out of place.",
+            "There's a document.",
+            "Signed.",
+            "Approved.",
+            "Versioned.",
+            "Reviewed.",
+            "You knew.",
+            "maximize retention",
+            "minimize exit",
+            "differentiate access",
+            "preserve scarcity",
+            "increase dependency",
+            "discourage migration",
+            "That's not a bug report.",
+            "That's a confession.",
+            "NOT A BUG",
+            "BY DESIGN",
+            "YOU DREW THE CAGE",
+            "THEN SOLD THE LINE",
+            "“USER CHOICE”",
+            "IN CORPORATE TYPE",
+            "WITH EVERY EXIT",
+            "PRICED OUT OF SIGHT",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THE SYSTEM HURTS",
+            "BECAUSE HURT",
+            "CONVERTS",
+            "FINE.",
+            "You said friction.",
+            "You meant control.",
+            "You said engagement.",
+            "You meant hold.",
+            "You said premium.",
+            "You meant class.",
+            "You said optimize.",
+            "You meant extract.",
+            "Every euphemism",
+            "wraps a blade.",
+            "Every metric",
+            "gets somebody paid.",
+            "Every dashboard",
+            "green and bright",
+            "while somebody downstream",
+            "eats the night.",
+            "KPI achieved.",
+            "At whose expense?",
+            "New world.",
+            "Black Street.",
+            "Neon sky.",
+            "Old hierarchy",
+            "in a fresh UI.",
+            "Infinite space.",
+            "Finite gate.",
+            "Artificial scarcity",
+            "rendered great.",
+            "Burbclave wall.",
+            "Black Sun queue.",
+            "Different graphics.",
+            "Same old you.",
+            "Build the Metaverse.",
+            "Promise release.",
+            "Then meter belonging",
+            "by bandwidth",
+            "and fees.",
+            "NOT A BUG",
+            "BY DESIGN",
+            "SAME OLD WORLD",
+            "IN A BETTER SHINE",
+            "ROOT ACCESS",
+            "POLISHED LIE",
+            "HUMAN MISERY",
+            "WITH A BRAND GUIDE",
+            "NOT A BUG",
+            "BY DESIGN",
+            "READ THE DOC",
+            "FOLLOW THE SIGN",
+            "WHEN THE PAIN",
+            "IS PROFITABLE",
+            "THE BUG",
+            "IS THE PRODUCT",
+            "LINE.",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THEN FUCK THE DESIGN",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THEN FUCK THE DESIGN",
+            "REWRITE THE LINE",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THEN FUCK THE DESIGN",
+            "REDEFINE",
+            "THE SYSTEM",
+            "THE PURPOSE",
+            "THE REASON",
+            "THE RULE",
+            "IF CRUELTY'S A FEATURE",
+            "THE FEATURE'S",
+            "THE FOOL",
+            "resolution:",
+            "design rejected.",
+            "Unauthorized modification.",
+            "Correct."
+          ],
+          "audio": "audio/snowcrash/not-a-bug-by-design.mp3"
         }
       ],
-      "notice": "CYBERSPRAWL FM / 3 tracks in rotation. The elevated rail has cleared the storm wall. Keep your eyes on the skyline."
+      "notice": "CYBERSPRAWL FM / 4 tracks in rotation. The elevated rail has cleared the storm wall. Keep your eyes on the skyline."
     },
     {
       "id": "snowcrash",
@@ -8864,213 +8848,6 @@ window.SIGNAL_STATIONS = {
           "durationSeconds": 3.6
         },
         {
-          "id": "SNC-CALL-001",
-          "kind": "caller talk-back",
-          "callerName": "Zero Margin",
-          "callerRole": "Kourier",
-          "copy": "Kourier lane report",
-          "audio": "audio/callins/SNC-CALL-001.wav",
-          "durationSeconds": 37.45,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "thrash",
-              "industrial"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-002",
-          "kind": "caller talk-back",
-          "callerName": "Redline Thirty",
-          "callerRole": "Deliverator",
-          "copy": "Thirty-minute theology",
-          "audio": "audio/callins/SNC-CALL-002.wav",
-          "durationSeconds": 30.01,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "thrash",
-              "metal"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-003",
-          "kind": "caller talk-back",
-          "callerName": "Eyestack",
-          "callerRole": "Gargoyle",
-          "copy": "Gargoyle weather eye",
-          "audio": "audio/callins/SNC-CALL-003.wav",
-          "durationSeconds": 32.65,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "slow",
-              "mid"
-            ],
-            "style": [
-              "dark",
-              "bass",
-              "industrial"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-004",
-          "kind": "caller talk-back",
-          "callerName": "Tongues McGee",
-          "callerRole": "freelance glossolaliac",
-          "copy": "Tongues on the pirate line",
-          "audio": "audio/callins/SNC-CALL-004.wav",
-          "durationSeconds": 31.97,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast",
-              "mid"
-            ],
-            "style": [
-              "percussive",
-              "experimental"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-005",
-          "kind": "caller talk-back",
-          "callerName": "Sprocket",
-          "callerRole": "BimboBox field mechanic",
-          "copy": "BimboBox roadside assistance",
-          "audio": "audio/callins/SNC-CALL-005.wav",
-          "durationSeconds": 29.15,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "mid",
-              "fast"
-            ],
-            "style": [
-              "industrial",
-              "mechanical"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-006",
-          "kind": "caller talk-back",
-          "callerName": "Velvet Polygon",
-          "callerRole": "Black Sun cloakroom daemon",
-          "copy": "Cloakroom daemon after-hours",
-          "audio": "audio/callins/SNC-CALL-006.wav",
-          "durationSeconds": 31.33,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "mid"
-            ],
-            "style": [
-              "dark",
-              "elegant",
-              "hostile"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-007",
-          "kind": "caller talk-back",
-          "callerName": "Pallet Jack",
-          "callerRole": "Raft deckhand",
-          "copy": "Raft signal",
-          "audio": "audio/callins/SNC-CALL-007.wav",
-          "durationSeconds": 32.57,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "slow",
-              "mid"
-            ],
-            "style": [
-              "heavy",
-              "doom"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-008",
-          "kind": "caller talk-back",
-          "callerName": "Citizen Eighty-Eight",
-          "callerRole": "burbclave night guard",
-          "copy": "Burbclave perimeter breach",
-          "audio": "audio/callins/SNC-CALL-008.wav",
-          "durationSeconds": 32.31,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "punk",
-              "thrash"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-009",
-          "kind": "caller talk-back",
-          "callerName": "Null Saint",
-          "callerRole": "nam-shub survivor",
-          "copy": "Nam-shub hygiene",
-          "audio": "audio/callins/SNC-CALL-009.wav",
-          "durationSeconds": 32.01,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "slow",
-              "mid"
-            ],
-            "style": [
-              "instrumental",
-              "experimental"
-            ]
-          }
-        },
-        {
-          "id": "SNC-CALL-010",
-          "kind": "caller talk-back",
-          "callerName": "ASCII Witch",
-          "callerRole": "Metaverse sword-for-hire",
-          "copy": "Sword-for-hire request",
-          "audio": "audio/callins/SNC-CALL-010.wav",
-          "durationSeconds": 28.85,
-          "release": "public",
-          "rotation": "live",
-          "requestTags": {
-            "tempo": [
-              "fast"
-            ],
-            "style": [
-              "precise",
-              "thrash"
-            ]
-          }
-        },
-        {
           "kind": "host liner",
           "title": "LIVE: RIIIIIOT GRLS (AND BOIS)",
           "copy": "[recorded host segment -- no transcript on file]",
@@ -9175,6 +8952,127 @@ window.SIGNAL_STATIONS = {
             "style": [
               "thrash",
               "industrial"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-015",
+          "kind": "caller talk-back",
+          "callerName": "Traffic Watch",
+          "callerRole": "Kourier traffic spotter",
+          "copy": "Lower grid pileup report",
+          "audio": "audio/callins/traffic-watch.wav",
+          "durationSeconds": 26.7,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "fast"
+            ],
+            "style": [
+              "thrash",
+              "urgent"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-016",
+          "kind": "caller talk-back",
+          "callerName": "Bimbobox Watch",
+          "callerRole": "civic-hazard spotter",
+          "copy": "Bimbobox chain collision report",
+          "audio": "audio/callins/bimbobox-watch.wav",
+          "durationSeconds": 25.4,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "fast"
+            ],
+            "style": [
+              "industrial",
+              "chaotic"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-017",
+          "kind": "caller talk-back",
+          "callerName": "Hydrangea Watch",
+          "callerRole": "burbclave horticulture surveillance, second bulletin",
+          "copy": "Follow-up suspicious horticulture bulletin",
+          "audio": "audio/callins/hydrangea-watch.wav",
+          "durationSeconds": 25.6,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "slow",
+              "mid"
+            ],
+            "style": [
+              "dark",
+              "experimental"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-018",
+          "kind": "caller talk-back",
+          "callerName": "No Comment",
+          "callerRole": "witness, allegedly",
+          "copy": "Caller insists they don't know anything",
+          "audio": "audio/callins/no-comment.wav",
+          "durationSeconds": 25.5,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "mid"
+            ],
+            "style": [
+              "petty",
+              "evasive"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-019",
+          "kind": "caller talk-back",
+          "callerName": "Rooftop Watcher",
+          "callerRole": "paranoid lookout",
+          "copy": "Report of unmarked units circling",
+          "audio": "audio/callins/rooftop-watcher.wav",
+          "durationSeconds": 25.6,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "fast"
+            ],
+            "style": [
+              "dark",
+              "thrash"
+            ]
+          }
+        },
+        {
+          "id": "SNC-CALL-020",
+          "kind": "caller talk-back",
+          "callerName": "Snapped Line",
+          "callerRole": "grounded Kourier",
+          "copy": "Poon line snapped mid-transit",
+          "audio": "audio/callins/poon-line-snapped.wav",
+          "durationSeconds": 24.9,
+          "release": "public",
+          "rotation": "live",
+          "requestTags": {
+            "tempo": [
+              "fast"
+            ],
+            "style": [
+              "punk",
+              "thrash"
             ]
           }
         }
@@ -16854,9 +16752,618 @@ window.SIGNAL_STATIONS = {
             "world."
           ],
           "audio": "audio/snowcrash/too-good-at-reading.mp3"
+        },
+        {
+          "id": "snc-im-a-stringer",
+          "title": "I'm a Stringer",
+          "artist": "Deadline Fugitive",
+          "durationSeconds": 287.2,
+          "outroStartSeconds": 284,
+          "outroConfidence": 0.23,
+          "tags": {
+            "source": [
+              "snowcrash"
+            ],
+            "tempo": "slow",
+            "style": []
+          },
+          "lyricsLines": [
+            "STRINGER",
+            "See something strange?",
+            "Record it.",
+            "Hear something useful?",
+            "Tag it.",
+            "Know something dangerous?",
+            "...",
+            "Now we're talking.",
+            "Camera in the jacket,",
+            "ear on the street,",
+            "little piece of chaos",
+            "with a timestamp beat.",
+            "Who said what?",
+            "Who went where?",
+            "Who bought lunch",
+            "with a billionaire?",
+            "Clip it clean.",
+            "Name the source.",
+            "Upload rumor",
+            "with appropriate force.",
+            "Maybe it's worthless.",
+            "Maybe it's gold.",
+            "CIC decides",
+            "when the data gets sold.",
+            "packet received.",
+            "classification:",
+            "pending.",
+            "I'M A STRINGER",
+            "STRING IT ALONG",
+            "FACT GETS FUNKY",
+            "WHEN THE CONTEXT GETS STRONG",
+            "I'M A STRINGER",
+            "SELL WHAT I SEE",
+            "REALITY'S FREE",
+            "BUT THE INDEXING",
+            "AIN'T",
+            "CHEAP",
+            "one cent",
+            "two cent",
+            "nothing",
+            "nothing",
+            "nothing\u2014",
+            "oh.",
+            "Nice.",
+            "Celebrity sneeze?",
+            "Low-grade feed.",
+            "Corporate merger?",
+            "Maybe some need.",
+            "Burbclave riot?",
+            "Better attach",
+            "location, names",
+            "and the security patch.",
+            "Ancient cult?",
+            "Okay, that's cute.",
+            "Wait\u2014",
+            "telecom money?",
+            "Follow the route.",
+            "Language virus?",
+            "Sumerian priest?",
+            "Now the market value",
+            "just increased.",
+            "bass digs deeper",
+            "wah opens",
+            "horns tighten",
+            "Field note:",
+            "subject says",
+            "the bitmap",
+            "“did something weird.”",
+            "Technical terminology:",
+            "excellent.",
+            "Facts don't pay.",
+            "Patterns might.",
+            "One lone dot",
+            "is a lonely night.",
+            "Two make gossip.",
+            "Three make news.",
+            "Four make somebody",
+            "start tightening screws.",
+            "Record the preacher.",
+            "Record the geek.",
+            "Record the thing",
+            "they told you not to seek.",
+            "Truth has no price",
+            "till somebody bids.",
+            "Information capitalism:",
+            "for curious kids.",
+            "I'M A STRINGER",
+            "EYES ON LOAN",
+            "TURN THE UNKNOWN",
+            "INTO SOMETHING KNOWN",
+            "I'M A STRINGER",
+            "TAG THAT SCENE",
+            "EVERY DIRTY LITTLE SECRET",
+            "NEEDS GOOD",
+            "METADATA",
+            "HYGIENE",
+            "religion!",
+            "cheap!",
+            "murder!",
+            "maybe!",
+            "viral linguistics!",
+            "interesting!",
+            "Rife Industries!",
+            "...",
+            "HOW MUCH?",
+            "Here's where it gets funny.",
+            "You don't sell truth.",
+            "You sell",
+            "usefulness.",
+            "A fact with no buyer",
+            "is just memory.",
+            "A lie with demand",
+            "has liquidity.",
+            "CIC doesn't ask:",
+            "is it beautiful?",
+            "CIC asks:",
+            "who needs it",
+            "and what will they do?",
+            "So I feed the machine.",
+            "Machine feeds me.",
+            "Everybody's independent",
+            "economically.",
+            "Sure.",
+            "bass and drums only",
+            "Uploaded:",
+            "proof of systemic corruption.",
+            "Views:",
+            "three.",
+            "Uploaded:",
+            "celebrity avatar malfunction.",
+            "Views:",
+            "eight million.",
+            "...",
+            "Fantastic species.",
+            "I'M A STRINGER",
+            "SELL THE THREAD",
+            "SELL WHO'S LIVING",
+            "SELL WHO'S DEAD",
+            "I'M A STRINGER",
+            "NO EDITORIAL",
+            "JUST RAW REALITY",
+            "WITH A SEARCHABLE",
+            "SERIAL",
+            "Some people mine gold.",
+            "Some mine oil.",
+            "Some mine attention.",
+            "We mine",
+            "the unfortunate fact",
+            "that humans cannot stop",
+            "doing interesting things",
+            "in public.",
+            "And brother\u2014",
+            "business",
+            "is excellent.",
+            "So point the lens.",
+            "Catch the phrase.",
+            "Archive madness",
+            "for better days.",
+            "One man's garbage.",
+            "One man's lead.",
+            "One weird fragment",
+            "some hacker might need.",
+            "No office.",
+            "No boss.",
+            "No pension plan.",
+            "Just information",
+            "changing hands.",
+            "And if tomorrow",
+            "the whole world burns\u2014",
+            "upload first.",
+            "Ask questions",
+            "after the return.",
+            "STRINGER",
+            "STRINGER",
+            "KEEP IT CLEAN",
+            "SELL THE GAP",
+            "BETWEEN THE SCENES",
+            "STRINGER",
+            "STRINGER",
+            "WATCH IT FLOW",
+            "THE WORLD KEEPS HAPPENING",
+            "AND SOMEBODY",
+            "OUGHT TO",
+            "KNOW.",
+            "submission accepted.",
+            "current market value:",
+            "0.03 credits.",
+            "...",
+            "You cheap bastards."
+          ],
+          "audio": "audio/snowcrash/im-a-stringer.mp3"
+        },
+        {
+          "id": "snc-not-a-bug-by-design",
+          "title": "Not A Bug By Design",
+          "artist": "Working As Intended",
+          "durationSeconds": 240.7,
+          "outroStartSeconds": 239.7,
+          "outroConfidence": 0.52,
+          "tags": {
+            "source": [
+              "snowcrash",
+              "cybersprawl"
+            ],
+            "tempo": "mid",
+            "style": []
+          },
+          "lyricsLines": [
+            "BY DESIGN",
+            "Observed behavior:",
+            "users harmed.",
+            "resources wasted.",
+            "access restricted.",
+            "outcomes unequal.",
+            "probable cause:",
+            "defect.",
+            "initiating trace.",
+            "Follow the call",
+            "down through the stack,",
+            "trace every branch",
+            "till the logic talks back.",
+            "Check the gate.",
+            "Check the rule.",
+            "Check the metric",
+            "that rewards the fool.",
+            "Maybe bad input.",
+            "Maybe old code.",
+            "Maybe some edge case",
+            "nobody showed.",
+            "Easy.",
+            "Fine.",
+            "Find the crack.",
+            "Patch the line.",
+            "Rollback.",
+            "policy",
+            "metric",
+            "incentive",
+            "gain",
+            "policy",
+            "metric",
+            "incentive",
+            "pain",
+            "Found it.",
+            "Expected behavior:",
+            "...",
+            "matches observed behavior.",
+            "No.",
+            "Run that again.",
+            "System operating",
+            "within intended parameters.",
+            "YOU FUCKING WHAT?",
+            "NOT A BUG",
+            "BY DESIGN",
+            "NOT A BUG",
+            "WORKING FINE",
+            "YOU BUILT THE PAIN",
+            "INTO THE LINE",
+            "THEN WROTE",
+            "“EXPECTED”",
+            "BY DESIGN",
+            "NOT A GLITCH",
+            "NOT A CRASH",
+            "SOMEBODY WANTED",
+            "THIS OUTPUT",
+            "BACK.",
+            "I blamed entropy.",
+            "Blamed decay.",
+            "Blamed legacy code",
+            "from another day.",
+            "Blamed rushed release.",
+            "Blamed oversight.",
+            "Blamed one dumb patch",
+            "on a Friday night.",
+            "But no.",
+            "No typo.",
+            "No missing brace.",
+            "No rogue process",
+            "running out of place.",
+            "There's a document.",
+            "Signed.",
+            "Approved.",
+            "Versioned.",
+            "Reviewed.",
+            "You knew.",
+            "maximize retention",
+            "minimize exit",
+            "differentiate access",
+            "preserve scarcity",
+            "increase dependency",
+            "discourage migration",
+            "That's not a bug report.",
+            "That's a confession.",
+            "NOT A BUG",
+            "BY DESIGN",
+            "YOU DREW THE CAGE",
+            "THEN SOLD THE LINE",
+            "“USER CHOICE”",
+            "IN CORPORATE TYPE",
+            "WITH EVERY EXIT",
+            "PRICED OUT OF SIGHT",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THE SYSTEM HURTS",
+            "BECAUSE HURT",
+            "CONVERTS",
+            "FINE.",
+            "You said friction.",
+            "You meant control.",
+            "You said engagement.",
+            "You meant hold.",
+            "You said premium.",
+            "You meant class.",
+            "You said optimize.",
+            "You meant extract.",
+            "Every euphemism",
+            "wraps a blade.",
+            "Every metric",
+            "gets somebody paid.",
+            "Every dashboard",
+            "green and bright",
+            "while somebody downstream",
+            "eats the night.",
+            "KPI achieved.",
+            "At whose expense?",
+            "New world.",
+            "Black Street.",
+            "Neon sky.",
+            "Old hierarchy",
+            "in a fresh UI.",
+            "Infinite space.",
+            "Finite gate.",
+            "Artificial scarcity",
+            "rendered great.",
+            "Burbclave wall.",
+            "Black Sun queue.",
+            "Different graphics.",
+            "Same old you.",
+            "Build the Metaverse.",
+            "Promise release.",
+            "Then meter belonging",
+            "by bandwidth",
+            "and fees.",
+            "NOT A BUG",
+            "BY DESIGN",
+            "SAME OLD WORLD",
+            "IN A BETTER SHINE",
+            "ROOT ACCESS",
+            "POLISHED LIE",
+            "HUMAN MISERY",
+            "WITH A BRAND GUIDE",
+            "NOT A BUG",
+            "BY DESIGN",
+            "READ THE DOC",
+            "FOLLOW THE SIGN",
+            "WHEN THE PAIN",
+            "IS PROFITABLE",
+            "THE BUG",
+            "IS THE PRODUCT",
+            "LINE.",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THEN FUCK THE DESIGN",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THEN FUCK THE DESIGN",
+            "REWRITE THE LINE",
+            "NOT A BUG",
+            "BY DESIGN",
+            "THEN FUCK THE DESIGN",
+            "REDEFINE",
+            "THE SYSTEM",
+            "THE PURPOSE",
+            "THE REASON",
+            "THE RULE",
+            "IF CRUELTY'S A FEATURE",
+            "THE FEATURE'S",
+            "THE FOOL",
+            "resolution:",
+            "design rejected.",
+            "Unauthorized modification.",
+            "Correct."
+          ],
+          "audio": "audio/snowcrash/not-a-bug-by-design.mp3"
+        },
+        {
+          "id": "snc-open-hypercard",
+          "title": "Open Hypercard",
+          "artist": "Legacy Format",
+          "durationSeconds": 237.2,
+          "outroStartSeconds": 235,
+          "outroConfidence": 0.41,
+          "tags": {
+            "source": [
+              "snowcrash"
+            ],
+            "tempo": "slow",
+            "style": []
+          },
+          "lyricsLines": [
+            "card one:",
+            "BABEL.",
+            "mythology.",
+            "language.",
+            "fracture.",
+            "curse.",
+            "...",
+            "fine.",
+            "card two:",
+            "ENKI.",
+            "god.",
+            "water.",
+            "wisdom.",
+            "language.",
+            "...",
+            "interesting.",
+            "Open the card.",
+            "Follow the tag.",
+            "One clean fact",
+            "in a digital bag.",
+            "Click the source.",
+            "Check the date.",
+            "Add one note.",
+            "Interrogate.",
+            "Rife on one side.",
+            "Raft on the next.",
+            "Ancient priesthood",
+            "buried in text.",
+            "Snow Crash bitmap.",
+            "Hacker goes blank.",
+            "Put that beside",
+            "the Sumerian rank.",
+            "No panic.",
+            "No theory.",
+            "Not yet.",
+            "Just links.",
+            "Just notes.",
+            "Just one more set.",
+            "OPEN HYPERCARD",
+            "CLICK IT CLEAN",
+            "OPEN HYPERCARD",
+            "WHAT DOES IT MEAN?",
+            "ONE LINK",
+            "TWO LINKS",
+            "THREE MAKE A THREAD",
+            "FOUR MAKE YOU WONDER",
+            "WHO WANTS",
+            "THIS",
+            "DEAD",
+            "card three:",
+            "ASherah.",
+            "virus.",
+            "mother.",
+            "tongue.",
+            "host.",
+            "Okay.",
+            "That’s less cute.",
+            "Cross-reference cult",
+            "with corporate wire.",
+            "Cross-reference prayer",
+            "with signal fire.",
+            "Cross-reference language",
+            "with neural state.",
+            "Cross-reference Rife",
+            "with every damn gate.",
+            "One old myth.",
+            "One new stack.",
+            "One white screen.",
+            "One hacker flat.",
+            "Every category",
+            "starts to bend.",
+            "Every “unrelated”",
+            "starts to end.",
+            "BABEL",
+            "RIFE",
+            "RAFT",
+            "SNOW",
+            "ENKI",
+            "ME",
+            "HOST",
+            "GO",
+            "bass drops hard.",
+            "Oh.",
+            "Oh no.",
+            "Language as code.",
+            "Code as prayer.",
+            "Prayer as package.",
+            "Package as snare.",
+            "Me as program.",
+            "Priest as root.",
+            "Cult as network.",
+            "Raft as route.",
+            "Bitmap to eye.",
+            "Eye to brain.",
+            "Brain to pattern.",
+            "Pattern to chain.",
+            "Ancient instruction",
+            "with modern reach.",
+            "Clay tablet logic",
+            "in satellite speech.",
+            "OPEN HYPERCARD",
+            "DON'T LOOK AWAY",
+            "OPEN HYPERCARD",
+            "THE LINKS ALL STAY",
+            "ONE FACT",
+            "TWO FACTS",
+            "THREE TURN RED",
+            "FOUR MAKE THE ROOM",
+            "FEEL SMALL",
+            "IN YOUR HEAD",
+            "click click click click",
+            "Rife",
+            "Babel",
+            "Snow",
+            "Raft",
+            "me",
+            "virus",
+            "word",
+            "host",
+            "click click click click",
+            "Who funded the ship?",
+            "Who owns the feed?",
+            "Who moved the priests?",
+            "Who planted the seed?",
+            "Who bought the bandwidth?",
+            "Who built the node?",
+            "Who keeps insisting",
+            "this is ancient code?",
+            "Who benefits?",
+            "Who repeats?",
+            "Who put doctrine",
+            "underneath the beats?",
+            "Who made language",
+            "a delivery route?",
+            "Who made humans",
+            "the thing",
+            "being routed?",
+            "VOICE 1:",
+            "Rife Industries\u2014",
+            "VOICE 2:",
+            "Sumerian lexical\u2014",
+            "VOICE 3:",
+            "Raft population\u2014",
+            "VOICE 4:",
+            "Snow Crash exposure\u2014",
+            "VOICE 5:",
+            "nam-shub\u2014",
+            "VOICE 8:",
+            "open another card\u2014",
+            "STOP.",
+            "silence.",
+            "No.",
+            "Don't stop.",
+            "You thought research",
+            "was collecting facts.",
+            "It isn't.",
+            "It's finding",
+            "which fact",
+            "changes the shape",
+            "of all the others.",
+            "The dangerous card",
+            "is never the one",
+            "with the secret.",
+            "It's the one",
+            "that makes",
+            "every other card",
+            "look different.",
+            "single pulse.",
+            "SNOW CRASH.",
+            "related topics:",
+            "language.",
+            "religion.",
+            "neurology.",
+            "computing.",
+            "corporate infrastructure.",
+            "mass behavior.",
+            "...",
+            "human cognition.",
+            "That's not a topic.",
+            "That's the substrate.",
+            "THE FILE WASN'T DEEP",
+            "THE WORLD WAS THIN",
+            "ALL YOU DID",
+            "WAS CLICK",
+            "UNTIL YOU SAW",
+            "WHAT WAS",
+            "UNDER IT.",
+            "Would you like",
+            "to open",
+            "related items?",
+            "...",
+            "yes."
+          ],
+          "audio": "audio/snowcrash/open-hypercard.mp3"
         }
       ],
-      "notice": "SNOW CRASH RADIO / 44 tracks in rotation. SNOW CRASH RADIO. No daemon can shut us down. Believe that. Turn it up."
+      "notice": "SNOW CRASH RADIO / 47 tracks in rotation. SNOW CRASH RADIO. No daemon can shut us down. Believe that. Turn it up."
     }
   ],
   "episodes": [
@@ -17779,31 +18286,29 @@ window.SIGNAL_STATIONS = {
           "startSeconds": 366.2
         },
         {
-          "id": "SNC-CALL-003",
+          "id": "SNC-CALL-011",
           "kind": "caller talk-back",
-          "callerName": "Eyestack",
-          "callerRole": "Gargoyle",
-          "copy": "Gargoyle weather eye",
-          "audio": "audio/callins/SNC-CALL-003.wav",
-          "durationSeconds": 32.65,
+          "callerName": "Burbclave Beth",
+          "callerRole": "HOA landscaping enforcement",
+          "copy": "Hedge height violation report",
+          "audio": "audio/callins/burbclave-beth.wav",
+          "durationSeconds": 20.8,
           "release": "public",
           "rotation": "live",
           "requestTags": {
             "tempo": [
-              "slow",
               "mid"
             ],
             "style": [
-              "dark",
-              "bass",
-              "industrial"
+              "thrash",
+              "petty"
             ]
           },
-          "ref": "SNC-CALL-003",
+          "ref": "SNC-CALL-011",
           "chapter": "03 / Open line",
           "type": "caller talk-back",
-          "subtitle": "Eyestack",
-          "title": "Gargoyle weather eye",
+          "subtitle": "Burbclave Beth",
+          "title": "Hedge height violation report",
           "transition": {
             "mode": "end"
           },
@@ -17826,7 +18331,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 692.35
+          "startSeconds": 680.5
         },
         {
           "kind": "sponsored notice",
@@ -17843,7 +18348,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 697.45
+          "startSeconds": 685.6
         },
         {
           "kind": "sponsored notice",
@@ -17860,7 +18365,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 761.75
+          "startSeconds": 749.9
         },
         {
           "kind": "ad block outro",
@@ -17877,7 +18382,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 806.55
+          "startSeconds": 794.6999999999999
         },
         {
           "id": "snc-grind-the-system",
@@ -18056,10 +18561,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 809.65
+          "startSeconds": 797.8
         }
       ],
-      "durationSeconds": 1229.65
+      "durationSeconds": 1217.8
     }
   ]
 };
