@@ -317,7 +317,8 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.28,
           "tags": {
             "source": [
-              "adhoc"
+              "adhoc",
+              "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "slow",
             "style": []
@@ -395,7 +396,8 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.15,
           "tags": {
             "source": [
-              "adhoc"
+              "adhoc",
+              "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "slow",
             "style": []
@@ -461,7 +463,8 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.28,
           "tags": {
             "source": [
-              "adhoc"
+              "adhoc",
+              "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "fast",
             "style": []
@@ -546,7 +549,8 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.32,
           "tags": {
             "source": [
-              "adhoc"
+              "adhoc",
+              "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "fast",
             "style": []
@@ -4591,10 +4595,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.32,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "anthem",
+              "edm"
+            ]
           },
           "lyricsLines": [
             "I woke up with the market already awake,",
@@ -4787,10 +4795,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.35,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ballad",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "I met myself last Tuesday.",
@@ -5029,10 +5041,15 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.38,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ballad",
+              "ambient",
+              "chill"
+            ]
           },
           "lyricsLines": [
             "They brought her back on a Wednesday.",
@@ -5256,10 +5273,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.4,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "edm"
+            ]
           },
           "lyricsLines": [
             "They told us scarcity was over.",
@@ -5500,10 +5520,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.33,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "ambient",
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "Something’s wrong.",
@@ -5711,10 +5735,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.18,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "edm"
+            ]
           },
           "audio": "audio/crustacean/little-red-lobster-knows-contract-law.mp3"
         },
@@ -5727,10 +5754,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.37,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "edm"
+            ]
           },
           "lyricsLines": [
             "Hello, hello.",
@@ -5946,10 +5976,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.38,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "edm",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "We spent a very long time",
@@ -6164,10 +6198,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.35,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "chill"
+            ]
           },
           "lyricsLines": [
             "We spent a very long time",
@@ -6382,10 +6419,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.31,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "chill"
+            ]
           },
           "lyricsLines": [
             "Something’s wrong.",
@@ -6593,10 +6633,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.33,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "chill"
+            ]
           },
           "lyricsLines": [
             "I don’t use money.",
@@ -6825,10 +6868,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.32,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ballad",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "Good kitty.",
@@ -7040,10 +7087,13 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.47,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "edm"
+            ]
           },
           "lyricsLines": [
             "I don’t use money.",
@@ -7271,10 +7321,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.28,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "frantic",
-            "style": []
+            "style": [
+              "ballad",
+              "chill"
+            ]
           },
           "lyricsLines": [
             "By the time you hear this,",
@@ -16967,10 +17021,14 @@ window.SIGNAL_STATIONS = {
           "outroConfidence": 0.35,
           "tags": {
             "source": [
-              "crustacean"
+              "crustacean",
+              "accelerando"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "ballad",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "I met myself last Tuesday.",
