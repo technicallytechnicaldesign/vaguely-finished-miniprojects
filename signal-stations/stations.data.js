@@ -8388,7 +8388,11 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "edm",
+              "glitch",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "BY DESIGN",
@@ -16780,7 +16784,10 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chill",
+              "synthwave"
+            ]
           },
           "lyricsLines": [
             "STRINGER",
@@ -16988,7 +16995,11 @@ window.SIGNAL_STATIONS = {
               "cybersprawl"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "edm",
+              "glitch",
+              "anthem"
+            ]
           },
           "lyricsLines": [
             "BY DESIGN",
@@ -17179,7 +17190,11 @@ window.SIGNAL_STATIONS = {
               "snowcrash"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "chill",
+              "synthwave",
+              "weird-pop"
+            ]
           },
           "lyricsLines": [
             "card one:",
