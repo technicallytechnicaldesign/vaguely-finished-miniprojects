@@ -17974,7 +17974,7 @@ window.SIGNAL_STATIONS = {
           ],
           "type": "call segment intro",
           "subtitle": "Dr. Aldous Krill",
-          "title": "Let's see what AINEKO dragged through the phonelines tonight. Caller, y…",
+          "title": "Open line / connection",
           "transition": {
             "mode": "end"
           },
@@ -18013,7 +18013,7 @@ window.SIGNAL_STATIONS = {
           ],
           "type": "caller talk-back",
           "subtitle": "Caller Four",
-          "title": "Partial Power of Attorney",
+          "title": "Caller Talk-Back",
           "transition": {
             "mode": "end"
           },
@@ -18047,7 +18047,7 @@ window.SIGNAL_STATIONS = {
           ],
           "type": "call segment filler",
           "subtitle": "Dr. Aldous Krill",
-          "title": "Ah. Identity drift, inheritance conflict, and an emotionally complicate…",
+          "title": "Call Segment Filler",
           "transition": {
             "mode": "end"
           },
@@ -18086,7 +18086,7 @@ window.SIGNAL_STATIONS = {
           ],
           "type": "caller talk-back",
           "subtitle": "Caller Eight",
-          "title": "Who Owns Who",
+          "title": "Caller Talk-Back",
           "transition": {
             "mode": "end"
           },
@@ -18120,7 +18120,7 @@ window.SIGNAL_STATIONS = {
           ],
           "type": "call segment outro",
           "subtitle": "Dr. Aldous Krill",
-          "title": "Enough consensual cognition for one segment. Back to the music before s…",
+          "title": "Back to the music",
           "transition": {
             "mode": "end"
           },
@@ -18846,7 +18846,7 @@ window.SIGNAL_STATIONS = {
           "chapter": "03 / Open line",
           "type": "caller talk-back",
           "subtitle": "Burbclave Beth",
-          "title": "Hedge height violation report",
+          "title": "Caller Talk-Back",
           "transition": {
             "mode": "end"
           },
@@ -18881,7 +18881,7 @@ window.SIGNAL_STATIONS = {
           "chapter": "04 / Sponsor block",
           "type": "sponsored notice",
           "subtitle": "sushiK",
-          "title": "Public-service warning against unlicensed linguistic material, unfamili…",
+          "title": "Sponsored Notice",
           "transition": {
             "mode": "end"
           },
@@ -18898,7 +18898,7 @@ window.SIGNAL_STATIONS = {
           "chapter": "04 / Sponsor block",
           "type": "sponsored notice",
           "subtitle": "sushiK",
-          "title": "Metaverse avatar-upgrade ad: premium facial architectures, licensed cel…",
+          "title": "Sponsored Notice",
           "transition": {
             "mode": "end"
           },
