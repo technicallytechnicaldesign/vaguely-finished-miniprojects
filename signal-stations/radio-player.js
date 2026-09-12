@@ -1218,6 +1218,32 @@
     if (image) { image.removeAttribute('src'); image.alt = ''; }
   }
 
+  // SIG-0601: songs.json tags.style -> which of the three song panels to show. See the long
+  // comment inline at the song branch below for the reasoning behind each bucket.
+  const SONG_VARIANT_HEAD = ['chant', 'spoken', 'ballad'];
+  const SONG_VARIANT_AD = ['aggro', 'rage', 'industrial', 'punk', 'thrash', 'metal', 'hardstyle'];
+  function songVisualVariant(styleTags) {
+    const tags = new Set((styleTags || []).map((t) => String(t).toLowerCase()));
+    if (SONG_VARIANT_HEAD.some((t) => tags.has(t))) return 'head';
+    if (SONG_VARIANT_AD.some((t) => tags.has(t))) return 'ad';
+    return 'ticker';
+  }
+
+  // Short barked hook words for the "ad" song variant, pulled from the song's own lyrics so the
+  // marquee reads as the track glitching, not a generic house ad. Falls back to the title split
+  // into words if there are no lyric lines at all.
+  function songAdHooks(lines, title) {
+    const words = (lines.length ? lines : [title || 'SIGNAL LOST'])
+      .flatMap((line) => String(line).split(/\s+/).filter(Boolean))
+      .filter((w) => w.length >= 3 && w.length <= 12);
+    const pool = words.length ? words : ['SIGNAL', 'LOST'];
+    const picked = [];
+    for (let i = 0; i < 5; i += 1) {
+      picked.push(pool[Math.floor(Math.random() * pool.length)].toUpperCase());
+    }
+    return picked;
+  }
+
   // The identity panel's left column: a mode-reactive glitch visual with spoken-head,
   // ad-marquee, and lyric treatments. Song visuals combine the real rolling lyric pool
   // with deliberately placeholder programmer-art objects until track tags can select them.
@@ -1242,8 +1268,23 @@
       // each line still spawned in order and roughly where it falls in the song's own timeline
       // (tickLyricTicker/onDeckTimeUpdate), but the earliest alive line gets pushed out to make
       // room the moment a new one arrives, not left to expire on its own. Falls back to just the
-      // title for tracks with no lyrics. A per-song-type effect vocabulary (tagging different
-      // treatments to different kinds of songs) is a good next step, logged rather than built here.
+      // title for tracks with no lyrics.
+      //
+      // SIG-0601 (2026-09-12): per-song-type effect vocabulary on top of that pool treatment.
+      // songVisualVariant() reads songs.json's tags.style (mood/genre, defined with the maker
+      // 2026-09-11) and picks one of three panels instead of always the lyric pool:
+      //   - "head"   chant/spoken/ballad -- vocal-forward, one line at a time reads better than
+      //              a crowded field, so it reuses the old round "glitch-head" blob (the
+      //              pre-2026-09-11 host idle spinner, orphaned in CSS since host modes moved to
+      //              live-object art -- revived here rather than left dead).
+      //   - "ad"     aggro/rage/industrial/punk/thrash/metal/hardstyle -- blunt-force genres get
+      //              the barked glitch-marquee (same mechanism as the sponsored-notice treatment
+      //              a few lines up) fed the song's own lyric hooks instead of fixed ad copy.
+      //   - "ticker" everything else (edm/synthwave/dance/glitch/anthem/pop/weird-pop/ambient/
+      //              chill) and any untagged song -- the existing rolling pool, unchanged, stays
+      //              the default so nothing regresses for songs with style: [] still to fill in.
+      // Untested live; SIG-1519 tracks the maker's confirm pass.
+      const variant = songVisualVariant(item && item.tags && item.tags.style);
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
       const isCrustacean = state.station && state.station.id === 'crustacean';
       const isSnowCrash = state.station && state.station.id === 'snowcrash';
@@ -1258,8 +1299,21 @@
             : isCybersprawl
               ? '<div class="lyric-art lyric-art-cybersprawl" aria-hidden="true"><div class="station-midground mid-cybersprawl"><img src="assets/objects/cybersprawl-daemon-rage-v2.png" alt=""></div></div>'
               : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
-      el.innerHTML = `<div class="glitch-song"><div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
+      const viz = `<div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>`;
       const lines = (item && item.lyricsLines) || [];
+      if (variant === 'head') {
+        state.lyricTicker = null;
+        const label = (item && item.title) ? item.title.toUpperCase() : 'ON AIR';
+        el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-host" style="z-index:4"><div class="glitch-head"></div><span class="glitch-tag" data-text="${label}">${label}</span></div></div>`;
+        return;
+      }
+      if (variant === 'ad') {
+        state.lyricTicker = null;
+        const hooks = songAdHooks(lines, item && item.title);
+        el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-ad" style="z-index:4">${hooks.map((w) => `<i>${w}</i>`).join('')}</div></div>`;
+        return;
+      }
+      el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
       const poolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : isAfterhuman ? 10 + Math.floor(Math.random() * 5) : isCybersprawl ? 18 + Math.floor(Math.random() * 6) : 13 + Math.floor(Math.random() * 9);
       const ticker = { item, lastIndex: -1, poolSize, pool: [] };
       state.lyricTicker = ticker;
