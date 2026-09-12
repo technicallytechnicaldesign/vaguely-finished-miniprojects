@@ -419,29 +419,38 @@
     'var(--font-head)', 'var(--font-lyric-a)', 'var(--font-lyric-b)', 'var(--font-lyric-c)', 'var(--font-lyric-d)',
     'var(--font-lyric-e)', 'var(--font-lyric-f)', 'var(--font-lyric-g)', 'var(--font-lyric-h)', 'var(--font-lyric-i)', 'var(--font-lyric-j)'
   ];
+  // SIG-1519: the "chaos" fonts pool for punk/aggro/ballad tags -- same wild display-font set,
+  // minus the plain monospace fallback, so a chaos-tagged track never lands on the calm option.
+  const LYRIC_FONTS_CHAOS = LYRIC_FONTS.filter((f) => f !== 'var(--font-head)');
   const CRUSTACEAN_LYRIC_VARIANTS = ['v-cru-drift', 'v-cru-drift', 'v-cru-fade', 'v-cru-depth'];
   const CRUSTACEAN_LYRIC_FONTS = ['var(--font-cru-serif)', 'var(--font-cru-mono)', 'var(--font-cru-book)'];
-  function spawnLyricWord(container, text) {
+  // SIG-1519: pace multipliers for tags.style-driven tempo -- fast tags spawn quicker/shorter-
+  // lived words, slow tags stretch them out. `ticker` carries {tempo, chaos} from songLyricPacing().
+  const LYRIC_TEMPO_SPEED = { fast: 1.8, slow: 0.55, normal: 1 };
+  function spawnLyricWord(container, text, ticker) {
     if (!container || !text) return null;
     const span = document.createElement('span');
     const isCrustacean = state.station && state.station.id === 'crustacean';
+    const chaos = !isCrustacean && Boolean(ticker && ticker.chaos);
+    const speed = LYRIC_TEMPO_SPEED[(ticker && ticker.tempo) || 'normal'] || 1;
     const variants = isCrustacean ? CRUSTACEAN_LYRIC_VARIANTS : LYRIC_VARIANTS;
-    const fonts = isCrustacean ? CRUSTACEAN_LYRIC_FONTS : LYRIC_FONTS;
+    const fonts = isCrustacean ? CRUSTACEAN_LYRIC_FONTS : (chaos ? LYRIC_FONTS_CHAOS : LYRIC_FONTS);
     const variant = variants[Math.floor(Math.random() * variants.length)];
     const isBg = variant === 'v-bg';
     const isFly = variant === 'v-fly';
-    const isGlitch = !isCrustacean && Math.random() < 0.38;
+    const isGlitch = !isCrustacean && Math.random() < (chaos ? 0.6 : 0.38);
     const size = isCrustacean ? 11 + Math.random() * 24 : isBg ? 50 + Math.random() * 100 : 8 + Math.random() * 46;
     const font = fonts[Math.floor(Math.random() * fonts.length)];
     const top = Math.random() * (isCrustacean ? 88 : 84);
     const left = isFly ? 0 : Math.random() * (isCrustacean ? 72 : 62);
-    const rot = (Math.random() * (isCrustacean ? 4 : 18) - (isCrustacean ? 2 : 9)).toFixed(1);
+    const rotSpread = (isCrustacean ? 4 : 18) + (chaos ? 14 : 0);
+    const rot = (Math.random() * rotSpread - rotSpread / 2).toFixed(1);
     const dx = (Math.random() * (isCrustacean ? 30 : 70) - (isCrustacean ? 15 : 35)).toFixed(0);
     const dy = (Math.random() * (isCrustacean ? 24 : 70) - (isCrustacean ? 12 : 35)).toFixed(0);
     const flyFrom = Math.random() < 0.5 ? '-20%' : '118%';
     const flyTo = flyFrom === '-20%' ? '118%' : '-20%';
-    const dur = (isCrustacean ? 14 + Math.random() * 12 : isFly ? 3.5 + Math.random() * 2.5 : isBg ? 8 + Math.random() * 6 : 5 + Math.random() * 4).toFixed(2);
-    const delay = (Math.random() * (isCrustacean ? 4 : 1.4)).toFixed(2);
+    const dur = ((isCrustacean ? 14 + Math.random() * 12 : isFly ? 3.5 + Math.random() * 2.5 : isBg ? 8 + Math.random() * 6 : 5 + Math.random() * 4) / speed).toFixed(2);
+    const delay = ((Math.random() * (isCrustacean ? 4 : 1.4)) / speed).toFixed(2);
     const timing = isGlitch ? `steps(${4 + Math.floor(Math.random() * 6)},jump-end)` : (isFly ? 'linear' : 'ease-in-out');
     const accent = Math.random() < 0.5 ? 'lyric-word-a' : 'lyric-word-b';
     span.className = `lyric-word ${variant} ${accent}${isGlitch ? ' glitch-word' : ''}`;
@@ -477,7 +486,7 @@
     let spawned = 0;
     while (ticker.lastIndex < targetIndex && spawned < 3) {
       ticker.lastIndex += 1;
-      ticker.pool.push(spawnLyricWord(field, item.lyricsLines[ticker.lastIndex]));
+      ticker.pool.push(spawnLyricWord(field, item.lyricsLines[ticker.lastIndex], ticker));
       if (ticker.pool.length > ticker.poolSize) evictLyricWord(ticker.pool.shift());
       spawned += 1;
     }
@@ -1218,30 +1227,18 @@
     if (image) { image.removeAttribute('src'); image.alt = ''; }
   }
 
-  // SIG-0601: songs.json tags.style -> which of the three song panels to show. See the long
-  // comment inline at the song branch below for the reasoning behind each bucket.
-  const SONG_VARIANT_HEAD = ['chant', 'spoken', 'ballad'];
-  const SONG_VARIANT_AD = ['aggro', 'rage', 'industrial', 'punk', 'thrash', 'metal', 'hardstyle'];
-  function songVisualVariant(styleTags) {
+  // SIG-1519: SIG-0601's three-way song panel split (head/ad/ticker) was reverted per the
+  // maker's explicit call -- the head and ad panels read as a downgrade from the layered lyric
+  // pool, so every song is back to the lyric pool, always. What's kept from that pass: tags.style
+  // now also drives the pool's *pace* and *font chaos* rather than which panel shows at all.
+  const SONG_TEMPO_FAST = ['aggro', 'rage', 'industrial', 'punk', 'thrash', 'metal', 'hardstyle'];
+  const SONG_TEMPO_SLOW = ['ballad', 'chant', 'spoken'];
+  const SONG_CHAOS_FONTS = ['punk', 'aggro', 'ballad'];
+  function songLyricPacing(styleTags) {
     const tags = new Set((styleTags || []).map((t) => String(t).toLowerCase()));
-    if (SONG_VARIANT_HEAD.some((t) => tags.has(t))) return 'head';
-    if (SONG_VARIANT_AD.some((t) => tags.has(t))) return 'ad';
-    return 'ticker';
-  }
-
-  // Short barked hook words for the "ad" song variant, pulled from the song's own lyrics so the
-  // marquee reads as the track glitching, not a generic house ad. Falls back to the title split
-  // into words if there are no lyric lines at all.
-  function songAdHooks(lines, title) {
-    const words = (lines.length ? lines : [title || 'SIGNAL LOST'])
-      .flatMap((line) => String(line).split(/\s+/).filter(Boolean))
-      .filter((w) => w.length >= 3 && w.length <= 12);
-    const pool = words.length ? words : ['SIGNAL', 'LOST'];
-    const picked = [];
-    for (let i = 0; i < 5; i += 1) {
-      picked.push(pool[Math.floor(Math.random() * pool.length)].toUpperCase());
-    }
-    return picked;
+    const tempo = SONG_TEMPO_FAST.some((t) => tags.has(t)) ? 'fast' : SONG_TEMPO_SLOW.some((t) => tags.has(t)) ? 'slow' : 'normal';
+    const chaos = SONG_CHAOS_FONTS.some((t) => tags.has(t));
+    return { tempo, chaos };
   }
 
   // The identity panel's left column: a mode-reactive glitch visual with spoken-head,
@@ -1270,21 +1267,14 @@
       // room the moment a new one arrives, not left to expire on its own. Falls back to just the
       // title for tracks with no lyrics.
       //
-      // SIG-0601 (2026-09-12): per-song-type effect vocabulary on top of that pool treatment.
-      // songVisualVariant() reads songs.json's tags.style (mood/genre, defined with the maker
-      // 2026-09-11) and picks one of three panels instead of always the lyric pool:
-      //   - "head"   chant/spoken/ballad -- vocal-forward, one line at a time reads better than
-      //              a crowded field, so it reuses the old round "glitch-head" blob (the
-      //              pre-2026-09-11 host idle spinner, orphaned in CSS since host modes moved to
-      //              live-object art -- revived here rather than left dead).
-      //   - "ad"     aggro/rage/industrial/punk/thrash/metal/hardstyle -- blunt-force genres get
-      //              the barked glitch-marquee (same mechanism as the sponsored-notice treatment
-      //              a few lines up) fed the song's own lyric hooks instead of fixed ad copy.
-      //   - "ticker" everything else (edm/synthwave/dance/glitch/anthem/pop/weird-pop/ambient/
-      //              chill) and any untagged song -- the existing rolling pool, unchanged, stays
-      //              the default so nothing regresses for songs with style: [] still to fill in.
-      // Untested live; SIG-1519 tracks the maker's confirm pass.
-      const variant = songVisualVariant(item && item.tags && item.tags.style);
+      // SIG-0601 (2026-09-12) tried splitting this into three panels by tags.style (a "head"
+      // single-line treatment for chant/spoken/ballad, a barked "ad" marquee for aggro-family
+      // tags, the pool for everything else). SIG-1519 (2026-09-12, live listen with the maker):
+      // reverted -- both alternate panels read as a downgrade from the layered pool, flat out.
+      // Kept from that pass: tags.style still drives the pool via songLyricPacing(), just as
+      // pace and font chaos now instead of panel choice -- fast/slow tempo (SONG_TEMPO_FAST/
+      // SLOW) and wilder fonts+rotation+glitch-chance for punk/aggro/ballad (SONG_CHAOS_FONTS).
+      const pacing = songLyricPacing(item && item.tags && item.tags.style);
       const bars = Array.from({ length: 40 }, () => `<i style="--h:${(0.15 + Math.random() * 0.85).toFixed(2)}"></i>`).join('');
       const isCrustacean = state.station && state.station.id === 'crustacean';
       const isSnowCrash = state.station && state.station.id === 'snowcrash';
@@ -1301,27 +1291,18 @@
               : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
       const viz = `<div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>`;
       const lines = (item && item.lyricsLines) || [];
-      if (variant === 'head') {
-        state.lyricTicker = null;
-        const label = (item && item.title) ? item.title.toUpperCase() : 'ON AIR';
-        el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-host" style="z-index:4"><div class="glitch-head"></div><span class="glitch-tag" data-text="${label}">${label}</span></div></div>`;
-        return;
-      }
-      if (variant === 'ad') {
-        state.lyricTicker = null;
-        const hooks = songAdHooks(lines, item && item.title);
-        el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-ad" style="z-index:4">${hooks.map((w) => `<i>${w}</i>`).join('')}</div></div>`;
-        return;
-      }
       el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
-      const poolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : isAfterhuman ? 10 + Math.floor(Math.random() * 5) : isCybersprawl ? 18 + Math.floor(Math.random() * 6) : 13 + Math.floor(Math.random() * 9);
-      const ticker = { item, lastIndex: -1, poolSize, pool: [] };
+      const basePoolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : isAfterhuman ? 10 + Math.floor(Math.random() * 5) : isCybersprawl ? 18 + Math.floor(Math.random() * 6) : 13 + Math.floor(Math.random() * 9);
+      // Fast tags crowd the field harder, slow tags leave it sparser -- same tempo call as the
+      // per-word pacing in spawnLyricWord().
+      const poolSize = Math.max(4, Math.round(basePoolSize * (pacing.tempo === 'fast' ? 1.3 : pacing.tempo === 'slow' ? 0.7 : 1)));
+      const ticker = { item, lastIndex: -1, poolSize, pool: [], tempo: pacing.tempo, chaos: pacing.chaos };
       state.lyricTicker = ticker;
       const field = byId('glitch-lyric-field');
       const initialCount = Math.min(poolSize, lines.length);
       for (let i = 0; i < initialCount; i += 1) {
         ticker.lastIndex = i;
-        ticker.pool.push(spawnLyricWord(field, lines[i]));
+        ticker.pool.push(spawnLyricWord(field, lines[i], ticker));
       }
       return;
     }
