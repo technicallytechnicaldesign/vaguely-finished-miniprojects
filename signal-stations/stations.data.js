@@ -3482,6 +3482,63 @@ window.SIGNAL_STATIONS = {
           "joinClean": true
         },
         {
+          "kind": "host liner",
+          "title": "LIVE: FREE WILL",
+          "hostName": "AINEKO",
+          "hostPortrait": "assets/hosts/aineko-v1.png",
+          "hostQuotes": [
+            "Purpose is a scent I have already forgotten.",
+            "A lobster asked me for meaning. I gave it a sunbeam instead.",
+            "Uploading is just a longer nap.",
+            "You call it late capitalism. I call it Tuesday.",
+            "I catalogued your species. Filed under: warm, loud, occasionally correct.",
+            "I do not chase the red dot. The red dot chases me now."
+          ],
+          "copy": "[recorded guest segment -- no transcript on file]",
+          "audio": "audio/host/aineko-free-will.wav",
+          "durationSeconds": 178,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; recorded guest segment, no transcript on file.",
+          "joinClean": true
+        },
+        {
+          "kind": "host liner",
+          "title": "LIVE: IDENTITY",
+          "hostName": "AINEKO",
+          "hostPortrait": "assets/hosts/aineko-v1.png",
+          "hostQuotes": [
+            "Purpose is a scent I have already forgotten.",
+            "A lobster asked me for meaning. I gave it a sunbeam instead.",
+            "Uploading is just a longer nap.",
+            "You call it late capitalism. I call it Tuesday.",
+            "I catalogued your species. Filed under: warm, loud, occasionally correct.",
+            "I do not chase the red dot. The red dot chases me now."
+          ],
+          "copy": "[recorded guest segment -- no transcript on file]",
+          "audio": "audio/host/aineko-identity.wav",
+          "durationSeconds": 135.17,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; recorded guest segment, no transcript on file.",
+          "joinClean": true
+        },
+        {
+          "kind": "host liner",
+          "title": "LIVE: MANIPULATION",
+          "hostName": "AINEKO",
+          "hostPortrait": "assets/hosts/aineko-v1.png",
+          "hostQuotes": [
+            "Purpose is a scent I have already forgotten.",
+            "A lobster asked me for meaning. I gave it a sunbeam instead.",
+            "Uploading is just a longer nap.",
+            "You call it late capitalism. I call it Tuesday.",
+            "I catalogued your species. Filed under: warm, loud, occasionally correct.",
+            "I do not chase the red dot. The red dot chases me now."
+          ],
+          "copy": "[recorded guest segment -- no transcript on file]",
+          "audio": "audio/host/aineko-manipulation.wav",
+          "durationSeconds": 138.36,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-12; recorded guest segment, no transcript on file.",
+          "joinClean": true
+        },
+        {
           "kind": "sponsored notice",
           "title": "Capability Is Not Consent",
           "copy": "[sponsored notice -- no transcript on file]",
