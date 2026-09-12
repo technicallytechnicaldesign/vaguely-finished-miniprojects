@@ -1247,7 +1247,17 @@
   function renderIdentityVisual(mode, item) {
     const el = byId('identity-visual');
     if (!el) return;
-    if (item?.episodeId && mode.id !== 'song') {
+    // The decorative scene-rings/headline overlay is for episodes that actually carry director
+    // cues (CRUSTACEAN's "Continuity Dispute" -- a real cinematic beat, cues driving the
+    // headline/console lines). "Extended Broadcast Block" (SNOW CRASH) has no cues on any item
+    // -- gating on episodeId alone left its host liner/street report/ad-block segments showing
+    // empty decorative rings and a raw copy-text placeholder as the title, instead of the same
+    // katana/board/mic live-object treatment those same segment kinds get outside an episode.
+    // Investigated live 2026-09-12 (maker: "the host sections on crustacean are borked... back
+    // to being the shitty little circles") -- not a regression from SIG-1519's song-panel work
+    // (that touched only the song branch below), a pre-existing gap in this episode branch that
+    // predates it. Fix: only take the scene-field path when this item actually has cues to show.
+    if (item?.episodeId && mode.id !== 'song' && Array.isArray(item.cues) && item.cues.length) {
       state.lyricTicker = null;
       el.innerHTML = '<div class="scene-field"><div class="scene-rings" aria-hidden="true"><i></i><i></i><i></i></div><div class="scene-headline" id="scene-headline"></div></div>';
       return;

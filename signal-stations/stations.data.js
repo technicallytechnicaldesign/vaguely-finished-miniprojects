@@ -18641,7 +18641,7 @@ window.SIGNAL_STATIONS = {
           "chapter": "02 / Street report",
           "type": "street report",
           "subtitle": "sushiK",
-          "title": "[recorded host segment -- no transcript on file]",
+          "title": "Street Report",
           "transition": {
             "mode": "end"
           },
@@ -18864,7 +18864,7 @@ window.SIGNAL_STATIONS = {
           "chapter": "04 / Sponsor block",
           "type": "ad block intro",
           "subtitle": "sushiK",
-          "title": "[recorded host segment -- no transcript on file]",
+          "title": "Ad Block Intro",
           "transition": {
             "mode": "end"
           },
@@ -18916,7 +18916,7 @@ window.SIGNAL_STATIONS = {
           "chapter": "04 / Sponsor block",
           "type": "ad block outro",
           "subtitle": "sushiK",
-          "title": "[recorded host segment -- no transcript on file]",
+          "title": "Ad Block Outro",
           "transition": {
             "mode": "end"
           },
