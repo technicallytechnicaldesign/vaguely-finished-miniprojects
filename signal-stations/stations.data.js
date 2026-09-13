@@ -253,6 +253,53 @@ window.SIGNAL_STATIONS = {
           }
         ]
       },
+      "interludes": [
+        {
+          "kind": "host liner",
+          "title": "LIVE: EXISTENCE HAS NO AUTOSAVE",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/existence-has-no-autosave.wav",
+          "durationSeconds": 44.6,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-13; audio is a real recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
+        },
+        {
+          "kind": "host liner",
+          "title": "LIVE: SCIENCE HAS LIMITS",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/science-has-limits.wav",
+          "durationSeconds": 41.3,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-13; audio is a real recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
+        },
+        {
+          "kind": "host liner",
+          "title": "LIVE: WE FORGOT TO SOLVE GRIEF",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/we-forgot-to-solve-grief.wav",
+          "durationSeconds": 39.3,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-13; audio is a real recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
+        },
+        {
+          "kind": "host liner",
+          "title": "LIVE: WHAT EXACTLY ARE WE",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/what-exactly-are-we.wav",
+          "durationSeconds": 64.5,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-13; audio is a real recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
+        },
+        {
+          "kind": "host liner",
+          "title": "LIVE: WUFFIE WUFFIE",
+          "copy": "[recorded host segment -- no transcript on file]",
+          "audio": "audio/host/wuffie-wuffie.wav",
+          "durationSeconds": 40.3,
+          "measurementNote": "MEASURED duration with ffprobe, 2026-09-13; audio is a real recording with no embedded lyrics/transcript tag.",
+          "joinClean": true
+        }
+      ],
       "networkFeed": [
         [
           {
