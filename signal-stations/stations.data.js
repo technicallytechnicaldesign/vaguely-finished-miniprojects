@@ -174,13 +174,13 @@ window.SIGNAL_STATIONS = {
         "rgb": "61,255,176",
         "label": "Ad-hocracy exchange"
       },
-      "name": "AD HOC RADIO",
+      "name": "AD HOC AIRWAVES",
       "frequency": "42.0",
       "tagline": "Reputation is the only currency. Death is just downtime.",
       "host": "Tim",
       "hostPortrait": "assets/hosts/tim-v1.png",
       "theme": "Post-scarcity satire / Whuffie economy / ad-hocracy",
-      "sampleLine": "AD HOC RADIO. Your body's replaceable. Your number isn't. Keep it up.",
+      "sampleLine": "AD HOC AIRWAVES. Your body's replaceable. Your number isn't. Keep it up.",
       "hostQuotes": [
         "Good morning, ad hocs. Your Whuffie's down two points overnight. We'll talk about it.",
         "Nobody's dead. They're just restoring from Tuesday. Try to be nice to them anyway.",
@@ -345,7 +345,7 @@ window.SIGNAL_STATIONS = {
         [
           {
             "role": "signal",
-            "who": "AD_HOC_RADIO",
+            "who": "AD_HOC_AIRWAVES",
             "text": "carrier steady / quorum in session / nobody has died permanently in nine years"
           },
           {
@@ -1108,7 +1108,7 @@ window.SIGNAL_STATIONS = {
           "audio": "audio/adhoc/the-hall-of-presidents-is-watching.mp3"
         }
       ],
-      "notice": "AD HOC RADIO / 9 tracks in rotation. AD HOC RADIO. Your body's replaceable. Your number isn't. Keep it up."
+      "notice": "AD HOC AIRWAVES / 9 tracks in rotation. AD HOC AIRWAVES. Your body's replaceable. Your number isn't. Keep it up."
     },
     {
       "id": "afterhuman-loopback",
