@@ -4177,6 +4177,40 @@ window.SIGNAL_STATIONS = {
             "who": "ALDOUS_KRILL",
             "text": "both, if your licensing permits it"
           }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "UPLOAD_PENDING",
+            "text": "checked snow crash for research purposes. eleven riots and a sword fight before the first chorus."
+          },
+          {
+            "role": "listener",
+            "who": "BACKUP_OF_BACKUP",
+            "text": "and?"
+          },
+          {
+            "role": "listener",
+            "who": "UPLOAD_PENDING",
+            "text": "never again. fascinating. never again."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "LOBSTER_64",
+            "text": "there's a guy in a trenchcoat asking Krill if the lecture comes with riot gear"
+          },
+          {
+            "role": "listener",
+            "who": "KOURIER_4",
+            "text": "this economics desk needs way more bandwidth. two out of ten. good bassline potential though."
+          },
+          {
+            "role": "listener",
+            "who": "ECON2POINT0",
+            "text": "can whoever let the snow crash refugee in please also let them back out"
+          }
         ]
       ],
       "theme": "Post-singularity economics / dry academic broadcast",
