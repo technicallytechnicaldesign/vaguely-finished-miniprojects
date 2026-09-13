@@ -8,7 +8,7 @@
   <title>SIGNAL RADIO / LIVE RECEIVER</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=VT323&family=Monoton&family=Rubik+Glitch&family=Bungee&family=Permanent+Marker&family=Metal+Mania&family=Creepster&family=Faster+One&family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,300;0,500;1,300&family=Libre+Caslon+Text:ital@0;1&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;1,8..60,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=VT323&family=Monoton&family=Rubik+Glitch&family=Bungee&family=Permanent+Marker&family=Metal+Mania&family=Creepster&family=Faster+One&family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,300;0,500;1,300&family=Libre+Caslon+Text:ital@0;1&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;1,8..60,300&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Josefin+Sans:wght@400;600&family=Give+You+Glory&display=swap" rel="stylesheet">
   <style>
     :root{color-scheme:light;--page:#f2f4fa;--surface:#ffffff;--surface-2:#eef2ed;--ink:#10142b;--ink-2:#454e6e;--muted:#636e8d;--grid:#d8ddec;--ring:rgba(16,20,43,.14);--accent:#00789c;--accent-2:#b81683;--on-accent:#fff;--good:#0c8a54;--warn:#9a6b00;--crit:#c8322b;--font-body:system-ui,-apple-system,"Segoe UI",sans-serif;--font-head:"Cascadia Code",ui-monospace,Consolas,monospace;--font-mono:ui-monospace,Consolas,monospace;--radius:10px;--station-accent:#ffea00;--station-secondary:#ff2f92;--station-rgb:255,234,0;--audio-low:.08;--audio-mid:.08;--audio-high:.08;--mast:rgba(248,250,247,.82);--font-lyric-a:"Bebas Neue",var(--font-head);--font-lyric-b:"VT323",var(--font-head);--font-lyric-c:"Monoton",var(--font-head);--font-lyric-d:"Rubik Glitch",var(--font-head);--font-lyric-e:"Bungee",var(--font-head);--font-lyric-f:"Permanent Marker",var(--font-head);--font-lyric-g:"Metal Mania",var(--font-head);--font-lyric-h:"Creepster",var(--font-head);--font-lyric-i:"Faster One",var(--font-head);--font-lyric-j:"Press Start 2P",var(--font-head)}
     :root[data-theme="dark"]{color-scheme:dark;--page:#07080f;--surface:#0e1220;--surface-2:#0e1114;--ink:#eef4ff;--ink-2:#a8b6d4;--muted:#6c7996;--grid:#1c2440;--ring:rgba(84,240,255,.18);--accent:#54f0ff;--accent-2:#ff5fd2;--on-accent:#07080f;--good:#57f2a4;--warn:#ffd23e;--crit:#ff5d5d;--mast:rgba(4,5,7,.74)}
@@ -184,6 +184,28 @@
     .world-afterhuman .station-background-layer,.world-city .station-background-layer{position:absolute;pointer-events:none;object-fit:contain;mix-blend-mode:screen}.world-afterhuman .station-background-layer{filter:drop-shadow(0 0 12px rgba(141,99,255,.15));animation:afh-layer-drift var(--layer-time) ease-in-out var(--layer-delay) infinite both}.world-afterhuman .afh-contour{left:7%;top:4%;width:min(33vw,360px);opacity:.12}.world-afterhuman .afh-folio{right:8%;bottom:5%;width:min(34vw,370px);opacity:.1}.world-afterhuman .afh-seed{left:47%;top:23%;width:min(16vw,160px);opacity:.17}.world-city .station-background-layer{filter:drop-shadow(0 0 13px rgba(255,138,31,.2));animation:cyb-layer-jolt var(--layer-time) steps(2,end) var(--layer-delay) infinite both}.world-city .cyb-claw{left:3%;top:8%;width:min(34vw,370px);opacity:.14}.world-city .cyb-shard{right:5%;bottom:3%;width:min(31vw,340px);opacity:.13}.world-city .cyb-ring{left:43%;top:11%;width:min(19vw,200px);opacity:.17}
     .snc-citation{position:absolute;z-index:0;right:7%;bottom:7%;padding-right:9px;border-right:1px solid var(--station-secondary);color:rgba(var(--station-rgb),.36);font:700 7px/1.55 var(--font-head);letter-spacing:.13em;text-align:right;animation:cru-citation 13s ease-in-out infinite}
     .cru-citation{position:absolute;left:8%;bottom:8%;padding-left:9px;border-left:1px solid var(--station-accent);color:rgba(var(--station-rgb),.58);font:300 8px/1.55 var(--font-cru-mono);letter-spacing:.12em;animation:cru-citation 16s ease-in-out infinite}
+    /* AD HOC AIRWAVES sits between CRUSTACEAN's stillness and SNOW CRASH's violence:
+       Disney-magic-hour warmth meets electro-jazz-pop swing. Like CRUSTACEAN, it has no
+       fullscreen world scene -- its character lives in the identity/lyric panel below.
+       Backgrounds are the maker's own photos, dropped in as --adh-bg-image on .lyric-art-adhoc;
+       until supplied, a warm procedural glow stands in so the panel is never blank. */
+    :root{--font-adh-display:"Fraunces",Georgia,serif;--font-adh-sans:"Josefin Sans",var(--font-body);--font-adh-script:"Give You Glory",cursive;--adh-bg-image:none}
+    .lyric-art-adhoc{z-index:0;mix-blend-mode:screen;opacity:.6;overflow:hidden;isolation:isolate;background-image:var(--adh-bg-image),radial-gradient(ellipse at 50% 82%,rgba(255,176,32,.28),transparent 60%),radial-gradient(circle at 50% 10%,rgba(61,255,176,.18),transparent 50%);background-size:cover,auto,auto;background-position:center}
+    .adh-firefly{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(61,255,176,.85);box-shadow:0 0 10px 3px rgba(61,255,176,.55);animation:adh-firefly-drift 9s ease-in-out infinite}
+    .adh-firefly:nth-child(2){left:22%;top:64%;animation-delay:-2s}
+    .adh-firefly:nth-child(3){left:71%;top:38%;animation-delay:-5s}
+    .adh-firefly:nth-child(4){left:52%;top:80%;animation-delay:-7s}
+    [data-station="adhoc"] .lyric-word{font-family:var(--font-adh-display);font-weight:500;text-transform:none;letter-spacing:.01em;text-shadow:0 0 14px rgba(var(--station-rgb),.4);mix-blend-mode:normal}
+    .lyric-word.v-adh-sway{animation:adh-lyric-sway var(--dur,10s) ease-in-out infinite both}
+    .adh-object{position:absolute;z-index:0;width:var(--object-size);pointer-events:none;transform-origin:center;opacity:var(--object-alpha);mix-blend-mode:screen;filter:saturate(.95) contrast(1.05) brightness(.94) drop-shadow(0 0 16px rgba(var(--station-rgb),.3));animation:adh-object-drift var(--drift-time) ease-in-out var(--delay) infinite both;will-change:transform}
+    .adh-object img{display:block;width:100%;height:auto}
+    .adh-mansion{left:-6%;bottom:-10%;--object-size:clamp(230px,46%,360px);--object-alpha:.22;--drift-time:20s;--delay:-4s;--tilt:-2deg;--drift-x:10px;--drift-y:-8px}
+    .adh-earhat{right:-4%;top:-8%;--object-size:clamp(150px,28%,220px);--object-alpha:.24;--drift-time:16s;--delay:-9s;--tilt:6deg;--drift-x:-8px;--drift-y:9px}
+    .adh-mic{left:42%;top:6%;--object-size:clamp(120px,22%,180px);--object-alpha:.2;--drift-time:14s;--delay:-2s;--tilt:-4deg;--drift-x:6px;--drift-y:10px}
+    .adh-citation{position:absolute;z-index:0;left:8%;bottom:8%;padding-left:9px;border-left:1px solid var(--station-accent);color:rgba(var(--station-rgb),.6);font:600 8px/1.55 var(--font-adh-sans);letter-spacing:.14em;text-transform:uppercase;animation:cru-citation 15s ease-in-out infinite}
+    @keyframes adh-firefly-drift{0%,100%{transform:translate(0,0);opacity:.5}50%{transform:translate(14px,-18px);opacity:1}}
+    @keyframes adh-lyric-sway{0%,100%{transform:rotate(-1.1deg) translateY(0)}50%{transform:rotate(1.1deg) translateY(-3px)}}
+    @keyframes adh-object-drift{0%,100%{transform:rotate(var(--tilt)) translate(0,0)}50%{transform:rotate(calc(var(--tilt) * -1)) translate(var(--drift-x),var(--drift-y))}}
     .host-channel{grid-template-columns:minmax(0,1fr) 136px;min-height:168px;overflow:visible}
     .host-avatar{width:128px;height:148px;isolation:isolate}
     .host-portrait-frame{display:none;position:absolute;z-index:1;inset:0 8px 0 0;overflow:visible}
@@ -383,7 +405,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 <section class="panel transport" aria-label="Broadcast transport"><span class="transport-label">SIG / live control</span><button class="skip" id="skip" type="button" aria-label="Skip signal">›</button><span class="transport-label">Music / host / caller / report / ad</span></section>
     <footer class="footer"><p>Unlicensed spectrum / <span id="mapped-station-count">several</span> mapped stations</p><p>GENLYD transmission system / FREE_STREET</p></footer>
   </main>
-  <script src="stations.data.js?v=123b199b041b"></script>
-  <script src="radio-player.js?v=80315e645cf7"></script>
+  <script src="stations.data.js?v=407f2730f9a2"></script>
+  <script src="radio-player.js?v=659d58c0e7c9"></script>
 </body>
 </html>

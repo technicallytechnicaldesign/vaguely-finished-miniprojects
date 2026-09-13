@@ -424,6 +424,10 @@
   const LYRIC_FONTS_CHAOS = LYRIC_FONTS.filter((f) => f !== 'var(--font-head)');
   const CRUSTACEAN_LYRIC_VARIANTS = ['v-cru-drift', 'v-cru-drift', 'v-cru-fade', 'v-cru-depth'];
   const CRUSTACEAN_LYRIC_FONTS = ['var(--font-cru-serif)', 'var(--font-cru-mono)', 'var(--font-cru-book)'];
+  // AD HOC AIRWAVES: calmer than the default chaos pool, livelier than CRUSTACEAN's stillness --
+  // a gentle sway plus the tamest two default motions (no v-fly streak, no v-bg wall of text).
+  const ADHOC_LYRIC_VARIANTS = ['v-adh-sway', 'v-adh-sway', 'v-drift', 'v-pulse'];
+  const ADHOC_LYRIC_FONTS = ['var(--font-adh-display)', 'var(--font-adh-sans)', 'var(--font-adh-script)'];
   // SIG-1519: pace multipliers for tags.style-driven tempo -- fast tags spawn quicker/shorter-
   // lived words, slow tags stretch them out. `ticker` carries {tempo, chaos} from songLyricPacing().
   const LYRIC_TEMPO_SPEED = { fast: 1.8, slow: 0.55, normal: 1 };
@@ -1284,6 +1288,7 @@
       const isSnowCrash = state.station && state.station.id === 'snowcrash';
       const isAfterhuman = state.station && state.station.id === 'afterhuman';
       const isCybersprawl = state.station && state.station.id === 'cybersprawl';
+      const isAdhoc = state.station && state.station.id === 'adhoc';
       const art = isCrustacean
         ? '<div class="lyric-art lyric-art-crustacean" aria-hidden="true"><div class="cru-object cru-brain"><img src="assets/objects/crustacean-brain-v1.png" alt=""></div><div class="cru-object cru-book"><img src="assets/objects/crustacean-book-v1.png" alt=""></div><div class="cru-object cru-lobster"><img src="assets/objects/crustacean-lobster-v1.png" alt=""></div><div class="cru-citation">SPECIMEN 27.1<br>MEMORY / MARKETS<br>PLATE IV</div></div>'
         : isSnowCrash
@@ -1292,11 +1297,15 @@
             ? '<div class="lyric-art lyric-art-afterhuman" aria-hidden="true"><div class="station-midground mid-afterhuman"><img src="assets/objects/afterhuman-pensive-code-v2.png" alt=""></div></div>'
             : isCybersprawl
               ? '<div class="lyric-art lyric-art-cybersprawl" aria-hidden="true"><div class="station-midground mid-cybersprawl"><img src="assets/objects/cybersprawl-daemon-rage-v2.png" alt=""></div></div>'
-              : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
+              : isAdhoc
+                // Awaiting the maker's own background photos (wired to --adh-bg-image on
+                // .lyric-art-adhoc); object art below is a placeholder path until supplied.
+                ? '<div class="lyric-art lyric-art-adhoc" aria-hidden="true"><div class="adh-firefly"></div><div class="adh-firefly"></div><div class="adh-firefly"></div><div class="adh-object adh-mansion"><img src="assets/objects/adhoc-mansion-v1.png" alt=""></div><div class="adh-object adh-earhat"><img src="assets/objects/adhoc-earhat-v1.png" alt=""></div><div class="adh-object adh-mic"><img src="assets/objects/adhoc-mic-v1.png" alt=""></div><div class="adh-citation">AD-HOCRACY EXCHANGE<br>WHUFFIE LEDGER<br>LIVE</div></div>'
+                : '<div class="lyric-art" aria-hidden="true"><div class="lyric-orbit"></div><div class="lyric-cube"><i></i><i></i><i></i><i></i></div><div class="lyric-crosshair"></div><div class="lyric-code">TAG://PENDING<br>FX_BANK[NULL]<br>ROTATE_Z++<br>SONG.TYPE?</div></div>';
       const viz = `<div class="glitch-viz-overlay"><div class="glitch-viz-row">${bars}</div><div class="glitch-viz-row glitch-viz-mirror">${bars}</div></div>`;
       const lines = (item && item.lyricsLines) || [];
       el.innerHTML = `<div class="glitch-song">${viz}${art}<div class="glitch-lyric-field" id="glitch-lyric-field"></div></div>`;
-      const basePoolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : isAfterhuman ? 10 + Math.floor(Math.random() * 5) : isCybersprawl ? 18 + Math.floor(Math.random() * 6) : 13 + Math.floor(Math.random() * 9);
+      const basePoolSize = isCrustacean ? 16 + Math.floor(Math.random() * 5) : isAfterhuman ? 10 + Math.floor(Math.random() * 5) : isCybersprawl ? 18 + Math.floor(Math.random() * 6) : isAdhoc ? 12 + Math.floor(Math.random() * 5) : 13 + Math.floor(Math.random() * 9);
       // Fast tags crowd the field harder, slow tags leave it sparser -- same tempo call as the
       // per-word pacing in spawnLyricWord().
       const poolSize = Math.max(4, Math.round(basePoolSize * (pacing.tempo === 'fast' ? 1.3 : pacing.tempo === 'slow' ? 0.7 : 1)));

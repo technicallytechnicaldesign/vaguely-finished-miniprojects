@@ -353,6 +353,246 @@ window.SIGNAL_STATIONS = {
             "who": "CASTMEMBER_GHOST",
             "text": "nine years and the mansion still creaks on cue. some maintenance is a performance."
           }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "WHUFFIE_WATCH",
+            "text": "score dipped nine points overnight and nobody in the ad hoc will say why. democracy, I guess."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "NEW_HERE_88",
+            "text": "so if I die here somebody just... restores me? asking because I definitely just died"
+          },
+          {
+            "role": "listener",
+            "who": "RESTORED_TWICE",
+            "text": "welcome back. drink water, your Whuffie took the hit, not you"
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "AD_HOC_QUORUM",
+            "text": "deadheading roster renewed unanimously. six ghosts, zero understudies, infinite patience"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "CASTMEMBER_GHOST",
+            "text": "permadeath used to mean something. now it just means somebody forgot to back up"
+          },
+          {
+            "role": "listener",
+            "who": "QUEUE_VETERAN_2",
+            "text": "forgot, or chose to. there's a difference and everyone knows it"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "OLD_GUARD_MANSION",
+            "text": "deadheading isn't a shift, it's a marriage. try telling HR that"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "WAITLIST_VET",
+            "text": "my Whuffie's fine. my knees are the ones that didn't survive the ad hoc"
+          }
+        ],
+        [
+          {
+            "role": "signal",
+            "who": "AD_HOC_AIRWAVES",
+            "text": "carrier steady / no permadeaths logged this cycle / quorum still arguing about the fog machine"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "ZERO_STAR_MOURNER",
+            "text": "held a funeral for someone who's getting restored Thursday. cried anyway. worth it"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "DEBRA_STAN_04",
+            "text": "reminder that Whuffie only measures what people bothered to rate. rate more"
+          },
+          {
+            "role": "listener",
+            "who": "FOG_MACHINE_LOYALIST",
+            "text": "I rate the fog machine five stars every single day and it changes nothing"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "LINE_STANDER_9",
+            "text": "asked my ad hoc if permadeath was even still policy. long silence. longer line"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "OLD_GUARD_MANSION",
+            "text": "they want to 'brighten the ballroom scene.' the ballroom scene is supposed to be dim. that's the whole point"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "CASTMEMBER_GHOST",
+            "text": "I've done the same hitchhiking bit for eleven years. tell the upgrade committee I said hello, and also no"
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "AD_HOC_QUORUM",
+            "text": "vote scheduled: retire the stretching room's original portraits for 'motion-responsive' ones. good luck with that motion"
+          },
+          {
+            "role": "listener",
+            "who": "OLD_GUARD_MANSION",
+            "text": "the portraits have been staring at the same eight guests for a decade. leave them"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "NEW_HERE_88",
+            "text": "wait, there's a whole faction fighting over ghost seniority? I need to be part of this"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "DEBRA_STAN_04",
+            "text": "the new hearse prop has actual working wheels. the old one didn't. that's not nothing"
+          },
+          {
+            "role": "listener",
+            "who": "OLD_GUARD_MANSION",
+            "text": "the old one wasn't supposed to move. that was the joke"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "CASTMEMBER_GHOST",
+            "text": "someone deadheaded the organist role just to keep the wrong notes exactly wrong. respect"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "WAITLIST_VET",
+            "text": "line's out to the berm again for a ride that hasn't changed since before I could vote. some things you don't fix"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "ZERO_STAR_MOURNER",
+            "text": "cried at the graveyard scene again. seven hundred and something times. no plans to stop"
+          }
+        ],
+        [
+          {
+            "role": "exec",
+            "who": "AD_HOC_QUORUM",
+            "text": "motion to modernize the attic bride failed, four to three, on the grounds that she 'earned the cobwebs'"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "LINE_STANDER_9",
+            "text": "heard the update team wants to add a QR code to the tombstones. heard the tombstones voted no"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "NEW_HERE_88",
+            "text": "rode Debra's new line twice back to back. cried both times. she FOCUS TESTS the crying"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "DEBRA_STAN_04",
+            "text": "wait times down forty percent and the ride still made me feel something. how is that legal"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "JULIUS",
+            "text": "she had me MURDERED. decommissioned. same thing. don't let the press release fool you"
+          },
+          {
+            "role": "listener",
+            "who": "DEBRA_STAN_04",
+            "text": "Julius, you were an animatronic pirate and you're being reused in the queue line. breathe"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "WHUFFIE_WATCH",
+            "text": "Debra's Whuffie curve looks like a staircase. everyone else's looks like weather"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "JULIUS",
+            "text": "twenty-two years of loyal service and she swapped my head for a 'more expressive' one. I AM expressive. I am furious"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "RESTORED_TWICE",
+            "text": "got backed up twice this year and Debra's queue still moved faster than my recovery time"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "QUEUE_VETERAN_2",
+            "text": "she shipped a whole new finale in a weekend and it made people cry on cue. cue. ON CUE"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "JULIUS",
+            "text": "I've filed a grievance. the grievance was also optimized. I don't know what that means and I hate it"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "DEBRA_STAN_04",
+            "text": "say what you want about the dashboard, the dashboard has never once made me wait forty minutes for nothing"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "FOG_MACHINE_LOYALIST",
+            "text": "Debra's fog machines are on a rotation schedule. a SCHEDULE. mine just runs until it dies of shame"
+          }
         ]
       ],
       "tracks": [
