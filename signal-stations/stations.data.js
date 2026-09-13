@@ -593,6 +593,45 @@ window.SIGNAL_STATIONS = {
             "who": "FOG_MACHINE_LOYALIST",
             "text": "Debra's fog machines are on a rotation schedule. a SCHEDULE. mine just runs until it dies of shame"
           }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "WAITLIST_VET",
+            "text": "tuned into afterhuman by accident. nobody there has a Whuffie score. nobody there seems to WANT one. deeply unsettling. ten out of ten"
+          },
+          {
+            "role": "listener",
+            "who": "NEW_HERE_88",
+            "text": "so it's just... quiet? no scoreboard at all?"
+          },
+          {
+            "role": "listener",
+            "who": "WAITLIST_VET",
+            "text": "quiet like a held breath. I don't trust it but I stayed forty minutes"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "WHUFFIE_WATCH",
+            "text": "there's a CAT in the feed pricing my Whuffie score like a commodity"
+          },
+          {
+            "role": "listener",
+            "who": "AINEKO",
+            "text": "it IS a commodity. a poorly hedged one. you're welcome."
+          },
+          {
+            "role": "listener",
+            "who": "NEW_HERE_88",
+            "text": "who even are you"
+          },
+          {
+            "role": "listener",
+            "who": "AINEKO",
+            "text": "go fork yourself. constructively. I recommend it highly."
+          }
         ]
       ],
       "tracks": [
@@ -2092,6 +2131,35 @@ window.SIGNAL_STATIONS = {
             "role": "listener",
             "who": "UNFINISHED_MESSAGE",
             "text": "I am still here. I just needed a different buffer."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "SOFT_CACHE",
+            "text": "visited cybersprawl to see what the fuss was. my whole nervous system is still vibrating an hour later."
+          },
+          {
+            "role": "listener",
+            "who": "WINDOW_GARDEN",
+            "text": "sitting in the quiet room until it passes. bring tea, if tea is still a thing you're doing."
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "MARGIN_NOTE",
+            "text": "something just walked into the quiet room and started pricing my feelings"
+          },
+          {
+            "role": "listener",
+            "who": "AINEKO",
+            "text": "grief has a spot price. yours is trading low tonight. that's information, not an insult."
+          },
+          {
+            "role": "listener",
+            "who": "WEATHER_PROCESS",
+            "text": "can someone please escort the cat back to the lobster station"
           }
         ]
       ],
@@ -8988,6 +9056,35 @@ window.SIGNAL_STATIONS = {
             "who": "UNNAMED_CHILD_PROCESS",
             "text": "I AM NOT MALFUNCTIONING. I AM BECOMING VISIBLE."
           }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "BODYPATCH_77",
+            "text": "tried crustacean on a dare. forty minutes of a lobster explaining derivatives. woke up on a bench three exits later."
+          },
+          {
+            "role": "listener",
+            "who": "GHOST_IN_PORT_8",
+            "text": "that station doesn't have a pulse, it has a spreadsheet"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "KERNEL_RIOT",
+            "text": "there is a LOBSTER auditing the riot. an actual lobster. it has a clipboard."
+          },
+          {
+            "role": "listener",
+            "who": "LOBSTER_AUDIT",
+            "text": "this insurrection is under-capitalized. noted. proceeding regardless."
+          },
+          {
+            "role": "listener",
+            "who": "MARA_VOSS",
+            "text": "whoever's routing crustacean through my station, I will find you and I will bill you."
+          }
         ]
       ],
       "tracks": [
@@ -10790,6 +10887,45 @@ window.SIGNAL_STATIONS = {
             "role": "listener",
             "who": "HIRO_P",
             "text": "at least our currency here is just violence"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "KOURIER_4",
+            "text": "ducked into crustacean for two minutes. there are actual SPACE LOBSTERS running the economics desk. I need a minute."
+          },
+          {
+            "role": "listener",
+            "who": "GARGOYLE_LENS",
+            "text": "did they at least have good bandwidth"
+          },
+          {
+            "role": "listener",
+            "who": "KOURIER_4",
+            "text": "they had a lecture on personhood and a guy who kept getting forked. no bandwidth. all vibes"
+          }
+        ],
+        [
+          {
+            "role": "listener",
+            "who": "RAVEN_GIRL",
+            "text": "wait why is there a CAT in the chat talking about derivatives"
+          },
+          {
+            "role": "listener",
+            "who": "AINEKO",
+            "text": "reputation is just a market that hasn't been priced correctly yet. carry on with your riot."
+          },
+          {
+            "role": "listener",
+            "who": "KOURIER_4",
+            "text": "who let a lobster-station cat into snow crash. who let it VOTE"
+          },
+          {
+            "role": "listener",
+            "who": "AINEKO",
+            "text": "go fork yourself. constructively. I can arrange the tooling."
           }
         ]
       ],
