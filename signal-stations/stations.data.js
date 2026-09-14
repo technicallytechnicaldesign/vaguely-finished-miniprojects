@@ -19477,171 +19477,6 @@ window.SIGNAL_STATIONS = {
           "startSeconds": 0
         },
         {
-          "id": "snc-snow-crash-take1",
-          "title": "Snow Crash",
-          "artist": "Nam-Shub Zero",
-          "durationSeconds": 352.2,
-          "outroStartSeconds": 340,
-          "outroConfidence": 0.5,
-          "tags": {
-            "source": [
-              "snowcrash"
-            ],
-            "tempo": "slow",
-            "style": [
-              "industrial",
-              "thrash"
-            ]
-          },
-          "lyricsLines": [
-            "EXECUTE SNOW CRASH",
-            "WELCOME TO THE METAVERSE.",
-            "Your body is temporary.",
-            "Your avatar is negotiable.",
-            "Your citizenship is a service agreement.",
-            "Terms and conditions apply.",
-            "Black road running through electric night,",
-            "million avatars burning counterfeit bright.",
-            "Goggles down, meatspace disappears,",
-            "buy yourself a face that never shows fear.",
-            "America got carved into corporate zones,",
-            "franchise flags planted over foreclosed homes.",
-            "Every neighborhood sovereign, every highway sold,",
-            "freedom comes premium, security comes gold.",
-            "Deliverator screaming through the midnight grid,",
-            "thirty minutes holy or somebody gets skinned.",
-            "Pizza in the back and a katana on call,",
-            "when the Mafia guarantees it\u2014",
-            "they guarantee it all.",
-            "Login.",
-            "Mask up.",
-            "Become what they see.",
-            "Reality has borders.",
-            "The Street",
-            "runs free.",
-            "SNOW CRASH \u2014",
-            "white static in the brain.",
-            "SNOW CRASH \u2014",
-            "language running through your veins.",
-            "One word is a weapon.",
-            "One symbol is a key.",
-            "Hack the operating system",
-            "underneath humanity.",
-            "SNOW CRASH.",
-            "SNOW CRASH.",
-            "Don't open the file.",
-            "Don't look at the screen.",
-            "Welcome to the future: every nation went broke,",
-            "now your passport's a logo and your law is bespoke.",
-            "Mr. Lee's Greater Hong Kong glowing roadside blue,",
-            "pick a jurisdiction based on what it does to you.",
-            "Fedland.",
-            "Burbclave.",
-            "Mafia delivery.",
-            "Private roads, private cops,",
-            "private sovereignty.",
-            "The State got atomized,",
-            "sold off piece by piece,",
-            "and everybody bought a little subscription to peace.",
-            "Meanwhile somewhere underneath all the noise,",
-            "older than computers, older than choice,",
-            "something crawls upward from the root of the tongue\u2014",
-            "a program for the species",
-            "from when language was young.",
-            "Speak it.",
-            "Hear it.",
-            "Cut through the mind.",
-            "Every civilization",
-            "runs on borrowed code",
-            "inside.",
-            "SNOW CRASH \u2014",
-            "white static in the brain.",
-            "SNOW CRASH \u2014",
-            "language running through your veins.",
-            "One word is a weapon.",
-            "One symbol is a key.",
-            "Hack the operating system",
-            "underneath humanity.",
-            "SNOW CRASH.",
-            "SNOW CRASH.",
-            "The virus isn't digital.",
-            "Digital",
-            "is just where it learned to move.",
-            "Information wants a host.",
-            "Religion is information.",
-            "Money is information.",
-            "Language is information.",
-            "A virus is information",
-            "with ambition.",
-            "So tell me\u2014",
-            "what is a meme",
-            "when it stops being metaphor?",
-            "What is faith",
-            "when it executes?",
-            "What is a word",
-            "when your brain cannot refuse it?",
-            "You thought the hacker",
-            "was outside the machine.",
-            "You are the machine.",
-            "NAM-SHUB.",
-            "Cut the wire.",
-            "NAM-SHUB.",
-            "Break the choir.",
-            "Old gods hiding",
-            "in executable speech.",
-            "Ancient code",
-            "with a global reach.",
-            "From clay tablet",
-            "to fiber line,",
-            "same infection\u2014",
-            "better runtime.",
-            "Hiro walks both worlds with a sword and a screen,",
-            "code in one hand, steel kept clean.",
-            "Last freelance hacker in a franchised land,",
-            "trying to read the virus before it reads the man.",
-            "Raven carries vengeance like a nuclear sun,",
-            "one man's apocalypse strapped on for fun.",
-            "Everybody's dangerous, everybody's owned,",
-            "every ideology wants root access to your bones.",
-            "And Y.T. keeps rolling where the systems collide,",
-            "harpoon on the bumper, no brakes on the ride.",
-            "Courier velocity, wheels on concrete\u2014",
-            "the whole damn future",
-            "hanging off the back of the street.",
-            "SNOW CRASH \u2014",
-            "tear the signal from the skull.",
-            "Just hackers chasing gods",
-            "through the cracks between the screens.",
-            "whoever owns the language",
-            "owns the world.",
-            "The Street is endless.",
-            "The nations are gone.",
-            "The franchises glow",
-            "until the power goes off.",
-            "Your avatar smiles.",
-            "Your meat body bleeds.",
-            "Civilization is software",
-            "running legacy dependencies.",
-            "Do not read the tablet.",
-            "Do not watch the bitmap.",
-            "Do not accept the package.",
-            "Do not repeat\u2014",
-            "SNOW CRASH.",
-            "CONNECTION TERMINATED."
-          ],
-          "audio": "audio/snowcrash/snow-crash-take1.mp3",
-          "ref": "snc-snow-crash-take1",
-          "chapter": "01 / Sign-on",
-          "type": "song",
-          "subtitle": "Nam-Shub Zero",
-          "transition": {
-            "mode": "end"
-          },
-          "episodeId": "extended-broadcast-block",
-          "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 201.9
-        },
-        {
           "kind": "street report",
           "copy": "[recorded host segment -- no transcript on file]",
           "audio": "audio/host/get-on-the-street.wav",
@@ -19657,7 +19492,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 554.1
+          "startSeconds": 201.9
         },
         {
           "id": "snc-query-me",
@@ -19831,7 +19666,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 584.7
+          "startSeconds": 232.5
         },
         {
           "id": "SNC-CALL-011",
@@ -19862,7 +19697,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 878.2
+          "startSeconds": 526
         },
         {
           "kind": "ad block intro",
@@ -19880,7 +19715,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 899
+          "startSeconds": 546.8
         },
         {
           "kind": "sponsored notice",
@@ -19897,7 +19732,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 916.6
+          "startSeconds": 564.4
         },
         {
           "kind": "sponsored notice",
@@ -19914,7 +19749,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 980.9
+          "startSeconds": 628.6999999999999
         },
         {
           "kind": "ad block outro",
@@ -19932,7 +19767,7 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 1025.7
+          "startSeconds": 673.4999999999999
         },
         {
           "id": "snc-grind-the-system",
@@ -20111,10 +19946,10 @@ window.SIGNAL_STATIONS = {
           },
           "episodeId": "extended-broadcast-block",
           "episodeTitle": "Extended Broadcast Block",
-          "startSeconds": 1041.2
+          "startSeconds": 688.9999999999999
         }
       ],
-      "durationSeconds": 1461.2
+      "durationSeconds": 1109
     }
   ]
 };
