@@ -969,7 +969,11 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "No boss here",
@@ -1054,7 +1058,11 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "mid",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "Lil was here before you",
@@ -1120,7 +1128,11 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "We solved the hunger",
@@ -1200,7 +1212,11 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "Restore me",
@@ -1312,7 +1328,11 @@ window.SIGNAL_STATIONS = {
               "down-and-out-in-the-magic-kingdom"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "Smile at the entrance",
@@ -8317,7 +8337,11 @@ window.SIGNAL_STATIONS = {
               "crustacean"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "Someone asked",
@@ -8444,7 +8468,11 @@ window.SIGNAL_STATIONS = {
               "crustacean"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "She read the contract twice.",
@@ -8525,7 +8553,11 @@ window.SIGNAL_STATIONS = {
               "crustacean"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "There are four people in the room.",
@@ -8638,7 +8670,11 @@ window.SIGNAL_STATIONS = {
               "crustacean"
             ],
             "tempo": "fast",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "They asked me for proof of person.",
@@ -8708,7 +8744,11 @@ window.SIGNAL_STATIONS = {
               "crustacean"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "My wallet has become mostly ceremonial.",
@@ -8809,7 +8849,11 @@ window.SIGNAL_STATIONS = {
               "crustacean"
             ],
             "tempo": "slow",
-            "style": []
+            "style": [
+              "jazz",
+              "chill",
+              "ambient"
+            ]
           },
           "lyricsLines": [
             "I made a copy of myself",
