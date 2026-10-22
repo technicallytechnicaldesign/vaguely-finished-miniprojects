@@ -1,0 +1,12 @@
+
+node_modules/
+*.md
+!README.md
+*.mdx
+*.rst
+
+node_modules/
+*.md
+!README.md
+*.mdx
+*.rst
